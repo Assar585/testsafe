@@ -30,8 +30,8 @@ WORKDIR /var/www
 # Copy existing application directory contents
 COPY . /var/www
 
-# Install dependencies
-RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs
+# Install dependencies (ignoring audit and platform reqs)
+RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs --no-audit
 
 # Setup storage and cache permissions
 RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache \
@@ -43,4 +43,4 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 
 # Expose port and start script
 EXPOSE 8080
-CMD service nginx start && php-fpm
+CMD service nginx start && php-fpm -g "daemon off;"
