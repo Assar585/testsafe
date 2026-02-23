@@ -17,6 +17,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Clear the database before import
+echo "Clearing existing tables...<br>";
+$conn->query("SET FOREIGN_KEY_CHECKS = 0;");
+if ($result = $conn->query("SHOW TABLES")) {
+    while ($row = $result->fetch_array()) {
+        $conn->query("DROP TABLE IF EXISTS `" . $row[0] . "`;");
+    }
+}
+$conn->query("SET FOREIGN_KEY_CHECKS = 1;");
+
 $filename = __DIR__ . '/shop.sql';
 
 if (!file_exists($filename)) {
