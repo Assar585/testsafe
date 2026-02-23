@@ -44,6 +44,7 @@ RUN mkdir -p storage/framework/sessions storage/framework/views storage/framewor
 
 # Setup Nginx config
 COPY docker/nginx.conf /etc/nginx/sites-available/default
+RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Expose port and start script
 EXPOSE 8080

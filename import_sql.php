@@ -17,7 +17,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$filename = __DIR__ . '/../shop.sql';
+$filename = __DIR__ . '/shop.sql';
 
 if (!file_exists($filename)) {
     die("Error: shop.sql not found at " . $filename);
