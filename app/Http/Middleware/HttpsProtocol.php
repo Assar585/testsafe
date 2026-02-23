@@ -4,7 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 
-class HttpsProtocol {
+class HttpsProtocol
+{
     /**
      * Handle an incoming request.
      *
@@ -14,7 +15,14 @@ class HttpsProtocol {
      */
     public function handle($request, Closure $next)
     {
-        if (env('FORCE_HTTPS') == "On" && !$request->secure()) {
+        $force = env('FORCE_HTTPS');
+        $isSecure = $request->secure();
+        $proto = $request->header('X-Forwarded-Proto');
+
+        // Log for debugging (will appear in railway logs)
+        error_log("HttpsProtocol DEBUG: FORCE_HTTPS=$force, isSecure=" . ($isSecure ? 'YES' : 'NO') . ", X-Forwarded-Proto=$proto");
+
+        if ($force == "On" && !$isSecure) {
             return redirect()->secure($request->getRequestUri());
         }
         return $next($request);
