@@ -17,51 +17,49 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Clear the database before import
-echo "Clearing existing tables...<br>";
-$conn->query("SET FOREIGN_KEY_CHECKS = 0;");
-if ($result = $conn->query("SHOW TABLES")) {
-    while ($row = $result->fetch_array()) {
-        $conn->query("DROP TABLE IF EXISTS `" . $row[0] . "`;");
-    }
-}
-$conn->query("SET FOREIGN_KEY_CHECKS = 1;");
-
 $filename = __DIR__ . '/shop.sql';
 
-if (!file_exists($filename)) {
-    die("Error: shop.sql not found at " . $filename);
-}
-
-echo "Reading shop.sql...<br>";
+// 1. Drop tables mentioned in the SQL file more aggressively
+echo "Scanning shop.sql for tables to drop...<br>";
 $sql = file_get_contents($filename);
-
 if ($sql === false) {
     die("Error: Could not read shop.sql");
 }
 
+preg_match_all("/CREATE TABLE `([^`]+)`/i", $sql, $matches);
+if (!empty($matches[1])) {
+    $conn->query("SET FOREIGN_KEY_CHECKS = 0;");
+    foreach (array_unique($matches[1]) as $tableName) {
+        if (!$conn->query("DROP TABLE IF EXISTS `$tableName`")) {
+            echo "Warning: Could not drop $tableName: " . $conn->error . "<br>";
+        }
+    }
+    $conn->query("SET FOREIGN_KEY_CHECKS = 1;");
+}
+
 echo "Executing SQL queries (Size: " . round(strlen($sql) / 1024 / 1024, 2) . " MB)...<br>";
 
-// Disable foreign key checks for the import
 $conn->query("SET FOREIGN_KEY_CHECKS = 0;");
+$conn->query("SET NAMES 'utf8mb4';");
 
-if ($conn->multi_query($sql)) {
-    $count = 0;
-    do {
-        $count++;
-        // Need to consume results
-        if ($result = $conn->store_result()) {
-            $result->free();
-        }
-    } while ($conn->next_result());
+// Use try-catch for PHP 8+ mysqli exceptions
+try {
+    if ($conn->multi_query($sql)) {
+        $count = 0;
+        do {
+            $count++;
+            if ($result = $conn->store_result()) {
+                $result->free();
+            }
+        } while ($conn->next_result());
 
-    if ($conn->error) {
-        echo "<br><b style='color:red;'>SQL Error during import:</b> " . $conn->error;
+        echo "<br><b style='color:green;'>SUCCESS: Data imported successfully!</b> ($count blocks processed)";
     } else {
-        echo "<br><b style='color:green;'>SUCCESS: Data imported successfully!</b> ($count queries processed)";
+        echo "<br><b style='color:red;'>Error:</b> " . $conn->error;
     }
-} else {
-    echo "<br><b style='color:red;'>Error executing multi-query:</b> " . $conn->error;
+} catch (mysqli_sql_exception $e) {
+    echo "<br><b style='color:red;'>Fatal Error during SQL execution:</b> " . $e->getMessage();
+    echo "<br><i>Check if the database user has sufficient permissions.</i>";
 }
 
 $conn->query("SET FOREIGN_KEY_CHECKS = 1;");
