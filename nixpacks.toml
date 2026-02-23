@@ -1,3 +1,4 @@
+# Nixpacks configuration
 [phases.setup]
 nixPkgs = ["php82", "php82Packages.composer", "nginx"]
 
@@ -10,9 +11,9 @@ cmds = [
     "chmod -R 775 storage bootstrap/cache"
 ]
 
-[start]
-cmd = "apachectl -D FOREGROUND" # Попробуем другой способ запуска или вернемся к переменным
-
 [variables]
 NIXPACKS_PHP_ROOT = "."
 NIXPACKS_PHP_FALLBACK_PATH = "/index.php"
+# Disable automatic Node.js detection/install if Railpack/Nixpacks tries it
+NIXPACKS_NO_NODEJS = "1"
+NODE_ENV = "production"
