@@ -1,4 +1,3 @@
-# Nixpacks configuration for Laravel with index.php in root
 [phases.setup]
 nixPkgs = ["php82", "php82Packages.composer", "nginx"]
 
@@ -11,6 +10,9 @@ cmds = [
     "chmod -R 775 storage bootstrap/cache"
 ]
 
+[start]
+cmd = "apachectl -D FOREGROUND" # Попробуем другой способ запуска или вернемся к переменным
+
 [variables]
-# Tell Nixpacks to use the root directory as the public web root
 NIXPACKS_PHP_ROOT = "."
+NIXPACKS_PHP_FALLBACK_PATH = "/index.php"
