@@ -20,11 +20,17 @@ class HttpsProtocol
         $proto = $request->header('X-Forwarded-Proto');
 
         // Log for debugging (will appear in railway logs)
-        error_log("HttpsProtocol DEBUG: FORCE_HTTPS=$force, isSecure=" . ($isSecure ? 'YES' : 'NO') . ", X-Forwarded-Proto=$proto");
+        error_log("HttpsProtocol DEBUG: URI=" . $request->getRequestUri() . ", isSecure=" . ($isSecure ? 'YES' : 'NO') . ", Proto=$proto");
 
         if ($force == "On" && !$isSecure) {
+            error_log("HttpsProtocol: REDIRECTING TO HTTPS");
             return redirect()->secure($request->getRequestUri());
         }
-        return $next($request);
+
+        $response = $next($request);
+        if ($response instanceof \Illuminate\Http\RedirectResponse) {
+            error_log("REDIRECT DETECTED to: " . $response->getTargetUrl());
+        }
+        return $response;
     }
 }
