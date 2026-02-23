@@ -22,7 +22,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www
@@ -30,8 +30,9 @@ WORKDIR /var/www
 # Copy existing application directory contents
 COPY . /var/www
 
-# Install dependencies (ignoring audit and platform reqs)
-RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs --no-audit
+# Install dependencies (ignoring audit and platform reqs via ENV if flag fails)
+ENV COMPOSER_NO_AUDIT=1
+RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs
 
 # Setup storage and cache permissions
 RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache \
@@ -43,4 +44,5 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 
 # Expose port and start script
 EXPOSE 8080
-CMD service nginx start && php-fpm -g "daemon off;"
+# Use a cleaner way to run both services
+CMD service nginx start && php-fpm
