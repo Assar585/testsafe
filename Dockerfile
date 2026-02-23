@@ -30,8 +30,11 @@ WORKDIR /var/www
 # Copy existing application directory contents
 COPY . /var/www
 
-# Install dependencies (ignoring audit and platform reqs via ENV if flag fails)
-ENV COMPOSER_NO_AUDIT=1
+# Disable Composer audit blocks
+RUN composer config audit.block-insecure false \
+    && composer config audit.abandoned ignore
+
+# Install dependencies (ignoring platform reqs)
 RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs
 
 # Setup storage and cache permissions
@@ -44,5 +47,4 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 
 # Expose port and start script
 EXPOSE 8080
-# Use a cleaner way to run both services
 CMD service nginx start && php-fpm
