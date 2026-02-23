@@ -1,0 +1,16 @@
+# Nixpacks configuration for Laravel with index.php in root
+[phases.setup]
+nixPkgs = ["php82", "php82Packages.composer", "nginx"]
+
+[phases.install]
+cmds = ["composer install --no-interaction --no-dev --optimize-autoloader"]
+
+[phases.build]
+cmds = [
+    "mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache",
+    "chmod -R 775 storage bootstrap/cache"
+]
+
+[variables]
+# Tell Nixpacks to use the root directory as the public web root
+NIXPACKS_PHP_ROOT = "."
