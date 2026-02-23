@@ -2,43 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::get('/test-me', function () {
-    return 'I am alive';
-});
 
-Route::get('/debug-homepage', function () {
-    try {
-        $val = \App\Models\BusinessSetting::where('type', 'homepage_select')->first();
-        $all = \App\Models\BusinessSetting::select('type', 'value')->take(10)->get();
-        return response()->json([
-            'homepage_select' => $val,
-            'sample_settings' => $all,
-        ]);
-    } catch (\Exception $e) {
-        return 'DB Error: ' . $e->getMessage();
-    }
-});
-
-Route::get('/fix-homepage', function () {
-    try {
-        $setting = \App\Models\BusinessSetting::where('type', 'homepage_select')->first();
-        if (!$setting) {
-            $setting = new \App\Models\BusinessSetting();
-            $setting->type = 'homepage_select';
-            $setting->value = 'home';
-            $setting->save();
-            return 'Created homepage_select = home';
-        } else {
-            $old = $setting->value;
-            $setting->value = 'home';
-            $setting->save();
-            \Cache::forget('business_settings');
-            return "Updated homepage_select from '$old' to 'home'";
-        }
-    } catch (\Exception $e) {
-        return 'Error: ' . $e->getMessage();
-    }
-});
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AizUploadController;
