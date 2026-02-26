@@ -72,7 +72,11 @@ class HomeController extends Controller
         }
 
 
-        $homepage = get_setting('homepage_select') ?: 'home';
+        $homepage = get_setting('homepage_select') ?: 'classic';
+        // Fallback to 'classic' if the configured homepage view doesn't exist
+        if (!view()->exists('frontend.' . $homepage . '.index')) {
+            $homepage = 'classic';
+        }
         return view('frontend.' . $homepage . '.index', compact('featured_categories', 'hot_categories', 'lang'));
     }
 

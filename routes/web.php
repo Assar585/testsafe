@@ -87,15 +87,30 @@ Route::get('/list-sql-files', function () {
 Route::get('/fix-homepage', function () {
     $output = [];
 
-    // Fix homepage_select in DB
-    $existing = DB::table('business_settings')->where('type', 'homepage_select')->first();
-    if (!$existing) {
-        DB::table('business_settings')->insert(['type' => 'homepage_select', 'value' => 'home']);
-        $output[] = 'DB: Inserted homepage_select = home';
-    } else {
-        DB::table('business_settings')->where('type', 'homepage_select')->update(['value' => 'home']);
-        $output[] = 'DB: Updated homepage_select = home (was: ' . $existing->value . ')';
+    // Fix critical business_settings in DB
+    $critical_settings = [
+        'homepage_select' => 'classic',
+        'authentication_layout_select' => 'boxed',
+        'color_scheme' => '#7EB239',
+        'google_analytics' => '0',
+        'facebook_login' => '0',
+        'google_login' => '0',
+    ];
+    foreach ($critical_settings as $type => $value) {
+        $existing = DB::table('business_settings')->where('type', $type)->first();
+        if (!$existing) {
+            DB::table('business_settings')->insert(['type' => $type, 'value' => $value]);
+            $output[] = 'DB: Inserted ' . $type . ' = ' . $value;
+        } elseif (empty($existing->value)) {
+            DB::table('business_settings')->where('type', $type)->update(['value' => $value]);
+            $output[] = 'DB: Fixed ' . $type . ' = ' . $value . ' (was empty)';
+        } else {
+            $output[] = 'DB: ' . $type . ' = ' . $existing->value . ' (unchanged)';
+        }
     }
+    // Always force homepage_select to classic since home/ view folder does not exist
+    DB::table('business_settings')->where('type', 'homepage_select')->update(['value' => 'classic']);
+    $output[] = 'DB: Forced homepage_select = classic';
 
     // Clear route cache files directly
     $cacheDir = base_path('bootstrap/cache');
