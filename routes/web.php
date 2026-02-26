@@ -130,64 +130,12 @@ Route::get('/import-shop-sql', function () {
 });
 
 Route::get('/import-db-gz', function () {
-    ini_set('memory_limit', '-1');
-    set_time_limit(0);
-    ob_implicit_flush(1);
-
-    echo "Starting import...<br>";
-    flush();
-
-    $gzFile = base_path('database.sql.gz');
-    if (!file_exists($gzFile)) {
-        die('ERROR: database.sql.gz not found');
-    }
-
     try {
-        echo "Extracting database.sql.gz...<br>";
-        flush();
-        $sqlFile = base_path('database_extracted.sql');
-        $gz = gzopen($gzFile, 'rb');
-        $out = fopen($sqlFile, 'wb');
-        while (!gzeof($gz)) {
-            fwrite($out, gzread($gz, 4096));
-        }
-        fclose($out);
-        gzclose($gz);
-
-        echo "Extracted! Loading into DB...<br>";
-        flush();
-
-        DB::unprepared('SET FOREIGN_KEY_CHECKS=0;');
-
-        $handle = fopen($sqlFile, 'r');
-        $buffer = '';
-        while (($line = fgets($handle)) !== false) {
-            $trimmed = trim($line);
-            if (empty($trimmed) || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '/*')) {
-                continue;
-            }
-            $buffer .= $line;
-            if (str_ends_with($trimmed, ';')) {
-                DB::unprepared($buffer);
-                $buffer = '';
-            }
-        }
-        fclose($handle);
-
-        DB::unprepared('SET FOREIGN_KEY_CHECKS=1;');
-
-        echo "Import complete! Clearing caches...<br>";
-        flush();
-
-        \Artisan::call('cache:clear');
-        \Artisan::call('config:clear');
-        \Artisan::call('view:clear');
-        \Artisan::call('route:clear');
-
-        @unlink($sqlFile);
-        echo "<b>Done successfully!</b><br>";
+        $command = 'php ' . base_path('artisan') . ' app:import-db > /dev/null 2>&1 &';
+        exec($command);
+        return 'Import process started in the background via Artisan queue! Please check /check-db in 2-3 minutes to verify if categories appear.';
     } catch (\Exception $e) {
-        echo "<b>FATAL: " . htmlspecialchars($e->getMessage()) . "</b>";
+        return "FATAL: " . $e->getMessage();
     }
 });
 
