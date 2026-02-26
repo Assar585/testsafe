@@ -130,16 +130,21 @@ Route::get('/import-shop-sql', function () {
 });
 
 Route::get('/import-db-gz', function () {
+    ini_set('memory_limit', '-1');
+    set_time_limit(0);
+    ob_implicit_flush(1);
+
+    echo "Starting import...<br>";
+    flush();
+
     $gzFile = base_path('database.sql.gz');
     if (!file_exists($gzFile)) {
-        return 'ERROR: database.sql.gz not found at ' . $gzFile;
+        die('ERROR: database.sql.gz not found');
     }
 
-    $output = [];
-    $output[] = 'Found database.sql.gz (' . number_format(filesize($gzFile)) . ' bytes)';
-
     try {
-        // Unzip the file
+        echo "Extracting database.sql.gz...<br>";
+        flush();
         $sqlFile = base_path('database_extracted.sql');
         $gz = gzopen($gzFile, 'rb');
         $out = fopen($sqlFile, 'wb');
@@ -149,48 +154,41 @@ Route::get('/import-db-gz', function () {
         fclose($out);
         gzclose($gz);
 
-        $output[] = 'Extracted to database_extracted.sql (' . number_format(filesize($sqlFile)) . ' bytes)';
+        echo "Extracted! Loading into DB...<br>";
+        flush();
 
-        // Read and split SQL into individual statements
-        $sql = file_get_contents($sqlFile);
-        // Remove comments
-        $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
-        $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
-        // Split by semicolons
-        $statements = array_filter(array_map('trim', explode(';', $sql)));
+        DB::unprepared('SET FOREIGN_KEY_CHECKS=0;');
 
-        $success = 0;
-        $errors = 0;
-        foreach ($statements as $statement) {
-            if (empty($statement) || strlen($statement) < 3)
+        $handle = fopen($sqlFile, 'r');
+        $buffer = '';
+        while (($line = fgets($handle)) !== false) {
+            $trimmed = trim($line);
+            if (empty($trimmed) || str_starts_with($trimmed, '--') || str_starts_with($trimmed, '/*')) {
                 continue;
-            try {
-                // If it's pure schema creation, you might have duplicate table errors, but standard sql dumps usually have DROP TABLE IF EXISTS.
-                DB::unprepared($statement);
-                $success++;
-            } catch (\Exception $e) {
-                $errors++;
-                if ($errors <= 20) {
-                    $output[] = 'Error: ' . substr($e->getMessage(), 0, 200);
-                }
+            }
+            $buffer .= $line;
+            if (str_ends_with($trimmed, ';')) {
+                DB::unprepared($buffer);
+                $buffer = '';
             }
         }
-        $output[] = "Done! Success: {$success}, Errors: {$errors}";
+        fclose($handle);
 
-        // Clear all caches after import
+        DB::unprepared('SET FOREIGN_KEY_CHECKS=1;');
+
+        echo "Import complete! Clearing caches...<br>";
+        flush();
+
         \Artisan::call('cache:clear');
         \Artisan::call('config:clear');
         \Artisan::call('view:clear');
         \Artisan::call('route:clear');
-        $output[] = 'All caches cleared.';
 
-        // Clean up extracted file
-        unlink($sqlFile);
+        @unlink($sqlFile);
+        echo "<b>Done successfully!</b><br>";
     } catch (\Exception $e) {
-        $output[] = 'FATAL: ' . $e->getMessage();
+        echo "<b>FATAL: " . htmlspecialchars($e->getMessage()) . "</b>";
     }
-
-    return implode('<br>', $output);
 });
 
 Route::get('/check-db', function () {
@@ -214,7 +212,7 @@ Route::get('/check-db', function () {
                 $output[] = "Currency ID {$c->id}: {$c->name} ({$c->code}) - Status: {$c->status}";
             }
         }
-        
+
         if (Schema::hasTable('categories')) {
             $categories = DB::table('categories')->get();
             $output[] = "Total categories: " . count($categories);
