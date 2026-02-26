@@ -39,8 +39,11 @@ RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-pl
 
 # Setup storage and cache permissions
 RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache \
-    && chmod -R 775 storage bootstrap/cache \
-    && chown -R www-data:www-data /var/www
+    && mkdir -p /var/www/public/assets \
+    && chmod -R 775 storage bootstrap/cache public \
+    && chown -R www-data:www-data /var/www \
+    && echo "=== /var/www/public contents ===" \
+    && ls -la /var/www/public/ || echo "WARNING: /var/www/public does not exist!"
 
 # Setup Nginx config
 COPY docker/nginx.conf /etc/nginx/sites-available/default
