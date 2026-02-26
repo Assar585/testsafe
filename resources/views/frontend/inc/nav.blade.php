@@ -5,25 +5,25 @@
     $top_banner_image = get_setting('top_banner_image');
     $top_banner_image_for_tabs = get_setting('top_banner_image_for_tabs');
     $top_banner_image_for_mobile = get_setting('top_banner_image_for_mobile');
-    $topBanners = \App\Models\TopBanner::where('status', 1)->orderBy('id','desc')->get();
-@endphp 
-    @if (count($topBanners) > 0 || $top_banner_image != null)
-    <div class="position-relative top-banner removable-session z-1035 d-none" 
-         data-key="top-banner" data-value="removed" style="background-color: {{ $top_banner_background_color }}">
+    $topBanners = \App\Models\TopBanner::where('status', 1)->orderBy('id', 'desc')->get();
+@endphp
+@if (count($topBanners) > 0 || $top_banner_image != null)
+    <div class="position-relative top-banner removable-session z-1035 d-none" data-key="top-banner" data-value="removed"
+        style="background-color: {{ $top_banner_background_color }}">
         <div class="d-block text-reset h-40px h-lg-60px position-relative overflow-hidden">
 
             @if($top_banner_image != null)
-            <!-- For Large device -->
-            <img src="{{ uploaded_asset($top_banner_image)  }}"
-                class="d-none d-xl-block img-fit h-100 w-100" alt="{{ translate('top_banner') }}">
+                <!-- For Large device -->
+                <img src="{{ uploaded_asset($top_banner_image)  }}" class="d-none d-xl-block img-fit h-100 w-100"
+                    alt="{{ translate('top_banner') }}">
 
-            <!-- For Medium device -->
-            <img src="{{ uploaded_asset($top_banner_image_for_tabs ?? $top_banner_image)  }}"
-                class="d-none d-md-block d-xl-none img-fit h-100 w-100" alt="{{ translate('top_banner') }}">
+                <!-- For Medium device -->
+                <img src="{{ uploaded_asset($top_banner_image_for_tabs ?? $top_banner_image)  }}"
+                    class="d-none d-md-block d-xl-none img-fit h-100 w-100" alt="{{ translate('top_banner') }}">
 
-            <!-- For Small device -->
-            <img src="{{ uploaded_asset($top_banner_image_for_mobile ?? $top_banner_image) }}"
-                class="d-md-none img-fit h-100 w-100" alt="{{ translate('top_banner') }}">
+                <!-- For Small device -->
+                <img src="{{ uploaded_asset($top_banner_image_for_mobile ?? $top_banner_image) }}"
+                    class="d-md-none img-fit h-100 w-100" alt="{{ translate('top_banner') }}">
             @endif
 
             <!-- Scroll Text -->
@@ -42,14 +42,19 @@
                 </div>
             </div>
         </div>
-        <button class="btn text-white h-100 absolute-top-right set-session" 
-            data-key="top-banner" data-value="removed"
+        <button class="btn text-white h-100 absolute-top-right set-session" data-key="top-banner" data-value="removed"
             data-toggle="remove-parent" data-parent=".top-banner">
             <i style="color: {{$top_banner_text_color}};" class="la la-close la-2x"></i>
         </button>
     </div>
-    @endif
-	@include('header.' .get_element_type_by_id(get_setting('header_element')))
+@endif
+@php
+    $header_name = get_element_type_by_id(get_setting('header_element'));
+    if (empty($header_name)) {
+        $header_name = 'header1';
+    }
+@endphp
+@include('header.' . $header_name)
 <!-- Top Menu Sidebar -->
 <div class="aiz-top-menu-sidebar collapse-sidebar-wrap sidebar-xl sidebar-left d-lg-none z-1035">
     <div class="overlay overlay-fixed dark c-pointer" data-toggle="class-toggle" data-target=".aiz-top-menu-sidebar"
@@ -93,7 +98,7 @@
                 <a href="{{ route('user.registration') }}"
                     class="text-reset opacity-60 hov-opacity-100 hov-text-primary fs-12 d-inline-block py-2 pl-2">{{ translate('Registration') }}</a>
             </span>
-            
+
         @endauth
         <hr>
         <ul class="mb-0 pl-3 pb-3 h-100">
@@ -102,7 +107,7 @@
                     <li class="mr-0">
                         <a href="{{ json_decode(get_setting('header_menu_links'), true)[$key] }}"
                             class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                    @if (url()->current() == json_decode(get_setting('header_menu_links'), true)[$key]) active @endif">
+                                            @if (url()->current() == json_decode(get_setting('header_menu_links'), true)[$key]) active @endif">
                             {{ translate($value) }}
                         </a>
                     </li>
@@ -121,7 +126,7 @@
                     <hr>
                     <li class="mr-0">
                         <a href="{{ route('dashboard') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                        {{ areActiveRoutes(['dashboard'], ' active') }}">
+                                                {{ areActiveRoutes(['dashboard'], ' active') }}">
                             {{ translate('My Account') }}
                         </a>
                     </li>
@@ -129,19 +134,19 @@
                 @if (isCustomer())
                     <li class="mr-0">
                         <a href="{{ route('customer.all-notifications') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                        {{ areActiveRoutes(['customer.all-notifications'], ' active') }}">
+                                                {{ areActiveRoutes(['customer.all-notifications'], ' active') }}">
                             {{ translate('Notifications') }}
                         </a>
                     </li>
                     <li class="mr-0">
                         <a href="{{ route('wishlists.index') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                        {{ areActiveRoutes(['wishlists.index'], ' active') }}">
+                                                {{ areActiveRoutes(['wishlists.index'], ' active') }}">
                             {{ translate('Wishlist') }}
                         </a>
                     </li>
                     <li class="mr-0">
                         <a href="{{ route('compare') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                        {{ areActiveRoutes(['compare'], ' active') }}">
+                                                {{ areActiveRoutes(['compare'], ' active') }}">
                             {{ translate('Compare') }}
                         </a>
                     </li>
