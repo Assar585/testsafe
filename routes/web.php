@@ -84,6 +84,19 @@ Route::get('/list-sql-files', function () {
     return glob(base_path('sqlupdates/*.sql'));
 });
 
+Route::get('/debug-paths', function () {
+    $info = [];
+    $info['base_path'] = base_path();
+    $info['public_path'] = public_path();
+    $info['base_path_exists'] = file_exists(base_path('index.php')) ? 'yes' : 'no';
+    $info['public_path_contents'] = scandir(public_path()) ?: 'FAILED';
+    $info['public_assets_exists'] = file_exists(public_path('assets')) ? 'yes' : 'no';
+    $info['public_assets_contents'] = is_dir(public_path('assets')) ? scandir(public_path('assets')) : 'NOT A DIR';
+    $info['asset_url'] = asset('assets/css/vendors.css');
+    $info['my_asset_url'] = my_asset('assets/css/vendors.css');
+    return response()->json($info, 200, [], JSON_PRETTY_PRINT);
+});
+
 Route::get('/fix-homepage', function () {
     $output = [];
 
