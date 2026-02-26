@@ -129,6 +129,70 @@ Route::get('/import-shop-sql', function () {
     return implode('<br>', $output);
 });
 
+Route::get('/import-db-gz', function () {
+    $gzFile = base_path('database.sql.gz');
+    if (!file_exists($gzFile)) {
+        return 'ERROR: database.sql.gz not found at ' . $gzFile;
+    }
+
+    $output = [];
+    $output[] = 'Found database.sql.gz (' . number_format(filesize($gzFile)) . ' bytes)';
+
+    try {
+        // Unzip the file
+        $sqlFile = base_path('database_extracted.sql');
+        $gz = gzopen($gzFile, 'rb');
+        $out = fopen($sqlFile, 'wb');
+        while (!gzeof($gz)) {
+            fwrite($out, gzread($gz, 4096));
+        }
+        fclose($out);
+        gzclose($gz);
+
+        $output[] = 'Extracted to database_extracted.sql (' . number_format(filesize($sqlFile)) . ' bytes)';
+
+        // Read and split SQL into individual statements
+        $sql = file_get_contents($sqlFile);
+        // Remove comments
+        $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
+        $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+        // Split by semicolons
+        $statements = array_filter(array_map('trim', explode(';', $sql)));
+
+        $success = 0;
+        $errors = 0;
+        foreach ($statements as $statement) {
+            if (empty($statement) || strlen($statement) < 3)
+                continue;
+            try {
+                // If it's pure schema creation, you might have duplicate table errors, but standard sql dumps usually have DROP TABLE IF EXISTS.
+                DB::unprepared($statement);
+                $success++;
+            } catch (\Exception $e) {
+                $errors++;
+                if ($errors <= 20) {
+                    $output[] = 'Error: ' . substr($e->getMessage(), 0, 200);
+                }
+            }
+        }
+        $output[] = "Done! Success: {$success}, Errors: {$errors}";
+
+        // Clear all caches after import
+        \Artisan::call('cache:clear');
+        \Artisan::call('config:clear');
+        \Artisan::call('view:clear');
+        \Artisan::call('route:clear');
+        $output[] = 'All caches cleared.';
+
+        // Clean up extracted file
+        unlink($sqlFile);
+    } catch (\Exception $e) {
+        $output[] = 'FATAL: ' . $e->getMessage();
+    }
+
+    return implode('<br>', $output);
+});
+
 Route::get('/debug-paths', function () {
     $info = [];
     $info['base_path'] = base_path();
