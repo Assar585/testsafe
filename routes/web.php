@@ -225,6 +225,25 @@ Route::get('/debug-paths', function () {
     return response()->json($info, 200, [], JSON_PRETTY_PRINT);
 });
 
+Route::get('/show-log', function () {
+    $log = storage_path('logs/laravel.log');
+    if (!file_exists($log))
+        return 'No log file';
+
+    // get last 50 lines
+    $lines = file($log);
+    $last_lines = array_slice($lines, -50);
+    return implode('<br>', htmlspecialchars_array($last_lines));
+});
+
+function htmlspecialchars_array($arr)
+{
+    foreach ($arr as &$val) {
+        $val = htmlspecialchars($val);
+    }
+    return $arr;
+}
+
 Route::get('/fix-homepage', function () {
     $output = [];
 
