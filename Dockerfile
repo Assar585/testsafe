@@ -52,6 +52,10 @@ RUN php artisan route:clear \
     && php artisan view:clear \
     || true
 
-# Expose port and start script
+# Copy startup script
+COPY docker/start.sh /start.sh
+RUN chmod +x /start.sh
+
+# Expose port and start via script
 EXPOSE 8080
-CMD service nginx start && php-fpm
+CMD ["/start.sh"]
