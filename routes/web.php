@@ -233,16 +233,9 @@ Route::get('/show-log', function () {
     // get last 50 lines
     $lines = file($log);
     $last_lines = array_slice($lines, -50);
-    return implode('<br>', htmlspecialchars_array($last_lines));
+    $escaped = array_map('htmlspecialchars', $last_lines);
+    return implode('<br>', $escaped);
 });
-
-function htmlspecialchars_array($arr)
-{
-    foreach ($arr as &$val) {
-        $val = htmlspecialchars($val);
-    }
-    return $arr;
-}
 
 Route::get('/fix-homepage', function () {
     $output = [];
