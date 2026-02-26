@@ -138,11 +138,13 @@ $flash_deal = get_featured_flash_deal();
                                 <!-- Image -->
                                 <div class="d-block h-100 position-relative image-hover-effect">
                                     <img class="lazyload h-60px h-md-100px h-lg-140px mw-100 mx-auto has-transition product-main-image"
-                                        src="{{ get_image($flash_deal_product->product->thumbnail) }}"
+                                        src="{{ static_asset('assets/img/placeholder.jpg') }}"
+                                        data-src="{{ get_image($flash_deal_product->product->thumbnail) }}"
                                         alt="{{ $flash_deal_product->product->getTranslation('name') }}"
                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                     <img class="lazyload h-60px h-md-100px h-lg-140px w-100 mx-auto has-transition product-hover-image position-absolute"
-                                        src="{{ get_first_product_image($flash_deal_product->product->thumbnail, $flash_deal_product->product->photos) }}"
+                                        src="{{ static_asset('assets/img/placeholder.jpg') }}"
+                                        data-src="{{ get_first_product_image($flash_deal_product->product->thumbnail, $flash_deal_product->product->photos) }}"
                                         alt="{{ $flash_deal_product->product->getTranslation('name') }}"
                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
                                 </div>
