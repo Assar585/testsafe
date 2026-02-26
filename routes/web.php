@@ -240,6 +240,23 @@ Route::get('/show-log', function () {
 Route::get('/fix-homepage', function () {
     $output = [];
 
+    // Ensure currency exists
+    $currencyCount = DB::table('currencies')->count();
+    if ($currencyCount == 0) {
+        $currencyId = DB::table('currencies')->insertGetId([
+            'name' => 'US Dollar',
+            'symbol' => '$',
+            'code' => 'USD',
+            'exchange_rate' => 1,
+            'status' => 1,
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+        $output[] = 'DB: Inserted default USD currency with ID ' . $currencyId;
+    } else {
+        $currencyId = DB::table('currencies')->first()->id;
+    }
+
     // Fix critical business_settings in DB
     $critical_settings = [
         'homepage_select' => 'classic',
@@ -248,17 +265,17 @@ Route::get('/fix-homepage', function () {
         'google_analytics' => '0',
         'facebook_login' => '0',
         'google_login' => '0',
+        'system_default_currency' => $currencyId,
+        'home_default_currency' => $currencyId
     ];
     foreach ($critical_settings as $type => $value) {
         $existing = DB::table('business_settings')->where('type', $type)->first();
         if (!$existing) {
             DB::table('business_settings')->insert(['type' => $type, 'value' => $value]);
             $output[] = 'DB: Inserted ' . $type . ' = ' . $value;
-        } elseif (empty($existing->value)) {
-            DB::table('business_settings')->where('type', $type)->update(['value' => $value]);
-            $output[] = 'DB: Fixed ' . $type . ' = ' . $value . ' (was empty)';
         } else {
-            $output[] = 'DB: ' . $type . ' = ' . $existing->value . ' (unchanged)';
+            DB::table('business_settings')->where('type', $type)->update(['value' => $value]);
+            $output[] = 'DB: Fixed ' . $type . ' = ' . $value;
         }
     }
     // Always force homepage_select to classic since home/ view folder does not exist
