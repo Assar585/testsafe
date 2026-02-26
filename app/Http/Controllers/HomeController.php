@@ -72,7 +72,8 @@ class HomeController extends Controller
         }
 
 
-        return view('frontend.' . get_setting('homepage_select') . '.index', compact('featured_categories', 'hot_categories', 'lang'));
+        $homepage = get_setting('homepage_select') ?: 'home';
+        return view('frontend.' . $homepage . '.index', compact('featured_categories', 'hot_categories', 'lang'));
     }
 
     public function load_todays_deal_section()

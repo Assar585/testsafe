@@ -84,6 +84,17 @@ Route::get('/list-sql-files', function () {
     return glob(base_path('sqlupdates/*.sql'));
 });
 
+Route::get('/fix-homepage', function () {
+    $existing = DB::table('business_settings')->where('type', 'homepage_select')->first();
+    if (!$existing) {
+        DB::table('business_settings')->insert(['type' => 'homepage_select', 'value' => 'home']);
+        return 'Inserted homepage_select = home';
+    } else {
+        DB::table('business_settings')->where('type', 'homepage_select')->update(['value' => 'home']);
+        return 'Updated homepage_select = home (was: ' . $existing->value . ')';
+    }
+});
+
 Route::get('/run-sql-updates', function () {
     $files = glob(base_path('sqlupdates/*.sql'));
     natsort($files);
