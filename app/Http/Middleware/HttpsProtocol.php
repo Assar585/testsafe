@@ -15,10 +15,10 @@ class HttpsProtocol
      */
     public function handle($request, Closure $next)
     {
-        if (env('FORCE_HTTPS') == "On" && !$request->secure()) {
-            return redirect()->secure($request->getRequestUri());
-        }
-
+        // HTTPS redirect disabled - Railway handles HTTPS at the proxy level
+        // Previously this created a redirect loop because Railway proxies HTTPS
+        // but internal Nginx connection is HTTP, causing isSecure() = false even
+        // after TrustProxies = '*' was set.
         return $next($request);
     }
 }
