@@ -214,12 +214,19 @@ Route::get('/check-db', function () {
                 $output[] = "Currency ID {$c->id}: {$c->name} ({$c->code}) - Status: {$c->status}";
             }
         }
+        
+        if (Schema::hasTable('categories')) {
+            $categories = DB::table('categories')->get();
+            $output[] = "Total categories: " . count($categories);
+            foreach ($categories->take(10) as $c) {
+                $output[] = "Category ID {$c->id}: " . htmlspecialchars($c->name);
+            }
+        }
     } catch (\Exception $e) {
         $output[] = "Error: " . $e->getMessage();
     }
     return implode('<br>', $output);
 });
-
 Route::get('/debug-paths', function () {
     $info = [];
     $info['base_path'] = base_path();
