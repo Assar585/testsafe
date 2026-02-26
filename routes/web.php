@@ -84,6 +84,14 @@ Route::get('/list-sql-files', function () {
     return glob(base_path('sqlupdates/*.sql'));
 });
 
+Route::get('/clear-cache', function () {
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('config:clear');
+    \Illuminate\Support\Facades\Artisan::call('view:clear');
+    return '✅ Cache cleared successfully! You can now go back to admin and save your settings again.';
+});
+
+
 Route::get('/import-shop-sql', function () {
     $sqlFile = base_path('shop.sql');
     if (!file_exists($sqlFile)) {
