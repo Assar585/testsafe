@@ -85,14 +85,55 @@ Route::get('/list-sql-files', function () {
 });
 
 Route::get('/fix-homepage', function () {
+    $output = [];
+
+    // Fix homepage_select in DB
     $existing = DB::table('business_settings')->where('type', 'homepage_select')->first();
     if (!$existing) {
         DB::table('business_settings')->insert(['type' => 'homepage_select', 'value' => 'home']);
-        return 'Inserted homepage_select = home';
+        $output[] = 'DB: Inserted homepage_select = home';
     } else {
         DB::table('business_settings')->where('type', 'homepage_select')->update(['value' => 'home']);
-        return 'Updated homepage_select = home (was: ' . $existing->value . ')';
+        $output[] = 'DB: Updated homepage_select = home (was: ' . $existing->value . ')';
     }
+
+    // Clear route cache files directly
+    $cacheDir = base_path('bootstrap/cache');
+    $cacheFiles = glob($cacheDir . '/*.php');
+    foreach ($cacheFiles as $file) {
+        if (basename($file) !== '.gitignore') {
+            @unlink($file);
+            $output[] = 'Deleted cache: ' . basename($file);
+        }
+    }
+
+    // Clear Laravel caches via Artisan
+    try {
+        Artisan::call('route:clear');
+        $output[] = 'route:clear OK';
+    } catch (\Exception $e) {
+        $output[] = 'route:clear error: ' . $e->getMessage();
+    }
+    try {
+        Artisan::call('config:clear');
+        $output[] = 'config:clear OK';
+    } catch (\Exception $e) {
+        $output[] = 'config:clear error: ' . $e->getMessage();
+    }
+    try {
+        Artisan::call('view:clear');
+        $output[] = 'view:clear OK';
+    } catch (\Exception $e) {
+        $output[] = 'view:clear error: ' . $e->getMessage();
+    }
+    try {
+        Artisan::call('cache:clear');
+        $output[] = 'cache:clear OK';
+    } catch (\Exception $e) {
+        $output[] = 'cache:clear error: ' . $e->getMessage();
+    }
+
+    return implode('<br>', $output) . '<br><b>Done! Refresh the homepage now.</b>';
 });
 
 Route::get('/run-sql-updates', function () {
