@@ -193,6 +193,25 @@ Route::get('/import-db-gz', function () {
     return implode('<br>', $output);
 });
 
+Route::get('/check-db', function () {
+    $output = [];
+    try {
+        $tables = DB::select('SHOW TABLES');
+        $output[] = "Total tables: " . count($tables);
+
+        if (Schema::hasTable('business_settings')) {
+            $settings = DB::table('business_settings')->whereIn('type', ['system_default_currency', 'home_default_currency', 'homepage_select', 'authentication_layout_select'])->get();
+            $output[] = "Settings:";
+            foreach ($settings as $s) {
+                $output[] = $s->type . " = " . $s->value;
+            }
+        }
+    } catch (\Exception $e) {
+        $output[] = "Error: " . $e->getMessage();
+    }
+    return implode('<br>', $output);
+});
+
 Route::get('/debug-paths', function () {
     $info = [];
     $info['base_path'] = base_path();
