@@ -46,6 +46,12 @@ RUN mkdir -p storage/framework/sessions storage/framework/views storage/framewor
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
+# Clear all Laravel caches (route, config, view) built into the image
+RUN php artisan route:clear \
+    && php artisan config:clear \
+    && php artisan view:clear \
+    || true
+
 # Expose port and start script
 EXPOSE 8080
 CMD service nginx start && php-fpm

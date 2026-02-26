@@ -34,4 +34,5 @@ install.zip
 public/uploads.zip
 .env
 public/all
+/bootstrap/cache/*.php
 
