@@ -84,6 +84,51 @@ Route::get('/list-sql-files', function () {
     return glob(base_path('sqlupdates/*.sql'));
 });
 
+Route::get('/import-shop-sql', function () {
+    $sqlFile = base_path('shop.sql');
+    if (!file_exists($sqlFile)) {
+        return 'ERROR: shop.sql not found at ' . $sqlFile;
+    }
+
+    $output = [];
+    $output[] = 'Found shop.sql (' . number_format(filesize($sqlFile)) . ' bytes)';
+
+    try {
+        // Read and split SQL into individual statements
+        $sql = file_get_contents($sqlFile);
+        // Remove comments
+        $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
+        $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+        // Split by semicolons
+        $statements = array_filter(array_map('trim', explode(';', $sql)));
+
+        $success = 0;
+        $errors = 0;
+        foreach ($statements as $statement) {
+            if (empty($statement) || strlen($statement) < 3)
+                continue;
+            try {
+                DB::statement($statement);
+                $success++;
+            } catch (\Exception $e) {
+                $errors++;
+                if ($errors <= 10) {
+                    $output[] = 'Error: ' . substr($e->getMessage(), 0, 200);
+                }
+            }
+        }
+        $output[] = "Done! Success: {$success}, Errors: {$errors}";
+
+        // Clear all caches after import
+        Cache::flush();
+        $output[] = 'Cache cleared.';
+    } catch (\Exception $e) {
+        $output[] = 'FATAL: ' . $e->getMessage();
+    }
+
+    return implode('<br>', $output);
+});
+
 Route::get('/debug-paths', function () {
     $info = [];
     $info['base_path'] = base_path();
