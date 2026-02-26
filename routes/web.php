@@ -206,6 +206,14 @@ Route::get('/check-db', function () {
                 $output[] = $s->type . " = " . $s->value;
             }
         }
+
+        if (Schema::hasTable('currencies')) {
+            $currencies = DB::table('currencies')->get();
+            $output[] = "Total currencies: " . count($currencies);
+            foreach ($currencies as $c) {
+                $output[] = "Currency ID {$c->id}: {$c->name} ({$c->code}) - Status: {$c->status}";
+            }
+        }
     } catch (\Exception $e) {
         $output[] = "Error: " . $e->getMessage();
     }
