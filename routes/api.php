@@ -248,30 +248,30 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
 
     Route::get('seller/top', 'App\Http\Controllers\Api\V2\SellerController@topSellers');
 
-    Route::apiResource('banners', 'App\Http\Controllers\Api\V2\BannerController')->only('index');
+    Route::get('banners', 'App\Http\Controllers\Api\V2\BannerController@index')->name('api.banners.index');
 
     Route::get('brands/top', 'App\Http\Controllers\Api\V2\BrandController@top');
     Route::get('all-brands', [ProductController::class, 'getBrands'])->name('allBrands');
-    Route::apiResource('brands', 'App\Http\Controllers\Api\V2\BrandController')->only('index');
+    Route::get('brands', 'App\Http\Controllers\Api\V2\BrandController@index')->name('api.brands.index');
 
-    Route::apiResource('business-settings', 'App\Http\Controllers\Api\V2\BusinessSettingController')->only('index');
+    Route::get('business-settings', 'App\Http\Controllers\Api\V2\BusinessSettingController@index')->name('api.business-settings.index');
 
     Route::get('category/info/{slug}', 'App\Http\Controllers\Api\V2\CategoryController@info');
     Route::get('categories/featured', 'App\Http\Controllers\Api\V2\CategoryController@featured');
     Route::get('categories/home', 'App\Http\Controllers\Api\V2\CategoryController@home');
     Route::get('categories/top', 'App\Http\Controllers\Api\V2\CategoryController@top');
-    Route::apiResource('categories', 'App\Http\Controllers\Api\V2\CategoryController')->only('index');
+    Route::get('categories', 'App\Http\Controllers\Api\V2\CategoryController@index')->name('api.categories.index');
     Route::get('sub-categories/{id}', 'App\Http\Controllers\Api\V2\SubCategoryController@index')->name('subCategories.index');
 
-    Route::apiResource('colors', 'App\Http\Controllers\Api\V2\ColorController')->only('index');
+    Route::get('colors', 'App\Http\Controllers\Api\V2\ColorController@index')->name('api.colors.index');
 
-    Route::apiResource('currencies', 'App\Http\Controllers\Api\V2\CurrencyController')->only('index');
+    Route::get('currencies', 'App\Http\Controllers\Api\V2\CurrencyController@index')->name('api.currencies.index');
 
-    Route::apiResource('customers', 'App\Http\Controllers\Api\V2\CustomerController')->only('show');
+    Route::get('customers/{customer}', 'App\Http\Controllers\Api\V2\CustomerController@show')->name('api.customers.show');
 
-    Route::apiResource('general-settings', 'App\Http\Controllers\Api\V2\GeneralSettingController')->only('index');
+    Route::get('general-settings', 'App\Http\Controllers\Api\V2\GeneralSettingController@index')->name('api.general-settings.index');
 
-    Route::apiResource('home-categories', 'App\Http\Controllers\Api\V2\HomeCategoryController')->only('index');
+    Route::get('home-categories', 'App\Http\Controllers\Api\V2\HomeCategoryController@index')->name('api.home-categories.index');
 
 
 
