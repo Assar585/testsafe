@@ -52,9 +52,8 @@ RUN mkdir -p storage/framework/sessions storage/framework/views storage/framewor
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Generate optimal Laravel caches (route, config, view) built into the image
+# Generate optimal Laravel caches (config, view) built into the image
 RUN php artisan config:cache \
-    && php artisan route:cache \
     && php artisan view:cache \
     || true
 

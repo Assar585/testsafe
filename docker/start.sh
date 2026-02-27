@@ -4,7 +4,6 @@ set -e
 # Pre-warm Laravel caches for production on container boot
 echo "Building Laravel caches..."
 php /var/www/artisan config:cache
-php /var/www/artisan route:cache
 php /var/www/artisan view:cache
 echo "Caches built."
 # Start Nginx
