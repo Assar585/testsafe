@@ -51,7 +51,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
     Route::controller(ProductBulkUploadController::class)->group(function () {
         Route::get('/product-bulk-upload/index', 'index')->name('product_bulk_upload.index');
         Route::post('/product-bulk-upload/store', 'bulk_upload')->name('bulk_product_upload');
-        Route::group(['prefix' => 'bulk-upload/download'], function() {
+        Route::group(['prefix' => 'bulk-upload/download'], function () {
             Route::get('/category', 'pdf_download_category')->name('pdf.download_category');
             Route::get('/brand', 'pdf_download_brand')->name('pdf.download_brand');
         });
@@ -78,10 +78,11 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/custom-label-delete/{id}', 'destroy')->name('custom_label.delete');
         Route::post('/custom-label/products', 'products')->name('custom_label.products');
     });
-    
+
     // Note
     Route::resource('note', NoteController::class);
     Route::controller(NoteController::class)->group(function () {
+        Route::post('/get_notes', 'getNotes')->name('get_notes');
         Route::get('/note/edit/{id}', 'edit')->name('note.edit');
         Route::get('note/delete/{note}', 'destroy')->name('note.delete');
     });
@@ -102,18 +103,18 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
 
         // Order bulk export
         Route::get('/order-bulk-export', 'orderBulkExport')->name('order-bulk-export');
-         Route::get('/filtered-orders', 'get_filter_orders')->name('orders.filter');
+        Route::get('/filtered-orders', 'get_filter_orders')->name('orders.filter');
     });
 
     Route::controller(InvoiceController::class)->group(function () {
         Route::get('/invoice/{order_id}', 'invoice_download')->name('invoice.download');
     });
-    
+
     //Review
     Route::controller(ReviewController::class)->group(function () {
         Route::get('/product-reviews', 'index')->name('product-reviews');
         Route::get('/product/detail-reviews/{id}', 'detailReviews')->name('detail-reviews');
-        
+
     });
 
     //Shop
