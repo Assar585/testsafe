@@ -49,7 +49,7 @@
     			                <div class="form-group">
     								<label>{{ translate('Footer description') }} ({{ translate('Translatable') }})</label>
     								<input type="hidden" name="types[][{{ $lang }}]" value="footer_description">
-    								<textarea class="form-control" name="footer_description" rows="6" placeholder="Type.." >{{ get_setting('footer_description',null,$lang); }}</textarea>
+    								<textarea class="form-control" name="footer_description" rows="6" placeholder="Type.." >{{ get_setting('footer_description',null,$lang) }}</textarea>
     							</div>
 								<!-- Update Button -->
 								<div class="mt-4 text-right">
@@ -123,13 +123,76 @@
     							@csrf
 								<!-- Contact address -->
                                 <div class="form-group">
-    								<label>{{ translate('Contact address') }} ({{ translate('Translatable') }})</label>
-    								<input type="hidden" name="types[][{{ $lang }}]" value="contact_address">
-    								<input type="text" class="form-control" placeholder="{{ translate('Address') }}" name="contact_address" value="{{ get_setting('contact_address',null,$lang) }}">
-    							</div>
+                                    <label>{{ translate('Contact address') }} ({{ translate('Translatable') }})</label>
+                                    <div class="contact-address-target">
+                                        <input type="hidden" name="types[][{{ $lang }}]" value="contact_address">
+                                        @php
+                                            $address_data = get_setting('contact_address',null,$lang);
+                                            $addresses = [];
+                                            if ($address_data != null) {
+                                                $decoded = json_decode($address_data, true);
+                                                $addresses = is_array($decoded) ? $decoded : [$address_data];
+                                            }
+                                        @endphp
+                                        @if (count($addresses) > 0)
+                                            @foreach ($addresses as $key => $value)
+                                                <div class="row gutters-5">
+                                                    <div class="col">
+                                                        <div class="form-group">
+                                                            <input type="text" class="form-control" placeholder="{{ translate('Address') }}" name="contact_address[]" value="{{ $value }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-auto">
+                                                        <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                            <i class="las la-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <div class="row gutters-5">
+                                                <div class="col">
+                                                    <div class="form-group">
+                                                        <input type="text" class="form-control" placeholder="{{ translate('Address') }}" name="contact_address[]">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <button
+                                        type="button"
+                                        class="btn btn-soft-secondary btn-sm"
+                                        data-toggle="add-more"
+                                        data-content='<div class="row gutters-5">
+                                            <div class="col">
+                                                <div class="form-group">
+                                                    <input type="text" class="form-control" placeholder="{{translate('Address')}}" name="contact_address[]">
+                                                </div>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                    <i class="las la-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>'
+                                        data-target=".contact-address-target">
+                                        {{ translate('Add New') }}
+                                    </button>
+                                </div>
 								<!-- Contact phone -->
+                                <div class="form-group row align-items-center mb-0">
+                                    <div class="col-8">
+    								    <label>{{ translate('Contact phone') }}</label>
+                                    </div>
+                                    <div class="col-4 text-right">
+                                        <label class="aiz-switch aiz-switch-success mb-0">
+                                            <input type="hidden" name="types[]" value="show_contact_phone">
+                                            <input type="checkbox" name="show_contact_phone" @if(get_setting('show_contact_phone', 'on') == 'on') checked @endif>
+                                            <span></span>
+                                        </label>
+                                    </div>
+    							</div>
                                 <div class="form-group">
-    								<label>{{ translate('Contact phone') }}</label>
     								<input type="hidden" name="types[]" value="contact_phone">
     								<input type="text" class="form-control" placeholder="{{ translate('Phone') }}" name="contact_phone" value="{{ get_setting('contact_phone') }}">
     							</div>
