@@ -7,6 +7,8 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
+use App\Models\Product;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class WholesaleProductRequest extends FormRequest
@@ -34,7 +36,7 @@ class WholesaleProductRequest extends FormRequest
             $added_by = 'admin';
             $user_id = User::where('user_type', 'admin')->first()->id;
         }
-        
+
         $shipping_cost = 0;
         if (isset($this->shipping_type)) {
             if ($this->shipping_type == 'flat_rate') {
@@ -42,14 +44,23 @@ class WholesaleProductRequest extends FormRequest
             }
         }
 
+        $slug = $this->slug != null ? Str::slug($this->slug) : Str::slug($this->name);
+        $slug_query = Product::where('slug', 'LIKE', $slug . '%');
+        if ($this->id) {
+            $slug_query->where('id', '!=', $this->id);
+        }
+        $same_slug_count = $slug_query->count();
+        $slug_suffix = $same_slug_count ? '-' . ($same_slug_count + 1) : '';
+        $slug .= $slug_suffix;
+
         $this->merge([
-            'slug'              => ($this->slug == null) ? preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', strtolower($this->name))) : $this->slug,
-            'user_id'           => $user_id,
-            'approved'          => $approved,
+            'slug' => $slug,
+            'user_id' => $user_id,
+            'approved' => $approved,
             'wholesale_product' => 1,
-            'added_by'          => $added_by,
-            'shipping_cost'     => $shipping_cost,
-            'published'         => ($this->button == 'unpublish') ? 0 : 1,
+            'added_by' => $added_by,
+            'shipping_cost' => $shipping_cost,
+            'published' => ($this->button == 'unpublish') ? 0 : 1,
         ]);
     }
     /**
@@ -62,17 +73,17 @@ class WholesaleProductRequest extends FormRequest
 
         $rules = [];
 
-        $rules['name']                = 'required|max:255';
-        $rules['slug']                = ['required', 'max:255', Rule::unique('products')->ignore($this->id)];
-        $rules['category_ids']        = 'required';
-        $rules['category_id']         = ['required', Rule::in($this->category_ids)];
-        $rules['unit']                = 'required';
-        $rules['min_qty']             = 'required|numeric';
-        $rules['unit_price']          = 'required|numeric|gt:0';
+        $rules['name'] = 'required|max:255';
+        $rules['slug'] = ['required', 'max:255', Rule::unique('products')->ignore($this->id)];
+        $rules['category_ids'] = 'required';
+        $rules['category_id'] = ['required', Rule::in($this->category_ids)];
+        $rules['unit'] = 'required';
+        $rules['min_qty'] = 'required|numeric';
+        $rules['unit_price'] = 'required|numeric|gt:0';
         $rules['wholesale_min_qty.*'] = 'required';
         $rules['wholesale_max_qty.*'] = 'required';
-        $rules['wholesale_price.*']   = 'required';
-        $rules['current_stock']       = 'required|numeric';
+        $rules['wholesale_price.*'] = 'required';
+        $rules['current_stock'] = 'required|numeric';
 
         return $rules;
     }
@@ -85,20 +96,20 @@ class WholesaleProductRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required'                => 'Product name is required',
-            'category_ids.required'        => 'Product category is required',
-            'category_id.required'         => 'Main Category is required',
-            'category_id.in'               => 'Main Category must be within selected categories',
-            'unit.required'                => 'Unit field is required',
-            'min_qty.required'             => 'Minimum purchase quantity is required',
-            'min_qty.numeric'              => 'Minimum purchase must be numeric',
-            'unit_price.required'          => 'Unit price is required',
-            'unit_price.numeric'           => 'Unit price must be numeric',
-            'current_stock.required'       => 'Current stock is required',
-            'current_stock.numeric'        => 'Current stock must be numeric',
+            'name.required' => 'Product name is required',
+            'category_ids.required' => 'Product category is required',
+            'category_id.required' => 'Main Category is required',
+            'category_id.in' => 'Main Category must be within selected categories',
+            'unit.required' => 'Unit field is required',
+            'min_qty.required' => 'Minimum purchase quantity is required',
+            'min_qty.numeric' => 'Minimum purchase must be numeric',
+            'unit_price.required' => 'Unit price is required',
+            'unit_price.numeric' => 'Unit price must be numeric',
+            'current_stock.required' => 'Current stock is required',
+            'current_stock.numeric' => 'Current stock must be numeric',
             'wholesale_min_qty.*.required' => 'Product minimum qantity is required',
             'wholesale_max_qty.*.required' => 'Product maximum qantity is required',
-            'wholesale_price.*.required'   => 'Product price is required'
+            'wholesale_price.*.required' => 'Product price is required'
         ];
     }
 
