@@ -19,10 +19,10 @@ class AppServiceProvider extends ServiceProvider
     Schema::defaultStringLength(191);
     Paginator::useBootstrap();
 
-    // Add a local listener to print query execution times and counts to laravel.log
-    // so we can see what's blocking TTFB.
+    // Add a local listener to print query execution times and counts to a public file
     DB::listen(function ($query) {
-      \Log::info($query->sql, ['time' => $query->time]);
+      $log = sprintf("[%.2f ms] %s\n", $query->time, $query->sql);
+      file_put_contents(public_path('sql.txt'), $log, FILE_APPEND);
     });
 
     // Self-healing nav link fix:
