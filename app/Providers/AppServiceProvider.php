@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,6 +18,12 @@ class AppServiceProvider extends ServiceProvider
   {
     Schema::defaultStringLength(191);
     Paginator::useBootstrap();
+
+    // Add a local listener to print query execution times and counts to laravel.log
+    // so we can see what's blocking TTFB.
+    DB::listen(function ($query) {
+      \Log::info($query->sql, ['time' => $query->time]);
+    });
 
     // Self-healing nav link fix:
     // If the stored nav links still point to the old production domain,
