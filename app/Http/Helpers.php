@@ -193,9 +193,13 @@ if (!function_exists('verified_sellers_id')) {
 if (!function_exists('get_system_default_currency')) {
     function get_system_default_currency()
     {
-        return Cache::remember('system_default_currency', 86400, function () {
-            return Currency::findOrFail(get_setting('system_default_currency'));
-        });
+        static $currency = null;
+        if ($currency === null) {
+            $currency = Cache::remember('system_default_currency', 86400, function () {
+                return Currency::findOrFail(get_setting('system_default_currency'));
+            });
+        }
+        return $currency;
     }
 }
 
@@ -1740,9 +1744,12 @@ if (!function_exists('calculateCommissionAffilationClubPoint')) {
 if (!function_exists('addon_is_activated')) {
     function addon_is_activated($identifier, $default = null)
     {
-        $addons = Cache::remember('addons', 86400, function () {
-            return Addon::all();
-        });
+        static $addons = null;
+        if ($addons === null) {
+            $addons = Cache::remember('addons', 86400, function () {
+                return Addon::all();
+            });
+        }
 
         $activation = $addons->where('unique_identifier', $identifier)->where('activated', 1)->first();
         return $activation == null ? false : true;
@@ -1811,12 +1818,16 @@ if (!function_exists('get_admin')) {
 if (!function_exists('get_slider_images')) {
     function get_slider_images($ids)
     {
-        $slider_query = Upload::query();
-        $sliders = $slider_query->whereIn('id', $ids);
-        foreach ($ids as $id) {
-            $sliders->orderByRaw("id!=?", [$id]);
-        }
-        return $sliders->get();
+        if (empty($ids))
+            return [];
+        return Cache::remember('slider_images_' . implode('_', $ids), 3600, function () use ($ids) {
+            $slider_query = Upload::query();
+            $sliders = $slider_query->whereIn('id', $ids);
+            foreach ($ids as $id) {
+                $sliders->orderByRaw("id!=?", [$id]);
+            }
+            return $sliders->get();
+        });
     }
 }
 
