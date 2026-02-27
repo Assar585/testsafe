@@ -91,6 +91,18 @@ Route::get('/clear-cache', function () {
     return '✅ Cache cleared successfully! You can now go back to admin and save your settings again.';
 });
 
+Route::get('/debug-env', function () {
+    $menuLinks = json_decode(get_setting('header_menu_links'), true) ?? [];
+    $firstLink = array_values($menuLinks)[0] ?? '(none)';
+    return response()->json([
+        'app_url'              => config('app.url'),
+        'system_website_link'  => get_setting('system_website_link'),
+        'first_nav_link_raw'   => $firstLink,
+        'first_nav_link_fixed' => rewrite_nav_link($firstLink),
+        'current_host'         => request()->getHost(),
+    ]);
+});
+
 
 Route::get('/import-shop-sql', function () {
     $sqlFile = base_path('shop.sql');

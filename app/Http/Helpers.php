@@ -1374,32 +1374,34 @@ if (!function_exists('getBaseURL')) {
 
 if (!function_exists('rewrite_nav_link')) {
     /**
-     * Replaces the stored production domain in a database nav link with
-     * the current APP_URL. Uses regex to match any scheme (http/https)
-     * so mismatches between stored URLs and system_website_link don't break it.
+     * Rewrites a stored nav URL so it always points to the current server.
+     * Compares the URL's host vs the current server host — no DB dependency.
+     * Works for any cloned / staged environment (Railway, Hostinger staging, etc.)
      */
     function rewrite_nav_link(string $url): string
     {
-        $currentOrigin = rtrim(config('app.url'), '/');
+        // Parse the host of the link stored in the database
+        $urlHost = parse_url($url, PHP_URL_HOST);
 
-        // Get the stored domain from settings OR fall back to extracting host from APP_URL
-        $storedLink = get_setting('system_website_link') ?: '';
-        $storedHost = $storedLink ? parse_url($storedLink, PHP_URL_HOST) : '';
-
-        // If system_website_link isn't set, try to detect production host from the URL itself
-        // by comparing it to the current host
-        $currentHost = parse_url($currentOrigin, PHP_URL_HOST);
-
-        if ($storedHost && $storedHost !== $currentHost) {
-            // Replace http:// or https:// + storedHost (with or without trailing slash)
-            $url = preg_replace(
-                '#https?://' . preg_quote($storedHost, '#') . '#',
-                $currentOrigin,
-                $url
-            );
+        if (!$urlHost) {
+            return $url; // relative URL or invalid — leave as-is
         }
 
-        return $url;
+        // Determine the current server's host from APP_URL env
+        $currentOrigin = rtrim(config('app.url'), '/');
+        $currentHost = parse_url($currentOrigin, PHP_URL_HOST);
+
+        // If the link already points to the current server, no change needed
+        if ($urlHost === $currentHost) {
+            return $url;
+        }
+
+        // Replace http:// or https:// + the stored host with the current origin
+        return preg_replace(
+            '#https?://' . preg_quote($urlHost, '#') . '#',
+            $currentOrigin,
+            $url
+        );
     }
 }
 
