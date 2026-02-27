@@ -19,11 +19,7 @@ class AppServiceProvider extends ServiceProvider
     Schema::defaultStringLength(191);
     Paginator::useBootstrap();
 
-    // Add a local listener to print query execution times and counts to a storage file
-    DB::listen(function ($query) {
-      $log = sprintf("[%.2f ms] %s\n", $query->time, $query->sql);
-      file_put_contents(storage_path('sql.log'), $log, FILE_APPEND);
-    });
+    // SQL logging disabled for production performance
 
     // Self-healing nav link fix:
     // If the stored nav links still point to the old production domain,
