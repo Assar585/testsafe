@@ -96,17 +96,17 @@ Route::get('/debug-env', function () {
     $menuLinks = json_decode(get_setting('header_menu_links'), true) ?? [];
     $firstLink = array_values($menuLinks)[0] ?? '(none)';
     return response()->json([
-        'app_url'              => config('app.url'),
-        'system_website_link'  => get_setting('system_website_link'),
-        'first_nav_link_raw'   => $firstLink,
+        'app_url' => config('app.url'),
+        'system_website_link' => get_setting('system_website_link'),
+        'first_nav_link_raw' => $firstLink,
         'first_nav_link_fixed' => rewrite_nav_link($firstLink),
-        'current_host'         => request()->getHost(),
+        'current_host' => request()->getHost(),
     ]);
 });
 
 Route::get('/fix-nav-links', function () {
     $currentOrigin = rtrim(config('app.url'), '/');
-    $currentHost   = parse_url($currentOrigin, PHP_URL_HOST);
+    $currentHost = parse_url($currentOrigin, PHP_URL_HOST);
     $fixed = [];
 
     // Settings keys that may contain absolute URLs pointing to the old domain
@@ -114,7 +114,8 @@ Route::get('/fix-nav-links', function () {
 
     foreach ($settingKeys as $key) {
         $setting = \App\Models\Setting::where('type', $key)->first();
-        if (!$setting) continue;
+        if (!$setting)
+            continue;
 
         $original = $setting->value;
 
@@ -143,7 +144,7 @@ Route::get('/fix-nav-links', function () {
     \Illuminate\Support\Facades\Artisan::call('route:clear');
 
     return response()->json([
-        'status'        => '✅ Nav links fixed in database!',
+        'status' => '✅ Nav links fixed in database!',
         'current_origin' => $currentOrigin,
         'fixed_settings' => $fixed ?: 'No changes needed',
     ]);
@@ -701,3 +702,5 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/addresses/billing/update/{id}', 'billing_update')->name('billing_addresses.update');
         Route::post('/addresses/billing/store', 'billing_store')->name('billing_addresses.store');
     });
+});
+
