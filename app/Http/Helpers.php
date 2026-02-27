@@ -1375,19 +1375,28 @@ if (!function_exists('getBaseURL')) {
 if (!function_exists('rewrite_nav_link')) {
     /**
      * Replaces the stored production domain in a database nav link with
-     * the current APP_URL. This ensures nav links work correctly on any
-     * cloned environment (Railway, Hostinger staging, etc.).
+     * the current APP_URL. Uses regex to match any scheme (http/https)
+     * so mismatches between stored URLs and system_website_link don't break it.
      */
     function rewrite_nav_link(string $url): string
     {
-        $storedOrigin = get_setting('system_website_link') ?: '';
-        if ($storedOrigin) {
-            $storedOrigin = rtrim(parse_url($storedOrigin, PHP_URL_SCHEME) . '://' . parse_url($storedOrigin, PHP_URL_HOST), '/');
-        }
         $currentOrigin = rtrim(config('app.url'), '/');
 
-        if ($storedOrigin && $storedOrigin !== $currentOrigin) {
-            $url = str_replace($storedOrigin, $currentOrigin, $url);
+        // Get the stored domain from settings OR fall back to extracting host from APP_URL
+        $storedLink = get_setting('system_website_link') ?: '';
+        $storedHost = $storedLink ? parse_url($storedLink, PHP_URL_HOST) : '';
+
+        // If system_website_link isn't set, try to detect production host from the URL itself
+        // by comparing it to the current host
+        $currentHost = parse_url($currentOrigin, PHP_URL_HOST);
+
+        if ($storedHost && $storedHost !== $currentHost) {
+            // Replace http:// or https:// + storedHost (with or without trailing slash)
+            $url = preg_replace(
+                '#https?://' . preg_quote($storedHost, '#') . '#',
+                $currentOrigin,
+                $url
+            );
         }
 
         return $url;
