@@ -69,7 +69,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
         });
     });
 
-    Route::apiResource('carts', CartController::class)->only('destroy');
+    Route::delete('carts/{cart}', [CartController::class, 'destroy'])->name('api.carts.destroy');
     Route::controller(CartController::class)->group(function () {
         Route::post('cart-summary', 'summary');
         Route::post('cart-count', 'count');
@@ -294,7 +294,8 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     Route::get('products/search', 'App\Http\Controllers\Api\V2\ProductController@search');
     Route::post('products/variant/price', 'App\Http\Controllers\Api\V2\ProductController@getPrice');
     Route::get('products/digital', 'App\Http\Controllers\Api\V2\ProductController@digital')->name('products.digital');
-    Route::apiResource('products', 'App\Http\Controllers\Api\V2\ProductController')->except(['store', 'update', 'destroy']);
+    Route::get('products', 'App\Http\Controllers\Api\V2\ProductController@index')->name('api.products.index');
+    Route::get('products/{product}', 'App\Http\Controllers\Api\V2\ProductController@show')->name('api.products.show');
 
     Route::get('products/{slug}/{user_id}', 'App\Http\Controllers\Api\V2\ProductController@product_details');
 
@@ -316,7 +317,7 @@ Route::group(['prefix' => 'v2', 'middleware' => ['app_language']], function () {
     Route::get('shops/products/featured/{id}', 'App\Http\Controllers\Api\V2\ShopController@featuredProducts')->name('shops.featuredProducts');
     Route::get('shops/products/new/{id}', 'App\Http\Controllers\Api\V2\ShopController@newProducts')->name('shops.newProducts');
     Route::get('shops/brands/{id}', 'App\Http\Controllers\Api\V2\ShopController@brands')->name('shops.brands');
-    Route::apiResource('shops', 'App\Http\Controllers\Api\V2\ShopController')->only('index');
+    Route::get('shops', 'App\Http\Controllers\Api\V2\ShopController@index')->name('api.shops.index');
 
     Route::get('sliders', 'App\Http\Controllers\Api\V2\SliderController@sliders');
     Route::get('banners-one', 'App\Http\Controllers\Api\V2\SliderController@bannerOne');
