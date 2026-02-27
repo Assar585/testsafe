@@ -88,7 +88,8 @@ Route::get('/clear-cache', function () {
     \Illuminate\Support\Facades\Artisan::call('cache:clear');
     \Illuminate\Support\Facades\Artisan::call('config:clear');
     \Illuminate\Support\Facades\Artisan::call('view:clear');
-    return '✅ Cache cleared successfully! You can now go back to admin and save your settings again.';
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+    return '✅ All caches cleared!';
 });
 
 Route::get('/debug-env', function () {
@@ -100,6 +101,51 @@ Route::get('/debug-env', function () {
         'first_nav_link_raw'   => $firstLink,
         'first_nav_link_fixed' => rewrite_nav_link($firstLink),
         'current_host'         => request()->getHost(),
+    ]);
+});
+
+Route::get('/fix-nav-links', function () {
+    $currentOrigin = rtrim(config('app.url'), '/');
+    $currentHost   = parse_url($currentOrigin, PHP_URL_HOST);
+    $fixed = [];
+
+    // Settings keys that may contain absolute URLs pointing to the old domain
+    $settingKeys = ['header_menu_links', 'system_website_link', 'frontend_website_link'];
+
+    foreach ($settingKeys as $key) {
+        $setting = \App\Models\Setting::where('type', $key)->first();
+        if (!$setting) continue;
+
+        $original = $setting->value;
+
+        // Replace any http(s)://non-current-host with current origin
+        $updated = preg_replace_callback(
+            '#https?://([^/"\'\s]+)#',
+            function ($match) use ($currentHost, $currentOrigin) {
+                $host = parse_url($match[0], PHP_URL_HOST);
+                if ($host && $host !== $currentHost) {
+                    return str_replace($match[1], $currentHost, $match[0]);
+                }
+                return $match[0];
+            },
+            $original
+        );
+
+        if ($updated !== $original) {
+            $setting->value = $updated;
+            $setting->save();
+            $fixed[$key] = ['old' => $original, 'new' => $updated];
+        }
+    }
+
+    // Also clear all caches after DB update
+    \Illuminate\Support\Facades\Artisan::call('cache:clear');
+    \Illuminate\Support\Facades\Artisan::call('route:clear');
+
+    return response()->json([
+        'status'        => '✅ Nav links fixed in database!',
+        'current_origin' => $currentOrigin,
+        'fixed_settings' => $fixed ?: 'No changes needed',
     ]);
 });
 
