@@ -931,9 +931,14 @@ function translate($key, $lang = null, $addslashes = false)
 
     $lang_key = preg_replace('/[^A-Za-z0-9\_]/', '', str_replace(' ', '_', strtolower($key)));
 
-    $translations_en = Cache::rememberForever('translations-en', function () {
-        return Translation::where('lang', 'en')->pluck('lang_value', 'lang_key')->toArray();
-    });
+    static $memoized_translations = [];
+
+    if (!isset($memoized_translations['en'])) {
+        $memoized_translations['en'] = Cache::rememberForever('translations-en', function () {
+            return Translation::where('lang', 'en')->pluck('lang_value', 'lang_key')->toArray();
+        });
+    }
+    $translations_en = $memoized_translations['en'];
 
     if (!isset($translations_en[$lang_key])) {
         $translation_def = new Translation;
@@ -951,20 +956,30 @@ function translate($key, $lang = null, $addslashes = false)
         }
 
         Cache::forget('translations-en');
+        unset($memoized_translations['en']);
     }
 
     // return user session lang
-    $translation_locale = Cache::rememberForever("translations-{$lang}", function () use ($lang) {
-        return Translation::where('lang', $lang)->pluck('lang_value', 'lang_key')->toArray();
-    });
+    if (!isset($memoized_translations[$lang])) {
+        $memoized_translations[$lang] = Cache::rememberForever("translations-{$lang}", function () use ($lang) {
+            return Translation::where('lang', $lang)->pluck('lang_value', 'lang_key')->toArray();
+        });
+    }
+    $translation_locale = $memoized_translations[$lang];
+
     if (isset($translation_locale[$lang_key])) {
         return $addslashes ? addslashes(trim($translation_locale[$lang_key])) : trim($translation_locale[$lang_key]);
     }
 
     // return default lang if session lang not found
-    $translations_default = Cache::rememberForever('translations-' . env('DEFAULT_LANGUAGE', 'en'), function () {
-        return Translation::where('lang', env('DEFAULT_LANGUAGE', 'en'))->pluck('lang_value', 'lang_key')->toArray();
-    });
+    $default_lang = env('DEFAULT_LANGUAGE', 'en');
+    if (!isset($memoized_translations[$default_lang])) {
+        $memoized_translations[$default_lang] = Cache::rememberForever('translations-' . $default_lang, function () use ($default_lang) {
+            return Translation::where('lang', $default_lang)->pluck('lang_value', 'lang_key')->toArray();
+        });
+    }
+    $translations_default = $memoized_translations[$default_lang];
+
     if (isset($translations_default[$lang_key])) {
         return $addslashes ? addslashes(trim($translations_default[$lang_key])) : trim($translations_default[$lang_key]);
     }
@@ -1447,9 +1462,12 @@ if (!function_exists('isUnique')) {
 if (!function_exists('get_setting')) {
     function get_setting($key, $default = null, $lang = false)
     {
-        $settings = Cache::remember('business_settings', 86400, function () {
-            return BusinessSetting::all();
-        });
+        static $settings = null;
+        if ($settings === null) {
+            $settings = Cache::remember('business_settings', 86400, function () {
+                return BusinessSetting::all();
+            });
+        }
 
         if ($lang == false) {
             $setting = $settings->where('type', $key)->first();
@@ -2252,10 +2270,14 @@ if (!function_exists('get_single_category')) {
 if (!function_exists('get_level_zero_categories')) {
     function get_level_zero_categories()
     {
-        return Cache::remember('level_zero_categories', 3600, function () {
-            $categories_query = Category::query()->with(['coverImage', 'catIcon']);
-            return $categories_query->where('level', 0)->orderBy('order_level', 'desc')->get();
-        });
+        static $level_zeros = null;
+        if ($level_zeros === null) {
+            $level_zeros = Cache::remember('level_zero_categories', 3600, function () {
+                $categories_query = Category::query()->with(['coverImage', 'catIcon']);
+                return $categories_query->where('level', 0)->orderBy('order_level', 'desc')->get();
+            });
+        }
+        return $level_zeros;
     }
 }
 
