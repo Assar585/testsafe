@@ -1372,6 +1372,28 @@ if (!function_exists('getBaseURL')) {
     }
 }
 
+if (!function_exists('rewrite_nav_link')) {
+    /**
+     * Replaces the stored production domain in a database nav link with
+     * the current APP_URL. This ensures nav links work correctly on any
+     * cloned environment (Railway, Hostinger staging, etc.).
+     */
+    function rewrite_nav_link(string $url): string
+    {
+        $storedOrigin = get_setting('system_website_link') ?: '';
+        if ($storedOrigin) {
+            $storedOrigin = rtrim(parse_url($storedOrigin, PHP_URL_SCHEME) . '://' . parse_url($storedOrigin, PHP_URL_HOST), '/');
+        }
+        $currentOrigin = rtrim(config('app.url'), '/');
+
+        if ($storedOrigin && $storedOrigin !== $currentOrigin) {
+            $url = str_replace($storedOrigin, $currentOrigin, $url);
+        }
+
+        return $url;
+    }
+}
+
 
 if (!function_exists('getFileBaseURL')) {
     function getFileBaseURL()

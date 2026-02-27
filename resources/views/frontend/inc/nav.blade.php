@@ -103,11 +103,18 @@
         <hr>
         <ul class="mb-0 pl-3 pb-3 h-100">
             @if (get_setting('header_menu_labels') != null)
+                @php
+                    $rawLinks = json_decode(get_setting('header_menu_links'), true) ?? [];
+                    $currentOrigin = parse_url(get_setting('system_website_link') ?: config('app.url'), PHP_URL_SCHEME) . '://' . parse_url(get_setting('system_website_link') ?: config('app.url'), PHP_URL_HOST);
+                    $newOrigin = rtrim(config('app.url'), '/');
+                @endphp
                 @foreach (json_decode(get_setting('header_menu_labels'), true) as $key => $value)
+                    @php
+                        $navLink = isset($rawLinks[$key]) ? str_replace($currentOrigin, $newOrigin, $rawLinks[$key]) : '#';
+                    @endphp
                     <li class="mr-0">
-                        <a href="{{ json_decode(get_setting('header_menu_links'), true)[$key] }}"
-                            class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                            @if (url()->current() == json_decode(get_setting('header_menu_links'), true)[$key]) active @endif">
+                        <a href="{{ $navLink }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
+                                                    @if (url()->current() == $navLink) active @endif">
                             {{ translate($value) }}
                         </a>
                     </li>
@@ -126,7 +133,7 @@
                     <hr>
                     <li class="mr-0">
                         <a href="{{ route('dashboard') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                                {{ areActiveRoutes(['dashboard'], ' active') }}">
+                                                        {{ areActiveRoutes(['dashboard'], ' active') }}">
                             {{ translate('My Account') }}
                         </a>
                     </li>
@@ -134,19 +141,19 @@
                 @if (isCustomer())
                     <li class="mr-0">
                         <a href="{{ route('customer.all-notifications') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                                {{ areActiveRoutes(['customer.all-notifications'], ' active') }}">
+                                                        {{ areActiveRoutes(['customer.all-notifications'], ' active') }}">
                             {{ translate('Notifications') }}
                         </a>
                     </li>
                     <li class="mr-0">
                         <a href="{{ route('wishlists.index') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                                {{ areActiveRoutes(['wishlists.index'], ' active') }}">
+                                                        {{ areActiveRoutes(['wishlists.index'], ' active') }}">
                             {{ translate('Wishlist') }}
                         </a>
                     </li>
                     <li class="mr-0">
                         <a href="{{ route('compare') }}" class="fs-13 px-3 py-3 w-100 d-inline-block fw-700 text-dark header_menu_links
-                                                {{ areActiveRoutes(['compare'], ' active') }}">
+                                                        {{ areActiveRoutes(['compare'], ' active') }}">
                             {{ translate('Compare') }}
                         </a>
                     </li>
