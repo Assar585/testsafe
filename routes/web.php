@@ -704,10 +704,10 @@ Route::group(['middleware' => ['auth']], function () {
     });
 });
 
-Route::get('/debug-sql-logs', function () {
-    $logFile = storage_path('logs/laravel.log');
+Route::get('/sql-logs', function () {
+    $logFile = storage_path('sql.log');
     if (!file_exists($logFile)) {
-        return "Log file not found.";
+        return "Log file not found... yet! Go visit the homepage first, then refresh this page.";
     }
 
     $lines = file($logFile);
