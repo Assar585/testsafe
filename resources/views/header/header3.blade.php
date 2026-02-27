@@ -651,11 +651,13 @@
                     <div class="d-flex align-items-center justify-content-center justify-content-xl-start h-100">
                         <ul class="list-inline mb-0 pl-0 hor-swipe c-scrollbar-light">
                             @if (get_setting('header_menu_labels') != null)
+                                @php $rawMenuLinks3 = json_decode(get_setting('header_menu_links'), true) ?? []; @endphp
                                 @foreach (json_decode(get_setting('header_menu_labels'), true) as $key => $value)
+                                    @php $navLink = rewrite_nav_link($rawMenuLinks3[$key] ?? '#'); @endphp
                                     <li class="list-inline-item mr-0 animate-underline-white">
-                                        <a href="{{ json_decode(get_setting('header_menu_links'), true)[$key] }}"
+                                        <a href="{{ $navLink }}"
                                             class="fs-13 px-3 py-3 d-inline-block fw-700 header_menu_links hov-bg-black-10 bottom-text-color-visibility
-                                                                    @if (url()->current() == json_decode(get_setting('header_menu_links'), true)[$key]) active @endif" style="color: {{ $bottomHeaderTextColor }}">
+                                                                    @if (url()->current() == $navLink) active @endif" style="color: {{ $bottomHeaderTextColor }}">
                                             {{ translate($value) }}
                                         </a>
                                     </li>
