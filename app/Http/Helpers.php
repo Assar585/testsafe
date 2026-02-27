@@ -1365,7 +1365,7 @@ if (!function_exists('uploaded_asset')) {
             }
             $asset = $upload_cache[$id];
 
-            if ($asset != null) {
+            if ($asset !== null) {
                 return $asset->external_link == null ? my_asset($asset->file_name) : $asset->external_link;
             }
         }

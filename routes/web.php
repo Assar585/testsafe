@@ -92,6 +92,14 @@ Route::get('/clear-cache', function () {
     return '✅ All caches cleared!';
 });
 
+Route::get('/debug-products', function () {
+    try {
+        return app(\App\Http\Controllers\ProductController::class)->create();
+    } catch (\Throwable $e) {
+        return response("<b>Error:</b> " . $e->getMessage() . " <i>in file " . $e->getFile() . " on line " . $e->getLine() . "</i><br><br><pre>" . $e->getTraceAsString() . "</pre>", 500);
+    }
+});
+
 Route::get('/debug-env', function () {
     $menuLinks = json_decode(get_setting('header_menu_links'), true) ?? [];
     $firstLink = array_values($menuLinks)[0] ?? '(none)';
