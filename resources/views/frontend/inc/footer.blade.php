@@ -175,7 +175,8 @@
                 </div>
                 @if(get_setting('newsletter_activation'))
                     <h5 class="fs-14 fw-700 text-soft-light mt-1 mb-3">
-                        {{ translate('Subscribe to our newsletter for regular updates about Offers, Coupons & more') }}</h5>
+                        {{ translate('Subscribe to our newsletter for regular updates about Offers, Coupons & more') }}
+                    </h5>
                     <div class="mb-3">
                         <form method="POST" action="{{ route('subscribers.store') }}">
                             @csrf
@@ -214,8 +215,9 @@
                                 <a href="{{ get_setting('twitter_link') }}" target="_blank" class="x-twitter">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#ffffff"
                                         viewBox="0 0 16 16" class="mb-2 pb-1">
-                                        <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
-                                                .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+                                        <path
+                                            d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
+                                                        .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
                                     </svg>
                                 </a>
                             </li>
@@ -310,27 +312,35 @@
                     <h4 class="fs-14 text-secondary text-uppercase fw-700 mb-3">{{ translate('Contacts') }}</h4>
                     <ul class="list-unstyled">
                         <li class="mb-2">
-                            <p class="fs-13 text-secondary mb-1">{{ translate('Address') }}</p>
                             @php
                                 $address_data = get_setting('contact_address', null, App::getLocale());
+                                $phone_data = get_setting('contact_phone', null);
                                 $addresses = [];
+                                $phones = [];
                                 if ($address_data != null) {
-                                    $decoded = json_decode($address_data, true);
-                                    $addresses = is_array($decoded) ? $decoded : [$address_data];
+                                    $decoded_addr = json_decode($address_data, true);
+                                    $addresses = is_array($decoded_addr) ? $decoded_addr : [$address_data];
                                 }
+                                if ($phone_data != null) {
+                                    $decoded_phone = json_decode($phone_data, true);
+                                    $phones = is_array($decoded_phone) ? $decoded_phone : [$phone_data];
+                                }
+                                $show_phone = get_setting('show_contact_phone', 'on') == 'on';
+                                $max_count = max(count($addresses), count($phones));
                             @endphp
-                            @foreach($addresses as $address)
-                                <p class="fs-13 text-soft-light mb-1">{{ $address }}</p>
-                            @endforeach
+                            @for($i = 0; $i < $max_count; $i++)
+                                @if(isset($addresses[$i]) && $addresses[$i] != '')
+                                    <p class="fs-13 text-secondary mb-1 mt-2">{{ translate('Address') }}</p>
+                                    <p class="fs-13 text-soft-light mb-1">{{ $addresses[$i] }}</p>
+                                @endif
+                                @if($show_phone && isset($phones[$i]) && $phones[$i] != '')
+                                    <p class="fs-13 text-secondary mb-1 mt-1">{{ translate('Phone') }}</p>
+                                    <p class="fs-13 text-soft-light mb-1">{{ $phones[$i] }}</p>
+                                @endif
+                            @endfor
                         </li>
-                        @if(get_setting('show_contact_phone', 'on') == 'on')
-                            <li class="mb-2">
-                                <p class="fs-13 text-secondary mb-1">{{ translate('Phone') }}</p>
-                                <p class="fs-13 text-soft-light">{{ get_setting('contact_phone') }}</p>
-                            </li>
-                        @endif
                         <li class="mb-2">
-                            <p class="fs-13 text-secondary mb-1">{{ translate('Email') }}</p>
+                            <p class="fs-13 text-secondary mb-1 mt-2">{{ translate('Email') }}</p>
                             <p class="">
                                 <a href="mailto:{{ get_setting('contact_email') }}"
                                     class="fs-13 text-soft-light hov-text-primary">{{ get_setting('contact_email')  }}</a>
@@ -493,27 +503,35 @@
                 <div class="container">
                     <ul class="list-unstyled mt-3">
                         <li class="mb-2">
-                            <p class="fs-13 text-secondary mb-1">{{ translate('Address') }}</p>
                             @php
                                 $address_data = get_setting('contact_address', null, App::getLocale());
+                                $phone_data = get_setting('contact_phone', null);
                                 $addresses = [];
+                                $phones = [];
                                 if ($address_data != null) {
-                                    $decoded = json_decode($address_data, true);
-                                    $addresses = is_array($decoded) ? $decoded : [$address_data];
+                                    $decoded_addr = json_decode($address_data, true);
+                                    $addresses = is_array($decoded_addr) ? $decoded_addr : [$address_data];
                                 }
+                                if ($phone_data != null) {
+                                    $decoded_phone = json_decode($phone_data, true);
+                                    $phones = is_array($decoded_phone) ? $decoded_phone : [$phone_data];
+                                }
+                                $show_phone = get_setting('show_contact_phone', 'on') == 'on';
+                                $max_count = max(count($addresses), count($phones));
                             @endphp
-                            @foreach($addresses as $address)
-                                <p class="fs-13 text-soft-light mb-1">{{ $address }}</p>
-                            @endforeach
+                            @for($i = 0; $i < $max_count; $i++)
+                                @if(isset($addresses[$i]) && $addresses[$i] != '')
+                                    <p class="fs-13 text-secondary mb-1 mt-2">{{ translate('Address') }}</p>
+                                    <p class="fs-13 text-soft-light mb-1">{{ $addresses[$i] }}</p>
+                                @endif
+                                @if($show_phone && isset($phones[$i]) && $phones[$i] != '')
+                                    <p class="fs-13 text-secondary mb-1 mt-1">{{ translate('Phone') }}</p>
+                                    <p class="fs-13 text-soft-light mb-1">{{ $phones[$i] }}</p>
+                                @endif
+                            @endfor
                         </li>
-                        @if(get_setting('show_contact_phone', 'on') == 'on')
-                            <li class="mb-2">
-                                <p class="fs-13 text-secondary mb-1">{{ translate('Phone') }}</p>
-                                <p class="fs-13 text-soft-light">{{ get_setting('contact_phone') }}</p>
-                            </li>
-                        @endif
                         <li class="mb-2">
-                            <p class="fs-13 text-secondary mb-1">{{ translate('Email') }}</p>
+                            <p class="fs-13 text-secondary mb-1 mt-2">{{ translate('Email') }}</p>
                             <p class="">
                                 <a href="mailto:{{ get_setting('contact_email') }}"
                                     class="fs-13 text-soft-light hov-text-primary">{{ get_setting('contact_email')  }}</a>
