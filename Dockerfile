@@ -19,7 +19,10 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache
+
+# Setup highly optimized OPcache for production
+COPY docker/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 # Get latest Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -49,10 +52,10 @@ RUN mkdir -p storage/framework/sessions storage/framework/views storage/framewor
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Clear all Laravel caches (route, config, view) built into the image
-RUN php artisan route:clear \
-    && php artisan config:clear \
-    && php artisan view:clear \
+# Generate optimal Laravel caches (route, config, view) built into the image
+RUN php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache \
     || true
 
 # Copy startup script
