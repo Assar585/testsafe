@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,6 +19,11 @@ class AppServiceProvider extends ServiceProvider
   {
     Schema::defaultStringLength(191);
     Paginator::useBootstrap();
+
+    // Force HTTPS on production/Railway to fix 419 Page Expired CSRF errors
+    if (config('app.env') !== 'local' || str_contains(config('app.url'), 'https')) {
+      URL::forceScheme('https');
+    }
 
     // SQL logging disabled for production performance
 
