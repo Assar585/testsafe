@@ -1315,8 +1315,14 @@ if (!function_exists('app_timezone')) {
 if (!function_exists('uploaded_asset')) {
     function uploaded_asset($id)
     {
-        if (($asset = Upload::find($id)) != null) {
-            return $asset->external_link == null ? my_asset($asset->file_name) : $asset->external_link;
+        if ($id && $id > 0) {
+            $asset = \Cache::remember('uploaded_asset_' . $id, 86400, function () use ($id) {
+                return \App\Models\Upload::find($id);
+            });
+
+            if ($asset != null) {
+                return $asset->external_link == null ? my_asset($asset->file_name) : $asset->external_link;
+            }
         }
         return static_asset('assets/img/placeholder.jpg');
     }
@@ -1862,16 +1868,14 @@ if (!function_exists('get_active_taxes')) {
 if (!function_exists('get_system_language')) {
     function get_system_language()
     {
-        $language_query = Language::query();
-
         $locale = 'en';
         if (Session::has('locale')) {
             $locale = Session::get('locale', Config::get('app.locale'));
         }
 
-        $language_query->where('code', $locale);
-
-        return $language_query->first();
+        return \Cache::remember('language_' . $locale, 86400, function () use ($locale) {
+            return \App\Models\Language::where('code', $locale)->first();
+        });
     }
 }
 
