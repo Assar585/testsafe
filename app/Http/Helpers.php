@@ -1335,9 +1335,13 @@ if (!function_exists('uploaded_asset')) {
     function uploaded_asset($id)
     {
         if ($id && $id > 0) {
-            $asset = \Cache::remember('uploaded_asset_' . $id, 86400, function () use ($id) {
-                return \App\Models\Upload::find($id);
-            });
+            static $upload_cache = [];
+            if (!isset($upload_cache[$id])) {
+                $upload_cache[$id] = \Cache::remember('uploaded_asset_' . $id, 86400, function () use ($id) {
+                    return \App\Models\Upload::find($id);
+                });
+            }
+            $asset = $upload_cache[$id];
 
             if ($asset != null) {
                 return $asset->external_link == null ? my_asset($asset->file_name) : $asset->external_link;
@@ -1902,9 +1906,13 @@ if (!function_exists('get_system_language')) {
             $locale = Session::get('locale', Config::get('app.locale'));
         }
 
-        return \Cache::remember('language_' . $locale, 86400, function () use ($locale) {
-            return \App\Models\Language::where('code', $locale)->first();
-        });
+        static $lang_cache = [];
+        if (!isset($lang_cache[$locale])) {
+            $lang_cache[$locale] = \Cache::remember('language_' . $locale, 86400, function () use ($locale) {
+                return \App\Models\Language::where('code', $locale)->first();
+            });
+        }
+        return $lang_cache[$locale];
     }
 }
 
@@ -2727,22 +2735,40 @@ if (!function_exists('get_first_product_image')) {
     function get_first_product_image($photos = null, $thumbnail = null)
     {
         $image_url = static_asset('assets/img/placeholder.jpg');
-        $photos = $photos != null ? explode(',', $photos) : [];
-        $photos = array_diff($photos, [$thumbnail]);
-        $firstPhotoId = reset($photos);
-        $image = null;
-        if (!empty($firstPhotoId)) {
-            $image = Upload::find($firstPhotoId);
+
+        // Parameter order fix: If $photos is an ID/Model and $thumbnail is comma-separated list
+        if ((is_numeric($photos) || is_object($photos)) && is_string($thumbnail) && strpos($thumbnail, ',') !== false) {
+            $temp = $photos;
+            $photos = $thumbnail;
+            $thumbnail = $temp;
         }
-        if ($image == null && $thumbnail != null) {
-            $image = Upload::find($thumbnail);
+
+        // Handle if $thumbnail was passed as a relation Model
+        $thumbnail_id = is_object($thumbnail) ? $thumbnail->id : $thumbnail;
+
+        // Find the first valid photo from the comma-separated list
+        $photos_array = $photos != null ? explode(',', $photos) : [];
+        if ($thumbnail_id) {
+            $photos_array = array_diff($photos_array, [(string) $thumbnail_id]);
         }
-        if ($image instanceof \Illuminate\Database\Eloquent\Collection) {
-            $image = $image->first();
+        $firstPhotoId = reset($photos_array);
+
+        $target_id = !empty($firstPhotoId) ? $firstPhotoId : $thumbnail_id;
+
+        if ($target_id) {
+            static $upload_cache = [];
+            if (!isset($upload_cache[$target_id])) {
+                $upload_cache[$target_id] = \Cache::remember('uploaded_asset_' . $target_id, 86400, function () use ($target_id) {
+                    return \App\Models\Upload::find($target_id);
+                });
+            }
+            $image = $upload_cache[$target_id];
+
+            if ($image != null) {
+                return $image->external_link == null ? my_asset($image->file_name) : $image->external_link;
+            }
         }
-        if ($image != null) {
-            $image_url = $image->external_link == null ? my_asset($image->file_name) : $image->external_link;
-        }
+
         return $image_url;
     }
 }
