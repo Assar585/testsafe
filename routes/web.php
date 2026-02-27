@@ -704,3 +704,14 @@ Route::group(['middleware' => ['auth']], function () {
     });
 });
 
+Route::get('/debug-sql-logs', function () {
+    $logFile = storage_path('logs/laravel.log');
+    if (!file_exists($logFile)) {
+        return "Log file not found.";
+    }
+
+    $lines = file($logFile);
+    $lastLines = array_slice($lines, -800);
+
+    return response("<pre style='font-size: 11px;'>" . implode("", $lastLines) . "</pre>");
+});
