@@ -217,7 +217,7 @@
                                         viewBox="0 0 16 16" class="mb-2 pb-1">
                                         <path
                                             d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
-                                                                                                        .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+                                                                                                                .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
                                     </svg>
                                 </a>
                             </li>
@@ -247,11 +247,27 @@
                         @endphp
                         @for($i = 0; $i < $max_socials; $i++)
                             @if(!empty($custom_links[$i]) && !empty($custom_images[$i]))
+                                @php
+                                    $link = strtolower($custom_links[$i]);
+                                    $bg_color = '#ffffff';
+                                    $is_dark_bg = false;
+
+                                    if (strpos($link, 'tiktok.com') !== false) {
+                                        $bg_color = '#000000';
+                                        $is_dark_bg = true;
+                                    } elseif (strpos($link, 't.me') !== false || strpos($link, 'telegram.org') !== false) {
+                                        $bg_color = '#0088cc';
+                                        $is_dark_bg = true;
+                                    } elseif (strpos($link, 'wa.me') !== false || strpos($link, 'whatsapp.com') !== false) {
+                                        $bg_color = '#25d366';
+                                        $is_dark_bg = true;
+                                    }
+                                @endphp
                                 <li class="list-inline-item ml-2 mr-2">
                                     <a href="{{ $custom_links[$i] }}" target="_blank"
-                                        style="display: inline-block; width: 36px; height: 36px; background-color: #fff; border-radius: 50%; position: relative; vertical-align: middle; overflow: hidden;">
+                                        style="display: inline-block; width: 36px; height: 36px; background-color: {{ $bg_color }}; border-radius: 50%; line-height: 36px; text-align: center; vertical-align: middle; position: relative;">
                                         <img src="{{ uploaded_asset($custom_images[$i]) }}" alt="Custom Social Icon"
-                                            style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; object-fit: contain;">
+                                            style="width: 20px; height: 20px; object-fit: contain; vertical-align: middle; position: relative; top: -1px; {{ $is_dark_bg ? 'filter: brightness(0) invert(1);' : '' }}">
                                     </a>
                                 </li>
                             @endif
