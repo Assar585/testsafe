@@ -203,40 +203,44 @@
                 <!-- Social -->
                 @if (get_setting('show_social_links'))
                     <h5 class="fs-14 fw-700 text-secondary text-uppercase mt-3 mt-lg-0">{{ translate('Follow Us') }}</h5>
-                    <ul class="list-inline social colored mb-4 d-flex align-items-center flex-wrap">
+                    <ul class="list-inline social colored mb-4 d-flex align-items-center flex-wrap" style="gap: 5px;">
                         @if (!empty(get_setting('facebook_link')))
-                            <li class="list-inline-item ml-2 mr-2">
-                                <a href="{{ get_setting('facebook_link') }}" target="_blank" class="facebook"><i
+                            <li class="list-inline-item">
+                                <a href="{{ get_setting('facebook_link') }}" target="_blank" class="facebook"
+                                    style="display: flex; align-items: center; justify-content: center; line-height: normal;"><i
                                         class="lab la-facebook-f"></i></a>
                             </li>
                         @endif
                         @if (!empty(get_setting('twitter_link')))
-                            <li class="list-inline-item ml-2 mr-2">
-                                <a href="{{ get_setting('twitter_link') }}" target="_blank" class="x-twitter">
+                            <li class="list-inline-item">
+                                <a href="{{ get_setting('twitter_link') }}" target="_blank" class="x-twitter" style="display: flex; align-items: center; justify-content: center; line-height: normal;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#ffffff"
-                                        viewBox="0 0 16 16" class="mb-2 pb-1">
+                                        viewBox="0 0 16 16">
                                         <path
                                             d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
-                                                                                                                                                                .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+                                                                                                                                                                        .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
                                     </svg>
                                 </a>
                             </li>
                         @endif
                         @if (!empty(get_setting('instagram_link')))
-                            <li class="list-inline-item ml-2 mr-2">
-                                <a href="{{ get_setting('instagram_link') }}" target="_blank" class="instagram"><i
+                            <li class="list-inline-item">
+                                <a href="{{ get_setting('instagram_link') }}" target="_blank" class="instagram"
+                                    style="display: flex; align-items: center; justify-content: center; line-height: normal;"><i
                                         class="lab la-instagram"></i></a>
                             </li>
                         @endif
                         @if (!empty(get_setting('youtube_link')))
-                            <li class="list-inline-item ml-2 mr-2">
-                                <a href="{{ get_setting('youtube_link') }}" target="_blank" class="youtube"><i
+                            <li class="list-inline-item">
+                                <a href="{{ get_setting('youtube_link') }}" target="_blank" class="youtube"
+                                    style="display: flex; align-items: center; justify-content: center; line-height: normal;"><i
                                         class="lab la-youtube"></i></a>
                             </li>
                         @endif
                         @if (!empty(get_setting('linkedin_link')))
-                            <li class="list-inline-item ml-2 mr-2">
-                                <a href="{{ get_setting('linkedin_link') }}" target="_blank" class="linkedin"><i
+                            <li class="list-inline-item">
+                                <a href="{{ get_setting('linkedin_link') }}" target="_blank" class="linkedin"
+                                    style="display: flex; align-items: center; justify-content: center; line-height: normal;"><i
                                         class="lab la-linkedin-in"></i></a>
                             </li>
                         @endif
@@ -247,9 +251,9 @@
                         @endphp
                         @for($i = 0; $i < $max_socials; $i++)
                             @if(!empty($custom_links[$i]) && !empty($custom_images[$i]))
-                                <li class="list-inline-item ml-2 mr-2">
+                                <li class="list-inline-item">
                                     <a href="{{ $custom_links[$i] }}" target="_blank"
-                                        style="display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; background: transparent; border: none; border-radius: 0;">
+                                        style="display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; background: transparent !important; border: none !important; border-radius: 0; line-height: normal;">
                                         <img src="{{ uploaded_asset($custom_images[$i]) }}" alt="Custom Social Icon"
                                             style="max-width: 100%; max-height: 100%; object-fit: contain;">
                                     </a>
