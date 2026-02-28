@@ -2134,6 +2134,9 @@ $.fn.toggleAttr = function (attr, attr1, attr2) {
                     e.preventDefault();
                     $(target).append(content);
                     AIZ.plugins.bootstrapSelect();
+                    if (typeof AIZ.uploader !== 'undefined' && typeof AIZ.uploader.initForInput !== 'undefined') {
+                        AIZ.uploader.initForInput();
+                    }
                 });
             });
         },
