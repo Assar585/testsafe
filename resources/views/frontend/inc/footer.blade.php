@@ -203,7 +203,22 @@
                 <!-- Social -->
                 @if (get_setting('show_social_links'))
                     <h5 class="fs-14 fw-700 text-secondary text-uppercase mt-3 mt-lg-0">{{ translate('Follow Us') }}</h5>
-                    <ul class="list-inline social colored mb-4 d-flex align-items-center flex-wrap" style="gap: 5px;">
+                    <style>
+                        ul.social.colored li a.tiktok { background-color: #000000 !important; }
+                        ul.social.colored li a.telegram { background-color: #0088cc !important; }
+                        ul.social.colored li a.whatsapp { background-color: #25d366 !important; }
+                        ul.social li a { 
+                            display: inline-flex !important; 
+                            align-items: center !important; 
+                            justify-content: center !important; 
+                            vertical-align: middle !important;
+                            width: 36px !important;
+                            height: 36px !important;
+                            line-height: normal !important;
+                        }
+                        ul.social li { vertical-align: middle !important; }
+                    </style>
+                    <ul class="list-inline social colored mb-4">
                         @if (!empty(get_setting('facebook_link')))
                             <li class="list-inline-item">
                                 <a href="{{ get_setting('facebook_link') }}" target="_blank" class="facebook"
@@ -251,11 +266,17 @@
                         @endphp
                         @for($i = 0; $i < $max_socials; $i++)
                             @if(!empty($custom_links[$i]) && !empty($custom_images[$i]))
-                                <li class="list-inline-item">
-                                    <a href="{{ $custom_links[$i] }}" target="_blank"
-                                        style="display: flex; width: 36px; height: 36px; align-items: center; justify-content: center; background: transparent !important; border: none !important; border-radius: 0; line-height: normal;">
-                                        <img src="{{ uploaded_asset($custom_images[$i]) }}" alt="Custom Social Icon"
-                                            style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                @php
+                                    $link_url = strtolower($custom_links[$i]);
+                                    $class = 'social-custom';
+                                    if (strpos($link_url, 'tiktok.com') !== false) $class = 'tiktok';
+                                    elseif (strpos($link_url, 't.me') !== false || strpos($link_url, 'telegram.org') !== false) $class = 'telegram';
+                                    elseif (strpos($link_url, 'wa.me') !== false || strpos($link_url, 'whatsapp.com') !== false) $class = 'whatsapp';
+                                @endphp
+                                <li class="list-inline-item ml-2 mr-2">
+                                    <a href="{{ $custom_links[$i] }}" target="_blank" class="{{ $class }}">
+                                        <img src="{{ uploaded_asset($custom_images[$i]) }}" alt="Social Icon"
+                                            style="max-width: 22px; max-height: 22px; object-fit: contain;">
                                     </a>
                                 </li>
                             @endif
