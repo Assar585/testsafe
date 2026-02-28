@@ -217,7 +217,7 @@
                                         viewBox="0 0 16 16" class="mb-2 pb-1">
                                         <path
                                             d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
-                                                                                        .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+                                                                                                .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
                                     </svg>
                                 </a>
                             </li>
@@ -249,7 +249,8 @@
                             @if(!empty($custom_links[$i]) && !empty($custom_images[$i]))
                                 <li class="list-inline-item ml-2 mr-2">
                                     <a href="{{ $custom_links[$i] }}" target="_blank"
-                                        style="display: inline-flex; justify-content: center; align-items: center; width: 36px; height: 36px; background-color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; padding: 0; overflow: hidden; vertical-align: middle;">
+                                        class="d-inline-flex align-items-center justify-content-center"
+                                        style="width: 36px; height: 36px; background-color: #fff; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; padding: 0; overflow: hidden; vertical-align: middle; box-sizing: border-box;">
                                         <img src="{{ uploaded_asset($custom_images[$i]) }}" alt="Custom Social Icon"
                                             style="width: 100%; height: 100%; object-fit: cover;">
                                     </a>
