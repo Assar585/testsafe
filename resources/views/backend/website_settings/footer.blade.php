@@ -81,7 +81,8 @@
 									<div class="input-group " data-toggle="aizuploader" data-type="image">
 										<div class="input-group-prepend">
 											<div class="input-group-text bg-soft-secondary font-weight-medium">
-												{{ translate('Browse') }}</div>
+												{{ translate('Browse') }}
+											</div>
 										</div>
 										<div class="form-control file-amount">{{ translate('Choose File') }}</div>
 										<input type="hidden" name="types[]" value="footer_logo">
@@ -99,8 +100,8 @@
 									<textarea class="aiz-text-editor form-control" name="about_us_description"
 										data-buttons='[["font", ["bold", "underline", "italic"]],["para", ["ul", "ol"]],["view", ["undo","redo"]]]'
 										placeholder="Type.." data-min-height="150">
-											{!! get_setting('about_us_description', null, $lang) !!}
-										</textarea>
+												{!! get_setting('about_us_description', null, $lang) !!}
+											</textarea>
 								</div>
 								<!-- Play Store Link -->
 								<div class="form-group">
@@ -206,22 +207,22 @@
 									</div>
 									<button type="button" class="btn btn-soft-secondary btn-sm mb-3" data-toggle="add-more"
 										data-content='<div class="row gutters-5">
-												<div class="col-5">
-													<div class="form-group">
-														<input type="text" class="form-control" placeholder="{{translate('Address')}}" name="contact_address[]">
+													<div class="col-5">
+														<div class="form-group">
+															<input type="text" class="form-control" placeholder="{{translate('Address')}}" name="contact_address[]">
+														</div>
 													</div>
-												</div>
-												<div class="col-5">
-													<div class="form-group">
-														<input type="text" class="form-control" placeholder="{{translate('Phone')}}" name="contact_phone[]">
+													<div class="col-5">
+														<div class="form-group">
+															<input type="text" class="form-control" placeholder="{{translate('Phone')}}" name="contact_phone[]">
+														</div>
 													</div>
-												</div>
-												<div class="col-md-2">
-													<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-														<i class="las la-times"></i>
-													</button>
-												</div>
-											</div>' data-target=".contact-address-target">
+													<div class="col-md-2">
+														<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+															<i class="las la-times"></i>
+														</button>
+													</div>
+												</div>' data-target=".contact-address-target">
 										{{ translate('Add New') }}
 									</button>
 								</div>
@@ -315,22 +316,22 @@
 									</div>
 									<button type="button" class="btn btn-soft-secondary btn-sm" data-toggle="add-more"
 										data-content='<div class="row gutters-5">
-												<div class="col-4">
-													<div class="form-group">
-														<input type="text" class="form-control" placeholder="{{translate('Label')}}" name="widget_one_labels[]">
+													<div class="col-4">
+														<div class="form-group">
+															<input type="text" class="form-control" placeholder="{{translate('Label')}}" name="widget_one_labels[]">
+														</div>
 													</div>
-												</div>
-												<div class="col">
-													<div class="form-group">
-														<input type="text" class="form-control" placeholder="http://" name="widget_one_links[]">
+													<div class="col">
+														<div class="form-group">
+															<input type="text" class="form-control" placeholder="http://" name="widget_one_links[]">
+														</div>
 													</div>
-												</div>
-												<div class="col-auto">
-													<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-														<i class="las la-times"></i>
-													</button>
-												</div>
-											</div>' data-target=".w3-links-target">
+													<div class="col-auto">
+														<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+															<i class="las la-times"></i>
+														</button>
+													</div>
+												</div>' data-target=".w3-links-target">
 										{{ translate('Add New') }}
 									</button>
 								</div>
@@ -368,8 +369,8 @@
 							<textarea class="aiz-text-editor form-control" name="frontend_copyright_text"
 								data-buttons='[["font", ["bold", "underline", "italic"]],["insert", ["link"]],["view", ["undo","redo"]]]'
 								placeholder="Type.." data-min-height="150">
-									{!! get_setting('frontend_copyright_text', null, $lang) !!}
-								</textarea>
+										{!! get_setting('frontend_copyright_text', null, $lang) !!}
+									</textarea>
 						</div>
 					</div>
 				</div>
@@ -385,7 +386,8 @@
 							<div class="col-md-9">
 								<label class="aiz-switch aiz-switch-success mb-0">
 									<input type="hidden" name="types[]" value="show_social_links">
-									<input type="checkbox" name="show_social_links" @if(get_setting('show_social_links') == 'on') checked @endif>
+									<input type="checkbox" name="show_social_links"
+										@if(get_setting('show_social_links') == 'on') checked @endif>
 									<span></span>
 								</label>
 							</div>
@@ -408,7 +410,7 @@
 										<svg xmlns="http://www.w3.org/2000/svg" width="9" height="10" fill="#5d6161"
 											viewBox="0 0 16 16" class="ml-1">
 											<path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
-											.75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+												.75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
 										</svg>
 									</span>
 								</div>
@@ -442,6 +444,79 @@
 								<input type="hidden" name="types[]" value="linkedin_link">
 								<input type="text" class="form-control" placeholder="http://" name="linkedin_link"
 									value="{{ get_setting('linkedin_link')}}">
+							</div>
+							<hr>
+							<!-- Custom Dynamic Social Links -->
+							<div class="form-group mb-0">
+								<label>{{ translate('Additional Custom Social Links') }}</label>
+								<div class="custom-social-links-target">
+									<input type="hidden" name="types[]" value="custom_social_links">
+									<input type="hidden" name="types[]" value="custom_social_icons">
+									@php
+										$custom_links = json_decode(get_setting('custom_social_links'), true) ?? [];
+										$custom_icons = json_decode(get_setting('custom_social_icons'), true) ?? [];
+										$max_socials = max(count($custom_links), count($custom_icons));
+									@endphp
+									@for($i = 0; $i < $max_socials; $i++)
+										<div class="row gutters-5">
+											<div class="col-4">
+												<div class="form-group">
+													<select class="form-control aiz-selectpicker" name="custom_social_icons[]">
+														<option value="lab la-vk" @if(($custom_icons[$i] ?? '') == 'lab la-vk')
+														selected @endif>VKontakte</option>
+														<option value="lab la-telegram" @if(($custom_icons[$i] ?? '') == 'lab la-telegram') selected @endif>Telegram</option>
+														<option value="lab la-whatsapp" @if(($custom_icons[$i] ?? '') == 'lab la-whatsapp') selected @endif>WhatsApp</option>
+														<option value="lab la-viber" @if(($custom_icons[$i] ?? '') == 'lab la-viber') selected @endif>Viber</option>
+														<option value="lab la-tiktok" @if(($custom_icons[$i] ?? '') == 'lab la-tiktok') selected @endif>TikTok</option>
+														<option value="lab la-pinterest" @if(($custom_icons[$i] ?? '') == 'lab la-pinterest') selected @endif>Pinterest</option>
+														<option value="las la-globe" @if(($custom_icons[$i] ?? '') == 'las la-globe') selected @endif>Website (Globe)</option>
+													</select>
+												</div>
+											</div>
+											<div class="col">
+												<div class="form-group">
+													<input type="text" class="form-control" placeholder="http://"
+														name="custom_social_links[]" value="{{ $custom_links[$i] ?? '' }}">
+												</div>
+											</div>
+											<div class="col-auto">
+												<button type="button"
+													class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger"
+													data-toggle="remove-parent" data-parent=".row">
+													<i class="las la-times"></i>
+												</button>
+											</div>
+										</div>
+									@endfor
+								</div>
+								<button type="button" class="btn btn-soft-secondary btn-sm" data-toggle="add-more"
+									data-content='<div class="row gutters-5">
+												<div class="col-4">
+													<div class="form-group">
+														<select class="form-control" name="custom_social_icons[]">
+															<option value="lab la-vk">VKontakte</option>
+															<option value="lab la-telegram">Telegram</option>
+															<option value="lab la-whatsapp">WhatsApp</option>
+															<option value="lab la-viber">Viber</option>
+															<option value="lab la-tiktok">TikTok</option>
+															<option value="lab la-pinterest">Pinterest</option>
+															<option value="las la-globe">Website (Globe)</option>
+														</select>
+													</div>
+												</div>
+												<div class="col">
+													<div class="form-group">
+														<input type="text" class="form-control" placeholder="http://" name="custom_social_links[]">
+													</div>
+												</div>
+												<div class="col-auto">
+													<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+														<i class="las la-times"></i>
+													</button>
+												</div>
+											</div>' data-target=".custom-social-links-target">
+									{{ translate('Add New Social') }}
+								</button>
 							</div>
 						</div>
 					</div>
@@ -491,7 +566,8 @@
 							<div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
 								<div class="input-group-prepend">
 									<div class="input-group-text bg-soft-secondary font-weight-medium">
-										{{ translate('Browse')}}</div>
+										{{ translate('Browse')}}
+									</div>
 								</div>
 								<div class="form-control file-amount">{{ translate('Choose File') }}</div>
 								<input type="hidden" name="types[]" value="payment_method_images">

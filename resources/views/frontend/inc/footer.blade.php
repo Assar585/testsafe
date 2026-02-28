@@ -217,7 +217,7 @@
                                         viewBox="0 0 16 16" class="mb-2 pb-1">
                                         <path
                                             d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
-                                                        .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+                                                                .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
                                     </svg>
                                 </a>
                             </li>
@@ -240,6 +240,20 @@
                                         class="lab la-linkedin-in"></i></a>
                             </li>
                         @endif
+                        @php
+                            $custom_links = json_decode(get_setting('custom_social_links', '[]', App::getLocale()), true) ?? [];
+                            $custom_icons = json_decode(get_setting('custom_social_icons', '[]', App::getLocale()), true) ?? [];
+                            $max_socials = max(count($custom_links), count($custom_icons));
+                        @endphp
+                        @for($i = 0; $i < $max_socials; $i++)
+                            @if(!empty($custom_links[$i]))
+                                <li class="list-inline-item ml-2 mr-2">
+                                    <a href="{{ $custom_links[$i] }}" target="_blank" class="text-white opacity-60 hov-opacity-100">
+                                        <i class="{{ $custom_icons[$i] ?? 'las la-globe' }} fs-20"></i>
+                                    </a>
+                                </li>
+                            @endif
+                        @endfor
                     </ul>
                 @endif
 
