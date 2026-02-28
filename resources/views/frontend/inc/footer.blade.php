@@ -203,20 +203,33 @@
                 <!-- Social -->
                 @if (get_setting('show_social_links'))
                     <h5 class="fs-14 fw-700 text-secondary text-uppercase mt-3 mt-lg-0">{{ translate('Follow Us') }}</h5>
+                    <!-- ANTIGRAVITY_DEP_CHECK_V1 -->
                     <style>
-                        ul.social.colored li a.tiktok { background-color: #000000 !important; }
-                        ul.social.colored li a.telegram { background-color: #0088cc !important; }
-                        ul.social.colored li a.whatsapp { background-color: #25d366 !important; }
-                        ul.social li a { 
-                            display: inline-flex !important; 
-                            align-items: center !important; 
-                            justify-content: center !important; 
+                        ul.social.colored li a.tiktok {
+                            background-color: #000000 !important;
+                        }
+
+                        ul.social.colored li a.telegram {
+                            background-color: #0088cc !important;
+                        }
+
+                        ul.social.colored li a.whatsapp {
+                            background-color: #25d366 !important;
+                        }
+
+                        ul.social li a {
+                            display: inline-flex !important;
+                            align-items: center !important;
+                            justify-content: center !important;
                             vertical-align: middle !important;
                             width: 36px !important;
                             height: 36px !important;
                             line-height: normal !important;
                         }
-                        ul.social li { vertical-align: middle !important; }
+
+                        ul.social li {
+                            vertical-align: middle !important;
+                        }
                     </style>
                     <ul class="list-inline social colored mb-4">
                         @if (!empty(get_setting('facebook_link')))
@@ -228,12 +241,13 @@
                         @endif
                         @if (!empty(get_setting('twitter_link')))
                             <li class="list-inline-item">
-                                <a href="{{ get_setting('twitter_link') }}" target="_blank" class="x-twitter" style="display: flex; align-items: center; justify-content: center; line-height: normal;">
+                                <a href="{{ get_setting('twitter_link') }}" target="_blank" class="x-twitter"
+                                    style="display: flex; align-items: center; justify-content: center; line-height: normal;">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="#ffffff"
                                         viewBox="0 0 16 16">
                                         <path
                                             d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
-                                                                                                                                                                        .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+                                                                                                                                                                                .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
                                     </svg>
                                 </a>
                             </li>
@@ -269,9 +283,12 @@
                                 @php
                                     $link_url = strtolower($custom_links[$i]);
                                     $class = 'social-custom';
-                                    if (strpos($link_url, 'tiktok.com') !== false) $class = 'tiktok';
-                                    elseif (strpos($link_url, 't.me') !== false || strpos($link_url, 'telegram.org') !== false) $class = 'telegram';
-                                    elseif (strpos($link_url, 'wa.me') !== false || strpos($link_url, 'whatsapp.com') !== false) $class = 'whatsapp';
+                                    if (strpos($link_url, 'tiktok.com') !== false)
+                                        $class = 'tiktok';
+                                    elseif (strpos($link_url, 't.me') !== false || strpos($link_url, 'telegram.org') !== false)
+                                        $class = 'telegram';
+                                    elseif (strpos($link_url, 'wa.me') !== false || strpos($link_url, 'whatsapp.com') !== false)
+                                        $class = 'whatsapp';
                                 @endphp
                                 <li class="list-inline-item ml-2 mr-2">
                                     <a href="{{ $custom_links[$i] }}" target="_blank" class="{{ $class }}">

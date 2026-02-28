@@ -9,3 +9,8 @@ Route::get('/system-update/step1', [UpdateController::class, 'step1'])->name('up
 Route::post('/system-update/purchase_code', [UpdateController::class, 'purchase_code'])->name('update.purchase_code');
 Route::get('/system-update/step2', [UpdateController::class, 'step2'])->name('update.step2');
 Route::get('/system-update/step3', [UpdateController::class, 'step3'])->name('update.step3');
+
+Route::get('/clear-view-cache', function () {
+    \Artisan::call('view:clear');
+    return "View cache cleared at " . date('Y-m-d H:i:s');
+});
