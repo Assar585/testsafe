@@ -201,7 +201,7 @@ class AizUploadController extends Controller
                         $extension = get_setting('uploaded_image_format');
                     }
                     try {
-                        $path = 'uploads/all/'. Str::random(40) . '.' .$extension;
+                        $path = 'uploads/all/' . Str::random(40) . '.' . $extension;
                         $img = Image::make($request->file('aiz_file')->getRealPath())->encode($extension, 75);
                         $height = $img->height();
                         $width = $img->width();
@@ -251,12 +251,12 @@ class AizUploadController extends Controller
                                     $valign = 'middle';
                                     $align = 'center';
                                     $x = round($width / 2);
-                                    $y =  round($height / 2);
+                                    $y = round($height / 2);
                                 } else {
                                     $valign = explode('-', $watermark_position)[0];
                                     $align = explode('-', $watermark_position)[1];
                                     $x = ($align == 'right') ? ($width - 20) : 20;
-                                    $y =  ($valign == 'bottom') ? ($height - 20) : 20;
+                                    $y = ($valign == 'bottom') ? ($height - 20) : 20;
                                 }
                                 $img->text(get_setting('watermark_text', 'Watermark Text Here'), $x, $y, function ($font) use ($valign, $align) {
                                     $font->file(base_path('public/assets/fonts/robotoMedium.ttf'));
@@ -285,7 +285,8 @@ class AizUploadController extends Controller
                         clearstatcache();
                         $size = $img->filesize();
                     } catch (\Exception $e) {
-                        //dd($e);
+                        \Log::error('Image upload failed: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+                        throw $e;
                     }
                 } else {
                     $path = $request->file('aiz_file')->store('uploads/all', 'local');
@@ -302,7 +303,7 @@ class AizUploadController extends Controller
                         file_get_contents(base_path('public/') . $path),
                         [
                             'visibility' => 'public',
-                            'ContentType' =>  $extension == 'svg' ? 'image/svg+xml' : $file_mime
+                            'ContentType' => $extension == 'svg' ? 'image/svg+xml' : $file_mime
                         ]
                     );
 
