@@ -12,13 +12,14 @@ RUN apt-get update && apt-get install -y \
     nginx \
     libzip-dev \
     libjpeg-dev \
-    libfreetype6-dev
+    libfreetype6-dev \
+    libwebp-dev
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache
 
 # Setup highly optimized OPcache for production
