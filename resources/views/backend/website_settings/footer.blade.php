@@ -100,8 +100,8 @@
 									<textarea class="aiz-text-editor form-control" name="about_us_description"
 										data-buttons='[["font", ["bold", "underline", "italic"]],["para", ["ul", "ol"]],["view", ["undo","redo"]]]'
 										placeholder="Type.." data-min-height="150">
-													{!! get_setting('about_us_description', null, $lang) !!}
-												</textarea>
+														{!! get_setting('about_us_description', null, $lang) !!}
+													</textarea>
 								</div>
 								<!-- Play Store Link -->
 								<div class="form-group">
@@ -207,22 +207,22 @@
 									</div>
 									<button type="button" class="btn btn-soft-secondary btn-sm mb-3" data-toggle="add-more"
 										data-content='<div class="row gutters-5">
-														<div class="col-5">
-															<div class="form-group">
-																<input type="text" class="form-control" placeholder="{{translate('Address')}}" name="contact_address[]">
+															<div class="col-5">
+																<div class="form-group">
+																	<input type="text" class="form-control" placeholder="{{translate('Address')}}" name="contact_address[]">
+																</div>
 															</div>
-														</div>
-														<div class="col-5">
-															<div class="form-group">
-																<input type="text" class="form-control" placeholder="{{translate('Phone')}}" name="contact_phone[]">
+															<div class="col-5">
+																<div class="form-group">
+																	<input type="text" class="form-control" placeholder="{{translate('Phone')}}" name="contact_phone[]">
+																</div>
 															</div>
-														</div>
-														<div class="col-md-2">
-															<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-																<i class="las la-times"></i>
-															</button>
-														</div>
-													</div>' data-target=".contact-address-target">
+															<div class="col-md-2">
+																<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+																	<i class="las la-times"></i>
+																</button>
+															</div>
+														</div>' data-target=".contact-address-target">
 										{{ translate('Add New') }}
 									</button>
 								</div>
@@ -316,22 +316,22 @@
 									</div>
 									<button type="button" class="btn btn-soft-secondary btn-sm" data-toggle="add-more"
 										data-content='<div class="row gutters-5">
-														<div class="col-4">
-															<div class="form-group">
-																<input type="text" class="form-control" placeholder="{{translate('Label')}}" name="widget_one_labels[]">
+															<div class="col-4">
+																<div class="form-group">
+																	<input type="text" class="form-control" placeholder="{{translate('Label')}}" name="widget_one_labels[]">
+																</div>
 															</div>
-														</div>
-														<div class="col">
-															<div class="form-group">
-																<input type="text" class="form-control" placeholder="http://" name="widget_one_links[]">
+															<div class="col">
+																<div class="form-group">
+																	<input type="text" class="form-control" placeholder="http://" name="widget_one_links[]">
+																</div>
 															</div>
-														</div>
-														<div class="col-auto">
-															<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-																<i class="las la-times"></i>
-															</button>
-														</div>
-													</div>' data-target=".w3-links-target">
+															<div class="col-auto">
+																<button type="button" class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+																	<i class="las la-times"></i>
+																</button>
+															</div>
+														</div>' data-target=".w3-links-target">
 										{{ translate('Add New') }}
 									</button>
 								</div>
@@ -369,8 +369,8 @@
 							<textarea class="aiz-text-editor form-control" name="frontend_copyright_text"
 								data-buttons='[["font", ["bold", "underline", "italic"]],["insert", ["link"]],["view", ["undo","redo"]]]'
 								placeholder="Type.." data-min-height="150">
-											{!! get_setting('frontend_copyright_text', null, $lang) !!}
-										</textarea>
+												{!! get_setting('frontend_copyright_text', null, $lang) !!}
+											</textarea>
 						</div>
 					</div>
 				</div>
@@ -410,7 +410,7 @@
 										<svg xmlns="http://www.w3.org/2000/svg" width="9" height="10" fill="#5d6161"
 											viewBox="0 0 16 16" class="ml-1">
 											<path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 
-													.75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
+														.75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z" />
 										</svg>
 									</span>
 								</div>
@@ -461,9 +461,19 @@
 										<div class="row gutters-5">
 											<div class="col-4">
 												<div class="form-group">
-													<input type="text" class="form-control" name="custom_social_icons[]"
-														value="{{ $custom_icons[$i] ?? '' }}"
-														placeholder="{{ translate('Icon Class (e.g. lab la-telegram)') }}">
+													<div class="input-group" data-toggle="aizuploader" data-type="image">
+														<div class="input-group-prepend">
+															<div class="input-group-text bg-soft-secondary font-weight-medium">
+																{{ translate('Browse')}}
+															</div>
+														</div>
+														<div class="form-control file-amount">{{ translate('Choose File') }}
+														</div>
+														<input type="hidden" name="custom_social_images[]"
+															class="selected-files" value="{{ $custom_icons[$i] ?? '' }}">
+													</div>
+													<div class="file-preview box sm">
+													</div>
 												</div>
 											</div>
 											<div class="col">
@@ -486,7 +496,17 @@
 									data-content='<div class="row gutters-5">
 													<div class="col-4">
 														<div class="form-group">
-															<input type="text" class="form-control" name="custom_social_icons[]" placeholder="{{ translate('Icon Class (e.g. lab la-telegram)') }}">
+															<div class="input-group" data-toggle="aizuploader" data-type="image">
+																<div class="input-group-prepend">
+																	<div class="input-group-text bg-soft-secondary font-weight-medium">
+																		{{ translate('Browse')}}
+																	</div>
+																</div>
+																<div class="form-control file-amount">{{ translate('Choose File') }}</div>
+																<input type="hidden" name="custom_social_images[]" class="selected-files">
+															</div>
+															<div class="file-preview box sm">
+															</div>
 														</div>
 													</div>
 													<div class="col">
@@ -505,73 +525,72 @@
 							</div>
 						</div>
 					</div>
-				</div>
 
-				<!-- Download App Link -->
-				@if ((get_setting('vendor_system_activation') == 1) || addon_is_activated('delivery_boy'))
+					<!-- Download App Link -->
+					@if ((get_setting('vendor_system_activation') == 1) || addon_is_activated('delivery_boy'))
+						<div class="card shadow-none bg-light">
+							<div class="card-header">
+								<h6 class="mb-0">{{ translate('Download App Link') }}</h6>
+							</div>
+							<div class="card-body">
+								<!-- Seller App Link -->
+								@if (get_setting('vendor_system_activation') == 1)
+									<div class="form-group">
+										<label>{{ translate('Seller App Link') }}</label>
+										<div class="input-group form-group">
+											<input type="hidden" name="types[]" value="seller_app_link">
+											<input type="text" class="form-control" placeholder="http://" name="seller_app_link"
+												value="{{ get_setting('seller_app_link')}}">
+										</div>
+									</div>
+								@endif
+								<!-- Delivery Boy App Link -->
+								@if (addon_is_activated('delivery_boy'))
+									<div class="form-group">
+										<label>{{ translate('Delivery Boy App Link') }}</label>
+										<div class="input-group form-group">
+											<input type="hidden" name="types[]" value="delivery_boy_app_link">
+											<input type="text" class="form-control" placeholder="http://"
+												name="delivery_boy_app_link" value="{{ get_setting('delivery_boy_app_link')}}">
+										</div>
+									</div>
+								@endif
+							</div>
+						</div>
+					@endif
+
+					<!-- Payment Methods Widget -->
 					<div class="card shadow-none bg-light">
 						<div class="card-header">
-							<h6 class="mb-0">{{ translate('Download App Link') }}</h6>
+							<h6 class="mb-0">{{ translate('Payment Methods Widget ') }}</h6>
 						</div>
 						<div class="card-body">
-							<!-- Seller App Link -->
-							@if (get_setting('vendor_system_activation') == 1)
-								<div class="form-group">
-									<label>{{ translate('Seller App Link') }}</label>
-									<div class="input-group form-group">
-										<input type="hidden" name="types[]" value="seller_app_link">
-										<input type="text" class="form-control" placeholder="http://" name="seller_app_link"
-											value="{{ get_setting('seller_app_link')}}">
+							<div class="form-group">
+								<label>{{ translate('Payment Methods') }}</label>
+								<div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
+									<div class="input-group-prepend">
+										<div class="input-group-text bg-soft-secondary font-weight-medium">
+											{{ translate('Browse')}}
+										</div>
 									</div>
+									<div class="form-control file-amount">{{ translate('Choose File') }}</div>
+									<input type="hidden" name="types[]" value="payment_method_images">
+									<input type="hidden" name="payment_method_images" class="selected-files"
+										value="{{ get_setting('payment_method_images')}}">
 								</div>
-							@endif
-							<!-- Delivery Boy App Link -->
-							@if (addon_is_activated('delivery_boy'))
-								<div class="form-group">
-									<label>{{ translate('Delivery Boy App Link') }}</label>
-									<div class="input-group form-group">
-										<input type="hidden" name="types[]" value="delivery_boy_app_link">
-										<input type="text" class="form-control" placeholder="http://" name="delivery_boy_app_link"
-											value="{{ get_setting('delivery_boy_app_link')}}">
-									</div>
-								</div>
-							@endif
-						</div>
-					</div>
-				@endif
-
-				<!-- Payment Methods Widget -->
-				<div class="card shadow-none bg-light">
-					<div class="card-header">
-						<h6 class="mb-0">{{ translate('Payment Methods Widget ') }}</h6>
-					</div>
-					<div class="card-body">
-						<div class="form-group">
-							<label>{{ translate('Payment Methods') }}</label>
-							<div class="input-group" data-toggle="aizuploader" data-type="image" data-multiple="true">
-								<div class="input-group-prepend">
-									<div class="input-group-text bg-soft-secondary font-weight-medium">
-										{{ translate('Browse')}}
-									</div>
-								</div>
-								<div class="form-control file-amount">{{ translate('Choose File') }}</div>
-								<input type="hidden" name="types[]" value="payment_method_images">
-								<input type="hidden" name="payment_method_images" class="selected-files"
-									value="{{ get_setting('payment_method_images')}}">
+								<div class="file-preview box sm"></div>
+								<small
+									class="text-muted">{{ translate("Minimum dimensions required: 144px width X 20px height.") }}</small>
 							</div>
-							<div class="file-preview box sm"></div>
-							<small
-								class="text-muted">{{ translate("Minimum dimensions required: 144px width X 20px height.") }}</small>
 						</div>
 					</div>
-				</div>
 
-				<!-- Update Button -->
-				<div class="mt-4 text-right">
-					<button type="submit"
-						class="btn btn-success w-230px btn-md rounded-2 fs-14 fw-700 shadow-success">{{ translate('Update') }}</button>
+					<!-- Update Button -->
+					<div class="mt-4 text-right">
+						<button type="submit"
+							class="btn btn-success w-230px btn-md rounded-2 fs-14 fw-700 shadow-success">{{ translate('Update') }}</button>
+					</div>
 				</div>
-			</div>
 		</form>
 	</div>
 @endsection
