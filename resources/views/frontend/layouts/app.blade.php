@@ -1,3 +1,4 @@
+@php die('CORE APP START'); @endphp
 <!DOCTYPE html>
 
 @php
@@ -247,7 +248,7 @@
             !function (f, b, e, v, n, t, s) {
                 if (f.fbq) return; n = f.fbq = function () {
                     n.callMethod ?
-                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+                        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
                 };
                 if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
                 n.queue = []; t = b.createElement(e); t.async = !0;
@@ -584,7 +585,7 @@
                 @if (get_setting('homepage_select') == 'thecore')
                     toggleViewMoreButton();
                 @endif
-                });
+                    });
 
             $.post('{{ route('home.section.auction_products') }}', {
                 _token: '{{ csrf_token() }}'
@@ -1353,21 +1354,21 @@
                 if (!saleAlertProducts || saleAlertProducts.length === 0) return;
                 const randomProduct = saleAlertProducts[Math.floor(Math.random() * saleAlertProducts.length)];
                 const html = `
-                    <div class="alert  bg-white alert-dismissible rounded-0" role="alert" style="display: none; box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
-                        <div class="d-flex align-items-center">
-                            <img src="${randomProduct.image}" class="h-50px w-50px img-fit mr-2 rounded" alt="${randomProduct.title}">
-                            <div>
-                                <span class="text-truncate-2">
-                                    <a href="${randomProduct.url}" class="text-dark font-weight-bold">${randomProduct.title}</a>
-                                </span>
-                                 — {{ translate('ordered just now') }}!
+                        <div class="alert  bg-white alert-dismissible rounded-0" role="alert" style="display: none; box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
+                            <div class="d-flex align-items-center">
+                                <img src="${randomProduct.image}" class="h-50px w-50px img-fit mr-2 rounded" alt="${randomProduct.title}">
+                                <div>
+                                    <span class="text-truncate-2">
+                                        <a href="${randomProduct.url}" class="text-dark font-weight-bold">${randomProduct.title}</a>
+                                    </span>
+                                     — {{ translate('ordered just now') }}!
+                                </div>
+                                <button type="button" class="close ml-auto hov-text-primary set-session" data-parent=".alert">
+                                    <i class="la la-close fs-20"></i>
+                                </button>
                             </div>
-                            <button type="button" class="close ml-auto hov-text-primary set-session" data-parent=".alert">
-                                <i class="la la-close fs-20"></i>
-                            </button>
                         </div>
-                    </div>
-                `;
+                    `;
                 const $container = $('#aiz-custom-sale-alert');
                 const $alert = $(html).appendTo($container);
                 $alert.stop(true, true).fadeIn(600);
