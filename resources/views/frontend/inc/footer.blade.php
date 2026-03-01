@@ -371,19 +371,25 @@
                     </h4>
                     <ul class="list-unstyled">
                         @if (get_setting('widget_one_labels', null, App::getLocale()) != null)
-                            @foreach (json_decode(get_setting('widget_one_labels', null, App::getLocale()), true) as $key => $value)
-                                @php
-                                    $widget_one_links = '';
-                                    if (isset(json_decode(get_setting('widget_one_links'), true)[$key])) {
-                                        $widget_one_links = json_decode(get_setting('widget_one_links'), true)[$key];
-                                    }
-                                @endphp
-                                <li class="mb-2">
-                                    <a href="{{ $widget_one_links }}" class="fs-13 text-soft-light animate-underline-white">
-                                        {{ $value }}
-                                    </a>
-                                </li>
-                            @endforeach
+                            @php
+                                $widget_one_labels = json_decode(get_setting('widget_one_labels', null, App::getLocale()), true);
+                                $widget_one_links_arr = json_decode(get_setting('widget_one_links'), true);
+                            @endphp
+                            @if (is_array($widget_one_labels))
+                                @foreach ($widget_one_labels as $key => $value)
+                                    @php
+                                        $widget_one_links = '';
+                                        if (is_array($widget_one_links_arr) && isset($widget_one_links_arr[$key])) {
+                                            $widget_one_links = $widget_one_links_arr[$key];
+                                        }
+                                    @endphp
+                                    <li class="mb-2">
+                                        <a href="{{ $widget_one_links }}" class="fs-13 text-soft-light animate-underline-white">
+                                            {{ $value }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @endif
                         @endif
                     </ul>
                 </div>
@@ -539,20 +545,26 @@
                 <div class="container">
                     <ul class="list-unstyled mt-3">
                         @if (get_setting('widget_one_labels', null, App::getLocale()) != null)
-                            @foreach (json_decode(get_setting('widget_one_labels', null, App::getLocale()), true) as $key => $value)
-                                @php
-                                    $widget_one_links = '';
-                                    if (isset(json_decode(get_setting('widget_one_links'), true)[$key])) {
-                                        $widget_one_links = json_decode(get_setting('widget_one_links'), true)[$key];
-                                    }
-                                @endphp
-                                <li class="mb-2 pb-2 @if (url()->current() == $widget_one_links) active @endif">
-                                    <a href="{{ $widget_one_links }}"
-                                        class="fs-13 text-soft-light text-sm-secondary animate-underline-white">
-                                        {{ $value }}
-                                    </a>
-                                </li>
-                            @endforeach
+                            @php
+                                $widget_one_labels = json_decode(get_setting('widget_one_labels', null, App::getLocale()), true);
+                                $widget_one_links_arr = json_decode(get_setting('widget_one_links'), true);
+                            @endphp
+                            @if (is_array($widget_one_labels))
+                                @foreach ($widget_one_labels as $key => $value)
+                                    @php
+                                        $widget_one_links = '';
+                                        if (is_array($widget_one_links_arr) && isset($widget_one_links_arr[$key])) {
+                                            $widget_one_links = $widget_one_links_arr[$key];
+                                        }
+                                    @endphp
+                                    <li class="mb-2 pb-2 @if (url()->current() == $widget_one_links) active @endif">
+                                        <a href="{{ $widget_one_links }}"
+                                            class="fs-13 text-soft-light text-sm-secondary animate-underline-white">
+                                            {{ $value }}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            @endif
                         @endif
                     </ul>
                 </div>

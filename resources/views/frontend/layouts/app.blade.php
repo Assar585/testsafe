@@ -288,7 +288,7 @@
         @include('frontend.inc.nav')
 
         @yield('content')
-        @php die('BEFORE FOOTER'); @endphp
+
         <!-- footer -->
         @include('frontend.inc.footer')
 
