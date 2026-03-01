@@ -1,3 +1,4 @@
+@php die('FOOTER START'); @endphp
 <!-- Last Viewed Products  -->
 @if(get_setting('last_viewed_product_activation') == 1 && Auth::check() && auth()->user()->user_type == 'customer')
     <div class="border-top" id="section_last_viewed_products" style="background-color: #fcfcfc;">
