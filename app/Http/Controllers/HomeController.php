@@ -51,7 +51,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        die('CONTROLLER INDEX');
         $lang = get_system_language() ? get_system_language()->code : null;
         $featured_categories = Cache::rememberForever('featured_categories', function () {
             return Category::with('bannerImage')->where('featured', 1)->get();
