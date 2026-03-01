@@ -1,4 +1,3 @@
-@php die('CORE APP START'); @endphp
 <!DOCTYPE html>
 
 @php
