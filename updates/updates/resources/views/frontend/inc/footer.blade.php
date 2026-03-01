@@ -311,15 +311,17 @@
                                 $custom_links = json_decode(get_setting('custom_social_links'), true);
                                 $custom_images = json_decode(get_setting('custom_social_images'), true);
                             @endphp
-                            @foreach ($custom_links as $index => $link)
-                                @if (!empty($link) && isset($custom_images[$index]))
-                                    <li class="list-inline-item">
-                                        <a href="{{ $link }}" target="_blank" class="has-img">
-                                            <img src="{{ uploaded_asset($custom_images[$index]) }}" alt="Social Icon">
-                                        </a>
-                                    </li>
-                                @endif
-                            @endforeach
+                            @if (is_array($custom_links) && is_array($custom_images))
+                                @foreach ($custom_links as $index => $link)
+                                    @if (!empty($link) && isset($custom_images[$index]))
+                                        <li class="list-inline-item">
+                                            <a href="{{ $link }}" target="_blank" class="has-img">
+                                                <img src="{{ uploaded_asset($custom_images[$index]) }}" alt="Social Icon">
+                                            </a>
+                                        </li>
+                                    @endif
+                                @endforeach
+                            @endif
                         @endif
                     </ul>
                 @endif
