@@ -38,9 +38,20 @@ class SitemapController extends Controller
     /**
      * Generate a localized sitemap for a specific locale.
      */
-    public function localized($locale)
+    /**
+     * Generate a localized sitemap for a specific locale.
+     */
+    public function show($locale)
     {
-        $language = Language::where('code', $locale)->where('is_active', 1)->first();
+        try {
+            $language = Language::where('code', $locale)->where('is_active', 1)->first();
+            if (!$language) {
+                $language = Language::where('code', $locale)->first();
+            }
+        } catch (\Exception $e) {
+            $language = Language::where('code', $locale)->first();
+        }
+
         if (!$language) {
             abort(404);
         }

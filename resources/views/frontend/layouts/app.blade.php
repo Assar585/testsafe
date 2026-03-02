@@ -30,8 +30,18 @@
     @php
         $currentPath = implode('/', array_slice(request()->segments(), 1));
         $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
-        $activeLanguages = \App\Models\Language::where('is_active', 1)->get();
-        $defaultLang = $activeLanguages->where('is_default', 1)->first() ?? $activeLanguages->first();
+        try {
+            $activeLanguages = \App\Models\Language::where('is_active', 1)->get();
+            $defaultLang = $activeLanguages->where('is_default', 1)->first() ?? $activeLanguages->first();
+        } catch (\Exception $e) {
+            try {
+                $activeLanguages = \App\Models\Language::all();
+                $defaultLang = $activeLanguages->first();
+            } catch (\Exception $e2) {
+                $activeLanguages = collect();
+                $defaultLang = null;
+            }
+        }
     @endphp
     <link rel="canonical" href="{{ url()->current() }}" />
     @foreach($activeLanguages as $language)
@@ -119,7 +129,7 @@
             complete: '{{ translate('Complete') }}',
             file: '{{ translate('File') }}',
             files: '{{ translate('Files') }}',
-        }
+    }
     </script>
 
     <style>
@@ -226,11 +236,11 @@
         <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('TRACKING_ID') }}"></script>
 
         <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
-            gtag('config', '{{ env('TRACKING_ID') }}');
-        </script>
+                window.dataLayer = window.dataLayer || [];
+                  function gtag() { dataLa yer.push(arguments); }
+                gtag('js', new Date());
+                gtag('config', '{{ env('TRACKING_ID') }}');
+            </script>
     @endif
 
     @if (get_setting('facebook_pixel') == 1)
@@ -1406,14 +1416,14 @@
                     $currentPath = implode('/', array_slice(request()->segments(), request()->segment(1) == $system_language->code ? 1 : 0));
                     $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
                 @endphp
-                
+
                 var currentPath = '{{ $currentPath }}';
                 var queryString = '{{ $queryString }}';
                 var baseUrl = '{{ url('/') }}';
-                
+
                 // Construct new URL: baseUrl / locale / path ? query
                 var newUrl = baseUrl + '/' + code + '/' + currentPath + queryString;
-                
+
                 // Update session via AJAX for immediate effect, then redirect
                 $.post('{{ route('language.change') }}', {
                     _token: '{{ csrf_token() }}',

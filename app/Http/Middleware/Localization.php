@@ -31,7 +31,16 @@ class Localization
     {
         // 1. Check URL for locale
         $locale = $request->segment(1);
-        $languages = Language::where('is_active', 1)->pluck('code')->toArray();
+        $languages = [];
+        try {
+            $languages = Language::where('is_active', 1)->pluck('code')->toArray();
+        } catch (\Exception $e) {
+            try {
+                $languages = Language::pluck('code')->toArray();
+            } catch (\Exception $e2) {
+                $languages = ['en', 'ru']; // Emergency fallback
+            }
+        }
 
         // If the first segment is a valid lang code
         if (in_array($locale, $languages)) {
@@ -79,8 +88,16 @@ class Localization
 
         // 2. Browser Accept-Language
         $browserLang = $this->geoLocationService->getBrowserLanguage($request);
-        if ($browserLang && Language::where('code', $browserLang)->where('is_active', 1)->exists()) {
-            return $browserLang;
+        if ($browserLang) {
+            try {
+                if (Language::where('code', $browserLang)->where('is_active', 1)->exists()) {
+                    return $browserLang;
+                }
+            } catch (\Exception $e) {
+                if (Language::where('code', $browserLang)->exists()) {
+                    return $browserLang;
+                }
+            }
         }
 
         // 3. IP-Geo
@@ -94,7 +111,14 @@ class Localization
         }
 
         // 4. Default from DB
-        $defaultLang = Language::where('is_default', 1)->where('is_active', 1)->first();
+        try {
+            $defaultLang = Language::where('is_default', 1)->where('is_active', 1)->first();
+            if (!$defaultLang) {
+                $defaultLang = Language::where('is_default', 1)->first();
+            }
+        } catch (\Exception $e) {
+            $defaultLang = Language::first();
+        }
         return $defaultLang ? $defaultLang->code : env('DEFAULT_LANGUAGE', 'en');
     }
 
@@ -109,7 +133,7 @@ class Localization
         }
 
         // Add more exclusions as needed (e.g., webhooks, uploads)
-        $exclusions = ['aiz-uploader*', 'social-login*', 'apple-callback*', 'sitemap.xml'];
+        $exclusions = ['aiz-uploader*', 'social-login*', 'apple-callback*', 'sitemap.xml', 'force-cache-clear*', 'db-update*'];
         foreach ($exclusions as $exclusion) {
             if ($request->is($exclusion)) {
                 return false;

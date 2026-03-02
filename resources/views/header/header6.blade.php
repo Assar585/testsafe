@@ -310,9 +310,9 @@ $bottomHeaderTextColor = get_setting('bottom_header_text_color');
                                                 style="min-width: 200px; left: 100%; top: 1px!important; margin-top: -1px;">
                                                 @foreach (get_all_active_language() as $language)
                                                 <div class="px-2 py-1 border-bottom border-soft-light hover-bg-light">
-                                                    <a href="javascript:void(0)" class="d-block text-dark"
+                                                    <a href="{{ Localization::getLocalizedURL($language->code) }}" class="d-block text-dark"
                                                         data-flag="{{ $language->code }}"
-                                                        onclick="changeLanguage('{{ $language->code }}')">
+                                                        onclick="changeLanguage('{{ $language->code }}', event)">
                                                         <img src="{{ static_asset('assets/img/placeholder.jpg') }}"
                                                             data-src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
                                                             class="mr-1 lazyload" alt="{{ $language->name }}" height="11">

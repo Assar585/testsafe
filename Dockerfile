@@ -41,22 +41,16 @@ RUN composer config audit.block-insecure false \
 # Install dependencies (ignoring platform reqs)
 RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs
 
-# Setup storage and cache permissions
-RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache \
-    && mkdir -p /var/www/public/assets \
-    && chmod -R 775 storage bootstrap/cache public \
-    && chown -R www-data:www-data /var/www \
-    && echo "=== /var/www/public contents ===" \
-    && ls -la /var/www/public/ || echo "WARNING: /var/www/public does not exist!"
-
-# Setup Nginx config
-COPY docker/nginx.conf /etc/nginx/sites-available/default
-RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
-
 # Generate optimal Laravel caches (config, view) built into the image
 RUN php artisan config:cache \
     && php artisan view:cache \
     || true
+
+# Setup storage and cache permissions (Move to after cache generation)
+RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache \
+    && mkdir -p /var/www/public/assets \
+    && chown -R www-data:www-data /var/www \
+    && chmod -R 775 storage bootstrap/cache public
 
 # Copy startup script
 COPY docker/start.sh /start.sh
