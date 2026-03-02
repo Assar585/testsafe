@@ -16,11 +16,6 @@ class GeoLocationService
      */
     public function getCountryCode($ip)
     {
-        // Skip local IPs
-        if ($ip == '127.0.0.1' || $ip == '::1') {
-            return 'RU'; // Default to RU for local testing or change as needed
-        }
-
         // Cache the IP lookup for 24 hours to reduce API calls
         return Cache::remember('geoip_country_' . $ip, 86400, function () use ($ip) {
             try {
