@@ -8,13 +8,16 @@
         }
     }
 </style>
-@php $lang = get_system_language()->code; @endphp
+@php
+    $system_language = get_system_language();
+    $lang = $system_language ? $system_language->code : 'en';
+@endphp
 <!-- Sliders -->
 <div class="home-banner-area mb-3">
     <div class="container">
         <div class="d-flex flex-wrap position-relative">
             <div class="position-static d-none d-xl-block">
-                @include('frontend.' . get_setting('homepage_select') . '.partials.category_menu')
+                @include('frontend.' . get_setting('homepage_select', 'classic') . '.partials.category_menu')
             </div>
 
             <!-- Sliders -->

@@ -17,9 +17,9 @@
                         name="payment_option" checked>
                     <span class="d-flex align-items-center justify-content-between aiz-megabox-elem rounded-0 p-3">
                         <span class="d-block fw-400 fs-14">{{ ucfirst(translate($payment_method->name)) }}</span>
-                        <span class="rounded-1 h-40px overflow-hidden">
+                        <span class="rounded-1 h-40px w-70px overflow-hidden flex-shrink-0">
                             <img src="{{ static_asset('assets/img/cards/'.$payment_method->name.'.png') }}"
-                            class="img-fit h-100">
+                            class="img-fit h-100 w-100">
                         </span>
                     </span>
                 </label>
@@ -151,9 +151,17 @@
                     {{ translate('Insufficient balance') }}
                 </button>
             @else
-                <button type="button" onclick="use_wallet()"
-                    class="btn btn-primary fs-14 fw-700 px-5 rounded-0">
-                    {{ translate('Pay with wallet') }}
+                <button type="button" onclick="use_wallet(this)" id="walletBtn"
+                    class="btn btn-primary fs-14 fw-700 rounded-0 px-4">
+
+                    <span class="btn-text">
+                        {{ translate('Pay with Wallet') }}
+                    </span>
+
+                    <span class="btn-loader d-none">
+                        <i class="las la-spinner la-spin"></i> {{ translate('Processing...') }}
+                    </span>
+
                 </button>
             @endif
         </div>

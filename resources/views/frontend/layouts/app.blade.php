@@ -63,9 +63,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
     <!-- CSS Files -->
     <link rel="stylesheet" href="{{ static_asset('assets/css/vendors.css?v=') }}{{ get_setting('current_version') }}">
@@ -73,10 +71,9 @@
         <link rel="stylesheet" href="{{ static_asset('assets/css/bootstrap-rtl.min.css') }}">
     @endif
     <link rel="stylesheet" href="{{ static_asset('assets/css/aiz-core.css?v=') }}{{ rand(1000, 9999) }}">
-    <link rel="stylesheet"
-        href="{{ static_asset('assets/css/custom-style.css?v=') }}{{ get_setting('current_version') }}">
+    <link rel="stylesheet" href="{{ static_asset('assets/css/custom-style.css?v=') }}{{ get_setting('current_version') }}">
     @if(get_setting('homepage_select') == 'thecore')
-        <link rel="stylesheet" href="{{ static_asset('assets/css/thecore.css') }}">
+    <link rel="stylesheet" href="{{ static_asset('assets/css/thecore.css') }}">
     @endif
 
     <script>
@@ -106,19 +103,13 @@
     </script>
 
     <style>
-        :root {
+        :root{
             --blue: #3490f3;
             --hov-blue: #2e7fd6;
             --soft-blue: rgba(0, 123, 255, 0.15);
-            --secondary-base:
-                {{ get_setting('secondary_base_color', '#ffc519') }}
-            ;
-            --hov-secondary-base:
-                {{ get_setting('secondary_base_hov_color', '#dbaa17') }}
-            ;
-            --soft-secondary-base:
-                {{ hex2rgba(get_setting('secondary_base_color', '#ffc519'), 0.15) }}
-            ;
+            --secondary-base: {{ get_setting('secondary_base_color', '#ffc519') }};
+            --hov-secondary-base: {{ get_setting('secondary_base_hov_color', '#dbaa17') }};
+            --soft-secondary-base: {{ hex2rgba(get_setting('secondary_base_color', '#ffc519'), 0.15) }};
             --gray: #9d9da6;
             --gray-dark: #8d8d8d;
             --secondary: #919199;
@@ -132,21 +123,12 @@
             --soft-white: #b5b5bf;
             --dark: #292933;
             --soft-dark: #1b1b28;
-            --primary:
-                {{ get_setting('base_color', '#d43533') }}
-            ;
-            --hov-primary:
-                {{ get_setting('base_hov_color', '#9d1b1a') }}
-            ;
-            --soft-primary:
-                {{ hex2rgba(get_setting('base_color', '#d43533'), 0.15) }}
-            ;
+            --primary: {{ get_setting('base_color', '#d43533') }};
+            --hov-primary: {{ get_setting('base_hov_color', '#9d1b1a') }};
+            --soft-primary: {{ hex2rgba(get_setting('base_color', '#d43533'), 0.15) }};
         }
-
-        body {
-            font-family:
-                {!! !empty(get_setting('system_font_family')) ? get_setting('system_font_family') : "'Public Sans', sans-serif" !!}
-                , sans-serif;
+        body{
+            font-family: {!! !empty(get_setting('system_font_family')) ? get_setting('system_font_family') : "'Public Sans', sans-serif" !!}, sans-serif;
             font-weight: 400;
         }
 
@@ -162,7 +144,6 @@
             border-radius: 0 !important;
             color: var(--dark);
         }
-
         .pagination .page-item {
             margin: 0 5px;
         }
@@ -170,107 +151,72 @@
         .form-control:focus {
             border-width: 2px !important;
         }
-
         .iti__flag-container {
             padding: 2px;
         }
-
         .modal-content {
             border: 0 !important;
             border-radius: 0 !important;
         }
 
-        .tagify.tagify--focus {
+        .tagify.tagify--focus{
             border-width: 2px;
             border-color: var(--primary);
         }
 
-        #map {
+        #map{
+            width: 100%;
+            height: 250px;
+        }
+        #edit_map{
             width: 100%;
             height: 250px;
         }
 
-        #edit_map {
-            width: 100%;
-            height: 250px;
-        }
-
-        .pac-container {
-            z-index: 100000;
-        }
+        .pac-container { z-index: 100000; }
 
         .home-category-banner::after {
             content: "{{ translate('View All') }}";
         }
-
-        /* Prevent Jerky Layout Shifts on Carousel Initialization */
-        .aiz-carousel:not(.slick-initialized) {
-            display: flex;
-            overflow: hidden;
-            flex-wrap: nowrap;
-        }
-
-        .aiz-carousel:not(.slick-initialized)>* {
-            flex: 0 0 auto;
-            width: 240px;
-            margin-right: 16px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        /* Smooth Lazy Load Fade-In */
-        img.lazyload {
-            opacity: 0;
-        }
-
-        img.lazyloaded {
-            opacity: 1;
-            transition: opacity 0.5s ease-in-out;
-        }
     </style>
 
-    @if (get_setting('google_analytics') == 1)
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('TRACKING_ID') }}"></script>
+@if (get_setting('google_analytics') == 1)
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ env('TRACKING_ID') }}"></script>
 
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
-            gtag('config', '{{ env('TRACKING_ID') }}');
-        </script>
-    @endif
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ env('TRACKING_ID') }}');
+    </script>
+@endif
 
-    @if (get_setting('facebook_pixel') == 1)
-        <!-- Facebook Pixel Code -->
-        <script>
-            !function (f, b, e, v, n, t, s) {
-                if (f.fbq) return; n = f.fbq = function () {
-                    n.callMethod ?
-                        n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-                };
-                if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-                n.queue = []; t = b.createElement(e); t.async = !0;
-                t.src = v; s = b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t, s)
-            }(window, document, 'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '{{ env('FACEBOOK_PIXEL_ID') }}');
-            fbq('track', 'PageView');
-        </script>
-        <noscript>
-            <img height="1" width="1" style="display:none"
-                src="https://www.facebook.com/tr?id={{ env('FACEBOOK_PIXEL_ID') }}&ev=PageView&noscript=1" />
-        </noscript>
-        <!-- End Facebook Pixel Code -->
-    @endif
+@if (get_setting('facebook_pixel') == 1)
+    <!-- Facebook Pixel Code -->
+    <script>
+        !function(f,b,e,v,n,t,s)
+        {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+        n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+        if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+        n.queue=[];t=b.createElement(e);t.async=!0;
+        t.src=v;s=b.getElementsByTagName(e)[0];
+        s.parentNode.insertBefore(t,s)}(window, document,'script',
+        'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '{{ env('FACEBOOK_PIXEL_ID') }}');
+        fbq('track', 'PageView');
+    </script>
+    <noscript>
+        <img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id={{ env('FACEBOOK_PIXEL_ID') }}&ev=PageView&noscript=1"/>
+    </noscript>
+    <!-- End Facebook Pixel Code -->
+@endif
 
-    @php
-        echo get_setting('header_script');
-    @endphp
+@php
+    echo get_setting('header_script');
+@endphp
 
 </head>
-
 <body>
     <!-- aiz-main-wrapper -->
     <div class="aiz-main-wrapper d-flex flex-column bg-white aiz-{{ get_setting('homepage_select') }}">
@@ -300,11 +246,7 @@
     @endif
 
     <div class="aiz-refresh">
-        <div class="aiz-refresh-content">
-            <div></div>
-            <div></div>
-            <div></div>
-        </div>
+        <div class="aiz-refresh-content"><div></div><div></div><div></div></div>
     </div>
 
 
@@ -318,11 +260,13 @@
         $alert_location = get_setting('custom_alert_location');
         $order = in_array($alert_location, ['top-left', 'top-right']) ? 'asc' : 'desc';
         $custom_alerts = App\Models\CustomAlert::where('status', 1)->orderBy('id', $order)->get();
+        $hasUnreviewed = false;
+        
         use App\Models\Order;
         use App\Models\OrderDetail;
-        if (auth()->user()) {
-            $userOrderIds = Order::where('user_id', auth()->user()->id)->pluck('id');
-            $hasUnreviewed = OrderDetail::whereIn('order_id', $userOrderIds)->where('delivery_status', 'delivered')->where('reviewed', 0)->exists();
+        if(auth()->user()){
+        $userOrderIds = Order::where('user_id', auth()->user()->id)->pluck('id');
+        $hasUnreviewed = OrderDetail::whereIn('order_id', $userOrderIds)->where('delivery_status', 'delivered')->where('reviewed', 0)->exists();
         }
     @endphp
 
@@ -330,7 +274,7 @@
         @foreach ($custom_alerts as $custom_alert)
             @if($custom_alert->id == 1)
                 <div class="aiz-cookie-alert mb-3" style="box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
-                    <div class="p-3 px-lg-2rem rounded-0" style="background: {{ $custom_alert->background_color }};">
+                    <div class="p-3 px-lg-2rem rounded-2" style="background: {{ $custom_alert->background_color }};">
                         <div class="text-{{ $custom_alert->text_color }} mb-3">
                             {!! $custom_alert->description !!}
                         </div>
@@ -342,19 +286,19 @@
             @elseif($custom_alert->id == 200)
                 @php
                     $showalert = true;
-                    if (auth()->user()) {
-                        $showalert = $hasUnreviewed;
-                    } else {
-                        $showalert = false;
+                    if(auth()->user()){
+                    $showalert = $hasUnreviewed;
+                    }else{
+                    $showalert= false;  
                     }
                 @endphp
                 @if(addon_is_activated('club_point') && get_setting('set_point_for_product_review') != 0 && $showalert)
                     <div class="aiz-cookie-alert mb-3 club-point-alert" style="box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
-                        <div class="p-3 px-lg-2rem rounded-0" style="background: {{ $custom_alert->background_color }};">
+                        <div class="p-3 px-lg-2rem rounded-2" style="background: {{ $custom_alert->background_color }};">
                             <div class="text-{{ $custom_alert->text_color }} mb-3 custom-alert-for-product-club-point">
                                 {!! $custom_alert->description !!}
                                 @if(get_setting('set_club_point_for_sellers_product_review') == 0)
-                                    Club points are awarded only for reviews on admin’s products.
+                                    {{ translate('Club points are awarded only for reviews on admin’s products.') }}
                                 @endif
                             </div>
                             <button class="btn btn-block btn-primary rounded-0 aiz-cookie-accept-club-point">
@@ -362,24 +306,39 @@
                             </button>
                         </div>
                     </div>
-                @endif
+                @endif                  
+            @elseif($custom_alert->id == 300) 
+                @php
+                    if(auth()->check()){
+                    $showcustomalert = true;
+                    }else{
+                    $showcustomalert= false;  
+                    }
+                @endphp
+                @if(addon_is_activated('otp_system') && $showcustomalert && auth()->user()->otp_alert_seen == 0)
+                    <div class="aiz-cookie-alert mb-3" style="box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
+                        <div class="p-3 px-lg-2rem rounded-0" style="background: {{ $custom_alert->background_color }};">
+                            <div class="text-{{ $custom_alert->text_color }} mb-3">
+                                {!! $custom_alert->description !!}
+                            </div>
+                            <button class="btn btn-block btn-primary rounded-0 aiz-cookie-accept">
+                                {{ translate('Ok. I Understood') }}
+                            </button>
+                        </div>
+                    </div>
+                @endif                  
             @else
-                <div class="mb-3 custom-alert-box removable-session d-none" data-key="custom-alert-box-{{ $custom_alert->id }}"
-                    data-value="removed" style="box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
-                    <div class="rounded-0 position-relative" style="background: {{ $custom_alert->background_color }};">
+                <div class="mb-3 custom-alert-box removable-session rounded-2 d-none" data-key="custom-alert-box-{{ $custom_alert->id }}" data-value="removed" data-auto_hide={{ $custom_alert->auto_hide }} style="box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
+                    <div class=" position-relative" style="background: {{ $custom_alert->background_color }};">
                         <a href="{{ $custom_alert->link }}" class="d-block h-100 w-100">
                             <div class="@if ($custom_alert->type == 'small') d-flex @endif">
-                                <img class="@if ($custom_alert->type == 'small') h-140px w-120px img-fit @else w-100 @endif"
-                                    src="{{ uploaded_asset($custom_alert->banner) }}" alt="custom_alert">
+                                <img class="@if ($custom_alert->type == 'small') h-140px w-120px img-fit @else w-100 @endif" src="{{ uploaded_asset($custom_alert->banner) }}" alt="custom_alert">
                                 <div class="text-{{ $custom_alert->text_color }} p-2rem">
                                     {!! $custom_alert->description !!}
                                 </div>
                             </div>
                         </a>
-                        <button
-                            class="absolute-top-right bg-transparent btn btn-circle btn-icon d-flex align-items-center justify-content-center text-{{ $custom_alert->text_color }} hov-text-primary set-session"
-                            data-key="custom-alert-box-{{ $custom_alert->id }}" data-value="removed"
-                            data-parent=".custom-alert-box">
+                        <button class="absolute-top-right bg-transparent btn btn-circle btn-icon d-flex align-items-center justify-content-center text-{{ $custom_alert->text_color }} hov-text-primary set-session" data-key="custom-alert-box-{{ $custom_alert->id }}" data-value="removed" data-parent=".custom-alert-box">
                             <i class="la la-close fs-20"></i>
                         </button>
                     </div>
@@ -391,104 +350,117 @@
     <!-- website popup -->
     @php
         $dynamic_popups = App\Models\DynamicPopup::where('status', 1)->orderBy('id', 'asc')->get();
+        $popup_count = 0;
+        $hideWrapper = false;
+        if(count($dynamic_popups) == 1 && ($dynamic_popups[0]->id == 100 && $hasUnreviewed == false)) {
+            $hideWrapper = true;
+        }
     @endphp
-    @foreach ($dynamic_popups as $key => $dynamic_popup)
-        @php
-            $showPopup = true;
-            if ($dynamic_popup->id == 100) {
-                if (auth()->user()) {
-                    $showPopup = $hasUnreviewed;
-                } else {
-                    $showPopup = false;
-                }
-            }
-        @endphp
 
-        @if($dynamic_popup->id == 1)
-            <div class="modal website-popup removable-session d-none" data-key="website-popup" data-value="removed">
-                <div class="absolute-full bg-black opacity-60"></div>
-                <div class="modal-dialog modal-dialog-centered modal-dialog-zoom modal-md mx-4 mx-md-auto">
-                    <div class="modal-content position-relative border-0 rounded-0">
-                        <div class="aiz-editor-data">
-                            <div class="d-block">
-                                <img class="w-100" src="{{ uploaded_asset($dynamic_popup->banner) }}" alt="dynamic_popup">
-                            </div>
-                        </div>
-                        <div class="pb-5 pt-4 px-3 px-md-2rem">
-                            <h1 class="fs-30 fw-700 text-dark">{{ $dynamic_popup->title }}</h1>
-                            <p class="fs-14 fw-400 mt-3 mb-4">{{ $dynamic_popup->summary }}</p>
-                            @if ($dynamic_popup->show_subscribe_form == 'on')
-                                <form class="" method="POST" action="{{ route('subscribers.store') }}">
+    @if(count($dynamic_popups) > 0)
+    <div class="modal website-popup removable-session d-none "
+        data-key="stack-popup-main"
+        data-value="removed" id="stack-popup-main-wrapper" @if($hideWrapper) style="display: none;" @endif>
+
+
+        <div class="absolute-full bg-black opacity-60"></div>
+
+        <div class="stack-container mx-auto" id="stackParent">
+
+            @foreach ($dynamic_popups as $key => $dynamic_popup)
+                
+                @php
+                    
+                    $showPopup = true;
+                    if ($dynamic_popup->id == 100 ) {
+                        if(auth()->user()){
+                            $showPopup = $hasUnreviewed;
+                        }else{
+                            $showPopup = false;
+                        }
+                    }
+                @endphp
+
+                @if($showPopup)
+                @php $popup_count++; @endphp
+
+                <div class="card-wrapper card-pos-{{ $popup_count-1 }}"
+                    id="w{{ $dynamic_popup->id }}"
+                    data-key="stack-popup-{{ $dynamic_popup->id }}">
+
+                    <button class="btn-close-stack d-none"
+                            onclick="removeTopCard('w{{ $dynamic_popup->id }}')">
+                        <i class="la la-close"></i>
+                    </button>
+
+                    <div class="mirror-card">
+
+                        <img src="{{ uploaded_asset($dynamic_popup->banner) }}"
+                            class="card-img">
+
+                        <div class="p-4 text-center">
+                            <h5 class="font-weight-bold">
+                                {{ $dynamic_popup->title }}
+                            </h5>
+
+                            <p class="text-muted fs-16">
+                                {{ $dynamic_popup->summary }}
+                            </p>
+
+                            @if($dynamic_popup->id == 1 && $dynamic_popup->show_subscribe_form == 'on')
+                                <!-- Subscription form for ID 1 -->
+                                <form class="mt-3" method="POST" action="{{ route('subscribers.store') }}">
                                     @csrf
-                                    <div class="form-group mb-0">
-                                        <input type="email" class="form-control" placeholder="{{ translate('Your Email Address') }}"
+                                    <div class="form-group mb-3">
+                                        <input type="email" class="form-control rounded-0" 
+                                            placeholder="{{ translate('Your Email Address') }}" 
                                             name="email" required>
                                     </div>
-                                    <button type="submit"
-                                        class="btn btn-block mt-3 rounded-0 text-{{ $dynamic_popup->btn_text_color }}"
-                                        style="background: {{ $dynamic_popup->btn_background_color }};">
+                                    <button type="submit" class="vote-btn w-100 set-session"
+                                            data-key="stack-popup-{{ $dynamic_popup->id }}"
+                                            data-value="removed">
                                         {{ $dynamic_popup->btn_text }}
                                     </button>
                                 </form>
-                            @endif
-                        </div>
-                        <button class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session"
-                            data-key="website-popup" data-value="removed" data-parent=".website-popup">
-                            <i class="la la-close fs-20"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        @else
-            @if($showPopup)
-                <div class="modal website-popup removable-session d-none" data-key="website-popup-{{ $dynamic_popup->id }}"
-                    data-value="removed">
-                    <div class="absolute-full bg-black opacity-60"></div>
-                    <div class="modal-dialog modal-dialog-centered modal-dialog-zoom modal-md mx-4 mx-md-auto">
-                        <div class="modal-content position-relative border-0 rounded-0">
-                            <div class="aiz-editor-data">
-                                <div class="d-block">
-                                    <img class="w-100" src="{{ uploaded_asset($dynamic_popup->banner) }}" alt="dynamic_popup">
-                                </div>
-                            </div>
-                            <div class="pb-5 pt-4 px-3 px-md-2rem">
-                                <h1 class="fs-30 fw-700 text-dark">{{ $dynamic_popup->title }}</h1>
-                                <p class="fs-14 fw-400 mt-3 mb-4">{{ $dynamic_popup->summary }}</p>
+                            @elseif($dynamic_popup->btn_link)
+                                <!-- Regular button for other popups -->
                                 <a href="{{ $dynamic_popup->btn_link }}"
-                                    class="btn btn-block mt-3 rounded-0 text-{{ $dynamic_popup->btn_text_color }} set-session"
-                                    style="background: {{ $dynamic_popup->btn_background_color }};"
-                                    data-key="website-popup-{{ $dynamic_popup->id }}" data-value="removed"
-                                    data-parent=".website-popup">
+                                class="vote-btn d-block set-session w-100"
+                                data-key="stack-popup-{{ $dynamic_popup->id }}"
+                                data-value="removed">
                                     {{ $dynamic_popup->btn_text }}
                                 </a>
-                            </div>
-                            <button class="absolute-top-right bg-white shadow-lg btn btn-circle btn-icon mr-n3 mt-n3 set-session"
-                                data-key="website-popup-{{ $dynamic_popup->id }}" data-value="removed" data-parent=".website-popup">
-                                <i class="la la-close fs-20"></i>
-                            </button>
+                            @endif
+                        </div>
+                        <div class="loader-container">
+                            <div class="loader-fill" id="fill-w{{ $dynamic_popup->id }}"></div>
                         </div>
                     </div>
                 </div>
-            @endif
-        @endif
-    @endforeach
+                @endif
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+
+
+
+
+
 
     @include('frontend.partials.modal')
 
     @include('frontend.partials.account_delete_modal')
 
     <div class="modal fade" id="addToCart">
-        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-zoom product-modal" id="modal-size"
-            role="document">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-zoom product-modal" id="modal-size" role="document">
             <div class="modal-content position-relative">
                 <div class="c-preloader text-center p-3">
                     <i class="las la-spinner la-spin la-3x"></i>
                 </div>
-                <button type="button"
-                    class="close absolute-top-right btn-icon close z-1 btn-circle hov-text-blue bg-light hov-bg-gray has-transition mr-3 mt-3 d-flex justify-content-center align-items-center"
-                    data-dismiss="modal" aria-label="Close"
-                    style="background: #ededf2; width: calc(2rem + 2px); height: calc(2rem + 2px);">
-                    <i class="la la-close fs-20 text-gray hov-text-blue has-transition"></i>
+                <button type="button" class="close absolute-top-right btn-icon close z-1 btn-circle hov-text-blue bg-light hov-bg-gray has-transition mr-3 mt-3 d-flex justify-content-center align-items-center" data-dismiss="modal" aria-label="Close" style="background: #ededf2; width: calc(2rem + 2px); height: calc(2rem + 2px);">
+                     <i class="la la-close fs-20 text-gray hov-text-blue has-transition"></i>
                 </button>
                 <div id="addToCart-modal-body">
 
@@ -544,7 +516,24 @@
         a[aria-label="Go to GetButton.io website"] {
             display: none !important;
         }
+        
     </style>
+    @if(addon_is_activated('otp_system'))
+        <script>
+            document.querySelector('.otp-alert-link')?.addEventListener('click', function () {
+
+                fetch("{{ route('otp.alert.seen') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                    },
+                    body: JSON.stringify({})
+                });
+
+            });
+        </script>
+    @endif
 
     <script>
         @foreach (session('flash_notification', collect())->toArray() as $message)
@@ -553,42 +542,93 @@
     </script>
 
     <script>
+        window.POPUP_DURATION = {{ (int) get_setting('dynamic_popup_duration') ?? 5 }};
+        let currentIdx = 0;
+        let cardIds = [];
+        let timer;
+
+        $(document).ready(function () {
+
+            $('.card-wrapper:visible').each(function () {
+                cardIds.push($(this).attr('id'));
+            });
+            startTimer();
+        });
+
+    </script>
+
+    <!-- Smooth Alert Transitions JavaScript -->
+    <script>
+        
+        $(document).ready(function() {
+            // Handle auto-hide alerts
+            $('.aiz-custom-alert .custom-alert-box[data-auto_hide]').each(function() {
+                const $alert = $(this);
+                const seconds = parseInt($alert.attr('data-auto_hide'), 10) || 0;
+                if (seconds > 0) {                    
+                    setTimeout(() => {
+                        smoothlyRemoveElement($alert);
+                    }, seconds * 1000);
+                }
+            });
+
+            // Handle cookie alert accept button
+            $('.aiz-custom-alert').on('click', '.aiz-cookie-accept, .aiz-cookie-accept-club-point', function(e) {
+                e.preventDefault();
+                const $parent = $(this).closest('.aiz-cookie-alert');
+                if ($parent.length) {
+                    smoothlyRemoveElement($parent);
+                }
+            });
+
+            // Handle custom alert box close button
+            $('.aiz-custom-alert').on('click', '[data-parent=".custom-alert-box"]', function(e) {
+                e.preventDefault();
+                const $box = $(this).closest('.custom-alert-box');
+                if ($box.length) {
+                    smoothlyRemoveElement($box);
+                }
+            });
+        });
+    </script>
+
+    <script>
         @if (Route::currentRouteName() == 'home' || Route::currentRouteName() == '/')
 
             $.post('{{ route('home.section.featured') }}', {
                 _token: '{{ csrf_token() }}'
-            }, function (data) {
+            }, function(data) {
                 $('#section_featured').html(data);
                 AIZ.plugins.slickCarousel();
             });
 
             $.post('{{ route('home.section.todays_deal') }}', {
                 _token: '{{ csrf_token() }}'
-            }, function (data) {
+            }, function(data) {
                 $('#todays_deal').html(data);
                 AIZ.plugins.slickCarousel();
             });
 
             $.post('{{ route('home.section.best_selling') }}', {
                 _token: '{{ csrf_token() }}'
-            }, function (data) {
+            }, function(data) {
                 $('#section_best_selling').html(data);
                 AIZ.plugins.slickCarousel();
             });
 
             $.post('{{ route('home.section.newest_products') }}', {
                 _token: '{{ csrf_token() }}'
-            }, function (data) {
+            }, function(data) {
                 $('#section_newest').html(data);
                 AIZ.plugins.slickCarousel();
                 @if (get_setting('homepage_select') == 'thecore')
-                    toggleViewMoreButton();
+                 toggleViewMoreButton();
                 @endif
-                    });
+            });
 
             $.post('{{ route('home.section.auction_products') }}', {
                 _token: '{{ csrf_token() }}'
-            }, function (data) {
+            }, function(data) {
                 $('#auction_products').html(data);
                 AIZ.plugins.slickCarousel();
             });
@@ -598,7 +638,7 @@
             if (isPreorderEnabled) {
                 $.post('{{ route('home.section.preorder_products') }}', {
                     _token: '{{ csrf_token() }}'
-                }, function (data) {
+                }, function(data) {
                     $('#section_featured_preorder_products').html(data);
                     AIZ.plugins.slickCarousel();
                 });
@@ -606,23 +646,22 @@
 
             $.post('{{ route('home.section.home_categories') }}', {
                 _token: '{{ csrf_token() }}'
-            }, function (data) {
+            }, function(data) {
                 $('#section_home_categories').html(data);
                 AIZ.plugins.slickCarousel();
             });
 
         @endif
 
-        $(document).ready(function () {
-            $('.category-nav-element').each(function (i, el) {
+        $(document).ready(function() {
+            $('.category-nav-element').each(function(i, el) {
 
-                $(el).on('mouseover', function () {
-                    if (!$(el).find('.sub-cat-menu').hasClass('loaded')) {
+                $(el).on('mouseover', function(){
+                    if(!$(el).find('.sub-cat-menu').hasClass('loaded')){
                         $.post('{{ route('category.elements') }}', {
                             _token: AIZ.data.csrf,
-                            id: $(el).data('id'
-                            )
-                        }, function (data) {
+                            id:$(el).data('id'
+                            )}, function(data){
                             $(el).find('.sub-cat-menu').addClass('loaded').html(data);
                         });
                     }
@@ -630,12 +669,12 @@
             });
 
             if ($('#lang-change').length > 0) {
-                $('#lang-change .dropdown-menu a').each(function () {
-                    $(this).on('click', function (e) {
+                $('#lang-change .dropdown-menu a').each(function() {
+                    $(this).on('click', function(e){
                         e.preventDefault();
                         var $this = $(this);
                         var locale = $this.data('flag');
-                        $.post('{{ route('language.change') }}', { _token: AIZ.data.csrf, locale: locale }, function (data) {
+                        $.post('{{ route('language.change') }}',{_token: AIZ.data.csrf, locale:locale}, function(data){
                             location.reload();
                         });
 
@@ -644,12 +683,12 @@
             }
 
             if ($('#currency-change').length > 0) {
-                $('#currency-change .dropdown-menu a').each(function () {
-                    $(this).on('click', function (e) {
+                $('#currency-change .dropdown-menu a').each(function() {
+                    $(this).on('click', function(e){
                         e.preventDefault();
                         var $this = $(this);
                         var currency_code = $this.data('currency');
-                        $.post('{{ route('currency.change') }}', { _token: AIZ.data.csrf, currency_code: currency_code }, function (data) {
+                        $.post('{{ route('currency.change') }}',{_token: AIZ.data.csrf, currency_code:currency_code}, function(data){
                             location.reload();
                         });
 
@@ -658,30 +697,30 @@
             }
         });
 
-        $('#search').on('keyup', function () {
+        $('#search').on('keyup', function(){
             search();
         });
 
-        $('#search').on('focus', function () {
+        $('#search').on('focus', function(){
             search();
         });
 
-        function search() {
+        function search(){
             var searchKey = $('#search').val();
-            if (searchKey.length > 0) {
+            if(searchKey.length > 0){
                 $('body').addClass("typed-search-box-shown");
 
                 $('.typed-search-box').removeClass('d-none');
                 $('.search-preloader').removeClass('d-none');
-                $.post('{{ route('search.ajax') }}', { _token: AIZ.data.csrf, search: searchKey }, function (data) {
-                    if (data == '0') {
+                $.post('{{ route('search.ajax') }}', { _token: AIZ.data.csrf, search:searchKey}, function(data){
+                    if(data == '0'){
                         // $('.typed-search-box').addClass('d-none');
                         $('#search-content').html(null);
-                        $('.typed-search-box .search-nothing').removeClass('d-none').html('{{ translate('Sorry, nothing found for') }} <strong>"' + searchKey + '"</strong>');
+                        $('.typed-search-box .search-nothing').removeClass('d-none').html('{{ translate('Sorry, nothing found for') }} <strong>"'+searchKey+'"</strong>');
                         $('.search-preloader').addClass('d-none');
 
                     }
-                    else {
+                    else{
                         $('.typed-search-box .search-nothing').addClass('d-none').html(null);
                         $('#search-content').html(data);
                         $('.search-preloader').addClass('d-none');
@@ -697,32 +736,32 @@
         $(".aiz-user-top-menu").on("mouseover", function (event) {
             $(".hover-user-top-menu").addClass('active');
         })
-            .on("mouseout", function (event) {
-                $(".hover-user-top-menu").removeClass('active');
-            });
+        .on("mouseout", function (event) {
+            $(".hover-user-top-menu").removeClass('active');
+        });
 
-        $(document).on("click", function (event) {
+        $(document).on("click", function(event){
             var $trigger = $("#category-menu-bar");
-            if ($trigger !== event.target && !$trigger.has(event.target).length) {
+            if($trigger !== event.target && !$trigger.has(event.target).length){
                 $("#click-category-menu").slideUp("fast");;
                 $("#category-menu-bar-icon").removeClass('show');
             }
         });
 
-        function updateNavCart(view, count) {
+        function updateNavCart(view,count){
             $('.cart-count').html(count);
             $('#cart_items').html(view);
         }
 
-        function removeFromCart(key) {
+        function removeFromCart(key){
             $.post('{{ route('cart.removeFromCart') }}', {
-                _token: AIZ.data.csrf,
-                id: key
-            }, function (data) {
-                updateNavCart(data.nav_cart_view, data.cart_count);
+                _token  : AIZ.data.csrf,
+                id      :  key
+            }, function(data){
+                updateNavCart(data.nav_cart_view,data.cart_count);
                 $('#cart-details').html(data.cart_view);
                 AIZ.plugins.notify('danger', "{{ translate('Item has been removed from cart') }}");
-                $('#cart_items_sidenav').html(parseInt($('#cart_items_sidenav').html()) - 1);
+                $('#cart_items_sidenav').html(parseInt($('#cart_items_sidenav').html())-1);
             });
         }
 
@@ -730,22 +769,22 @@
             $('#login_modal').modal();
         }
 
-        function addToCompare(id) {
-            $.post('{{ route('compare.addToCompare') }}', { _token: AIZ.data.csrf, id: id }, function (data) {
+        function addToCompare(id){
+            $.post('{{ route('compare.addToCompare') }}', {_token: AIZ.data.csrf, id:id}, function(data){
                 $('#compare').html(data);
                 AIZ.plugins.notify('success', "{{ translate('Item has been added to compare list') }}");
-                $('#compare_items_sidenav').html(parseInt($('#compare_items_sidenav').html()) + 1);
+                $('#compare_items_sidenav').html(parseInt($('#compare_items_sidenav').html())+1);
             });
         }
 
-        function addToWishList(id) {
+        function addToWishList(id){
             @if (Auth::check() && Auth::user()->user_type == 'customer')
-                $.post('{{ route('wishlists.store') }}', { _token: AIZ.data.csrf, id: id }, function (data) {
-                    if (data != 0) {
+                $.post('{{ route('wishlists.store') }}', {_token: AIZ.data.csrf, id:id}, function(data){
+                    if(data != 0){
                         $('#wishlist').html(data);
                         AIZ.plugins.notify('success', "{{ translate('Item has been added to wishlist') }}");
                     }
-                    else {
+                    else{
                         AIZ.plugins.notify('warning', "{{ translate('Please login first') }}");
                     }
                 });
@@ -756,14 +795,14 @@
             @endif
         }
 
-        function showAddToCartModal(id) {
-            if (!$('#modal-size').hasClass('modal-lg')) {
+        function showAddToCartModal(id){
+            if(!$('#modal-size').hasClass('modal-lg')){
                 $('#modal-size').addClass('modal-lg');
             }
             $('#addToCart-modal-body').html(null);
-            $('#addToCart').modal();
+                $('#addToCart').modal();
             $('.c-preloader').show();
-            $.post('{{ route('cart.showCartModal') }}', { _token: AIZ.data.csrf, id: id }, function (data) {
+            $.post('{{ route('cart.showCartModal') }}', {_token: AIZ.data.csrf, id:id}, function(data){
                 $('.c-preloader').hide();
                 $('#addToCart-modal-body').html(data);
                 AIZ.plugins.slickCarousel();
@@ -773,7 +812,7 @@
             });
         }
 
-        // Right Offcanvas JS Start
+           // Right Offcanvas JS Start
         const rightOffcanvas = document.getElementById('rightOffcanvas');
         const overlay = document.getElementById('rightOffcanvasOverlay');
 
@@ -809,27 +848,27 @@
             });
         }
 
-        // Close function
-        function closeRightcanvas() {
-            rightOffcanvas.classList.remove('active');
-            overlay.classList.remove('active');
-            document.body.classList.remove('body-no-scroll');
-            const $social_chat = $('.sc-q8c6tt-3');
-            if ($social_chat.length) {
-                $social_chat.removeClass('d-none');
+            // Close function
+            function closeRightcanvas() {
+                rightOffcanvas.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.classList.remove('body-no-scroll');
+                const $social_chat = $('.sc-q8c6tt-3');
+                if ($social_chat.length) {
+                    $social_chat.removeClass('d-none');
+                }
             }
-        }
-        function closeOffcanvas() {
-            closeRightcanvas();
-        }
+            function closeOffcanvas() {
+                closeRightcanvas();
+            }
 
-        if (overlay) {
-            overlay.addEventListener('click', closeRightcanvas);
-        }
-        // Optional: close with ESC key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeRightcanvas();
-        });
+            if (overlay) {
+                overlay.addEventListener('click', closeRightcanvas);
+            }
+            // Optional: close with ESC key
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeRightcanvas();
+            });
         // Right Offcanvas JS End
 
         function showReviewImageModal(imageUrl, imagesJson) {
@@ -840,12 +879,12 @@
                 $('#modalReviewImage').attr('src', imageUrl);
                 $('#reviewImageModal').modal('show');
 
-                $('#prevImageBtn').off('click').on('click', function () {
+                $('#prevImageBtn').off('click').on('click', function() {
                     currentIndex = (currentIndex - 1 + images.length) % images.length;
                     $('#modalReviewImage').attr('src', images[currentIndex]);
                 });
 
-                $('#nextImageBtn').off('click').on('click', function () {
+                $('#nextImageBtn').off('click').on('click', function() {
                     currentIndex = (currentIndex + 1) % images.length;
                     $('#modalReviewImage').attr('src', images[currentIndex]);
                 });
@@ -854,7 +893,7 @@
             }
         }
 
-        $('#option-choice-form input').on('change', function () {
+        $('#option-choice-form input').on('change', function(){
             getVariantPrice();
         });
 
@@ -862,17 +901,20 @@
             getVariantPrice();
         });
 
-        function getVariantPrice() {
-            if ($('#option-choice-form input[name=quantity]').val() > 0 && checkAddToCartValidity()) {
+        
+        function getVariantPrice(){
+            if($('#option-choice-form input[name=quantity]').val() > 0 && checkAddToCartValidity()){
                 $.ajax({
-                    type: "POST",
+                    type:"POST",
                     url: '{{ route('products.variant_price') }}',
                     data: $('#option-choice-form').serializeArray(),
-                    success: function (data) {
+                    success: function(data){
+                        
+                        
                         const responseImage = data.image || null;
 
                         if (responseImage) {
-                            const thumbEl = document.querySelector('.thumb-slider');
+                         const thumbEl = document.querySelector('.thumb-slider');
                             const mainEl = document.querySelector('.main-slider');
                             const thumbSwiper = thumbEl && thumbEl.swiper ? thumbEl.swiper : null;
                             const mainSwiper = mainEl && mainEl.swiper ? mainEl.swiper : null;
@@ -907,15 +949,15 @@
                         $('#option-choice-form #selected_variant').html(data.variation);
                         $('#available-quantity').html(data.quantity);
                         $('.input-number').prop('max', data.max_limit);
-                        if (parseInt(data.in_stock) == 0 && data.digital == 0) {
-                            $('.buy-now').addClass('d-none');
-                            $('.add-to-cart').addClass('d-none');
-                            $('.out-of-stock').removeClass('d-none');
+                        if(parseInt(data.in_stock) == 0 && data.digital  == 0){
+                           $('.buy-now').addClass('d-none');
+                           $('.add-to-cart').addClass('d-none');
+                           $('.out-of-stock').removeClass('d-none');
                         }
-                        else {
-                            $('.buy-now').removeClass('d-none');
-                            $('.add-to-cart').removeClass('d-none');
-                            $('.out-of-stock').addClass('d-none');
+                        else{
+                           $('.buy-now').removeClass('d-none');
+                           $('.add-to-cart').removeClass('d-none');
+                           $('.out-of-stock').addClass('d-none');
                         }
 
                         AIZ.extra.plusMinus();
@@ -925,68 +967,68 @@
             }
         }
 
-        function checkAddToCartValidity() {
+        function checkAddToCartValidity(){
             var names = {};
-            $('#option-choice-form input:radio').each(function () { // find unique names
+            $('#option-choice-form input:radio').each(function() { // find unique names
                 names[$(this).attr('name')] = true;
             });
             var count = 0;
-            $.each(names, function () { // then count them
+            $.each(names, function() { // then count them
                 count++;
             });
 
-            if ($('#option-choice-form input:radio:checked').length == count) {
+            if($('#option-choice-form input:radio:checked').length == count){
                 return true;
             }
 
             return false;
         }
 
-        function addToCart() {
+        function addToCart(){
             @if (Auth::check() && Auth::user()->user_type != 'customer')
                 AIZ.plugins.notify('warning', "{{ translate('Please Login as a customer to add products to the Cart.') }}");
                 return false;
             @endif
 
-            if (checkAddToCartValidity()) {
+            if(checkAddToCartValidity()) {
                 animateAddToCartButton('#added_to_cart_btn', 'loading');
                 $('#addToCart').modal();
                 $('.c-preloader').show();
                 $.ajax({
-                    type: "POST",
+                    type:"POST",
                     url: '{{ route('cart.addToCart') }}',
                     data: $('#option-choice-form').serializeArray(),
-                    success: function (data) {
+                    success: function(data){
                         animateAddToCartButton('#added_to_cart_btn', 'success');
-                        $('#addToCart-modal-body').html(null);
-                        $('.c-preloader').hide();
-                        $('#modal-size').removeClass('modal-lg');
-                        $('#addToCart-modal-body').html(data.modal_view);
-                        AIZ.extra.plusMinus();
-                        AIZ.plugins.slickCarousel();
-                        updateNavCart(data.nav_cart_view, data.cart_count);
+                       $('#addToCart-modal-body').html(null);
+                       $('.c-preloader').hide();
+                       $('#modal-size').removeClass('modal-lg');
+                       $('#addToCart-modal-body').html(data.modal_view);
+                       AIZ.extra.plusMinus();
+                       AIZ.plugins.slickCarousel();
+                       updateNavCart(data.nav_cart_view,data.cart_count);
                     }
                 });
 
-                if ("{{ get_setting('facebook_pixel') }}" == 1) {
+                if ("{{ get_setting('facebook_pixel') }}" == 1){
                     // Facebook Pixel AddToCart Event
-                    fbq('track', 'AddToCart', { content_type: 'product' });
+                    fbq('track', 'AddToCart', {content_type: 'product'});
                     // Facebook Pixel AddToCart Event
                 }
             }
-            else {
+            else{
                 animateAddToCartButton('#added_to_cart_btn', 'reset');
                 AIZ.plugins.notify('warning', "{{ translate('Please choose all the options') }}");
             }
         }
 
-        function addToCartSingleProduct(productId = null) {
+        function addToCartSingleProduct(productId = null){
             @if (Auth::check() && Auth::user()->user_type != 'customer')
                 AIZ.plugins.notify('warning', "{{ translate('Please Login as a customer to add products to the Cart.') }}");
                 return false;
             @endif
 
-            if (!productId) {
+            if(!productId){
                 AIZ.plugins.notify('warning', "{{ translate('Product not found') }}");
                 return false;
             }
@@ -997,18 +1039,18 @@
                 _token: '{{ csrf_token() }}'
             };
 
-            if (checkAddToCartValidity()) {
+            if(checkAddToCartValidity()) {
                 $('.c-preloader').show();
                 $('#addToCart-modal-body').html('<div class="text-center p-5"><div class="c-preloader"></div></div>');
                 $('#modal-size').removeClass('modal-lg');
-                $('#addToCart').modal('show');
+                $('#addToCart').modal('show'); 
 
                 $.ajax({
                     type: "POST",
                     url: '{{ route('cart.addToCart') }}',
                     data: formData,
-                    success: function (data) {
-                        $('#addToCart .c-preloader').hide();
+                    success: function(data){
+                        $('#addToCart .c-preloader').hide(); 
 
                         if (data && data.modal_view) {
                             $('#addToCart-modal-body').html(data.modal_view);
@@ -1028,60 +1070,60 @@
                             $('#addToCart-modal-body').html('<div class="text-center p-5 text-danger">Product details not available.</div>');
                         }
                     },
-                    error: function () {
+                    error: function() {
                         AIZ.plugins.notify('danger', "{{ translate('Something went wrong') }}");
                         $('.c-preloader').hide();
                     }
                 });
 
-                if ("{{ get_setting('facebook_pixel') }}" == 1) {
-                    fbq('track', 'AddToCart', { content_type: 'product' });
+                if ("{{ get_setting('facebook_pixel') }}" == 1){
+                    fbq('track', 'AddToCart', {content_type: 'product'});
                 }
             }
-            else {
+            else{
                 AIZ.plugins.notify('warning', "{{ translate('Please choose all the options') }}");
             }
         }
 
-        function buyNow() {
+        function buyNow(){
             @if (Auth::check() && Auth::user()->user_type != 'customer')
                 AIZ.plugins.notify('warning', "{{ translate('Please Login as a customer to add products to the Cart.') }}");
                 return false;
             @endif
 
-            if (checkAddToCartValidity()) {
+            if(checkAddToCartValidity()) {
                 $('#addToCart-modal-body').html(null);
                 $('#addToCart').modal();
                 $('.c-preloader').show();
                 $.ajax({
-                    type: "POST",
+                    type:"POST",
                     url: '{{ route('cart.addToCart') }}',
                     data: $('#option-choice-form').serializeArray(),
-                    success: function (data) {
-                        if (data.status == 1) {
+                    success: function(data){
+                        if(data.status == 1){
                             $('#addToCart-modal-body').html(data.modal_view);
-                            updateNavCart(data.nav_cart_view, data.cart_count);
+                            updateNavCart(data.nav_cart_view,data.cart_count);
                             window.location.replace("{{ route('cart') }}");
                         }
-                        else {
+                        else{
                             $('#addToCart-modal-body').html(null);
                             $('.c-preloader').hide();
                             $('#modal-size').removeClass('modal-lg');
                             $('#addToCart-modal-body').html(data.modal_view);
                         }
                     }
-                });
+               });
             }
-            else {
+            else{
                 AIZ.plugins.notify('warning', "{{ translate('Please choose all the options') }}");
             }
         }
 
-        function bid_single_modal(bid_product_id, min_bid_amount, gst_rate = null) {
+        function bid_single_modal(bid_product_id, min_bid_amount, gst_rate = null){
             @if (Auth::check() && (isCustomer() || isSeller()))
-                var min_bid_amount_text = "({{ translate('Min Bid Amount: ') }}" + min_bid_amount + ")";
-                if (gst_rate !== null) {
-                    $('#gst_applicable_alert').text("{{ translate('An') }} " + gst_rate + "%" + " {{ translate('GST will be applied if you win the bid and proceed with the purchase') }}");
+                var min_bid_amount_text = "({{ translate('Min Bid Amount: ') }}"+min_bid_amount+")";
+                if (gst_rate !== null){
+                $('#gst_applicable_alert').text("{{ translate('An') }} "+gst_rate+"%" + " {{ translate('GST will be applied if you win the bid and proceed with the purchase') }}");
                 }
                 $('#min_bid_amount').text(min_bid_amount_text);
                 $('#bid_product_id').val(bid_product_id);
@@ -1094,44 +1136,44 @@
             @endif
         }
 
-        function clickToSlide(btn, id) {
-            $('#' + id + ' .aiz-carousel').find('.' + btn).trigger('click');
-            $('#' + id + ' .slide-arrow').removeClass('link-disable');
-            var arrow = btn == 'slick-prev' ? 'arrow-prev' : 'arrow-next';
-            if ($('#' + id + ' .aiz-carousel').find('.' + btn).hasClass('slick-disabled')) {
-                $('#' + id).find('.' + arrow).addClass('link-disable');
+        function clickToSlide(btn,id){
+            $('#'+id+' .aiz-carousel').find('.'+btn).trigger('click');
+            $('#'+id+' .slide-arrow').removeClass('link-disable');
+            var arrow = btn=='slick-prev' ? 'arrow-prev' : 'arrow-next';
+            if ($('#'+id+' .aiz-carousel').find('.'+btn).hasClass('slick-disabled')) {
+                $('#'+id).find('.'+arrow).addClass('link-disable');
             }
         }
 
         function goToView(params) {
-            document.getElementById(params).scrollIntoView({ behavior: "smooth", block: "center" });
+            document.getElementById(params).scrollIntoView({behavior: "smooth", block: "center"});
         }
 
-        function copyCouponCode(code) {
+        function copyCouponCode(code){
             navigator.clipboard.writeText(code);
             AIZ.plugins.notify('success', "{{ translate('Coupon Code Copied') }}");
         }
 
-        $(document).ready(function () {
-            $('.cart-animate').animate({ margin: 0 }, "slow");
+        $(document).ready(function(){
+            $('.cart-animate').animate({margin : 0}, "slow");
 
-            $({ deg: 0 }).animate({ deg: 360 }, {
+            $({deg: 0}).animate({deg: 360}, {
                 duration: 2000,
-                step: function (now) {
+                step: function(now) {
                     $('.cart-rotate').css({
                         transform: 'rotate(' + now + 'deg)'
                     });
                 }
             });
 
-            setTimeout(function () {
+            setTimeout(function(){
                 $('.cart-ok').css({ fill: '#d43533' });
             }, 2000);
 
         });
 
-        function nonLinkableNotificationRead() {
-            $.get('{{ route('non-linkable-notification-read') }}', function (data) {
+        function nonLinkableNotificationRead(){
+            $.get('{{ route('non-linkable-notification-read') }}',function(data){
                 $('.unread-notification-count').html(data);
             });
         }
@@ -1180,7 +1222,7 @@
 
 
     <script type="text/javascript">
-        if ($('input[name=country_code]').length > 0) {
+        if ($('input[name=country_code]').length > 0){
             // Country Code
             var isPhoneShown = true,
                 countryData = window.intlTelInputGlobals.getCountryData(),
@@ -1197,7 +1239,7 @@
                 separateDialCode: true,
                 utilsScript: "{{ static_asset('assets/js/intlTelutils.js') }}?1590403638580",
                 onlyCountries: @php echo get_active_countries()->pluck('code') @endphp,
-                customPlaceholder: function (selectedCountryPlaceholder, selectedCountryData) {
+                customPlaceholder: function(selectedCountryPlaceholder, selectedCountryData) {
                     if (selectedCountryData.iso2 == 'bd') {
                         return "01xxxxxxxxx";
                     }
@@ -1208,7 +1250,7 @@
             var country = iti.getSelectedCountryData();
             $('input[name=country_code]').val(country.dialCode);
 
-            input.addEventListener("countrychange", function (e) {
+            input.addEventListener("countrychange", function(e) {
                 // var currentMask = e.currentTarget.placeholder;
                 var country = iti.getSelectedCountryData();
                 $('input[name=country_code]').val(country.dialCode);
@@ -1237,7 +1279,7 @@
         var acc = document.getElementsByClassName("aiz-accordion-heading");
         var i;
         for (i = 0; i < acc.length; i++) {
-            acc[i].addEventListener("click", function () {
+            acc[i].addEventListener("click", function() {
                 this.classList.toggle("active");
                 var panel = this.nextElementSibling;
                 if (panel.style.maxHeight) {
@@ -1275,27 +1317,27 @@
                 if ($('.aiz-demo-nav-toggler').hasClass('show')) {
                     $('.aiz-demo-nav-toggler').removeClass('show');
                     demoHideOverlay();
-                } else {
+                }else{
                     $('.aiz-demo-nav-toggler').addClass('show');
                     demoShowOverlay();
                 }
             }
 
-            $('.aiz-demos').click(function (e) {
+            $('.aiz-demos').click(function(e){
                 if (!e.target.closest('.aiz-demos .aiz-demo-content')) {
                     toggleDemoNav();
                 }
             });
 
-            function demoShowOverlay() {
+            function demoShowOverlay(){
                 $('.top-banner').removeClass('z-1035').addClass('z-1');
                 $('.top-navbar').removeClass('z-1035').addClass('z-1');
                 $('header').removeClass('z-1020').addClass('z-1');
                 $('.aiz-demos').addClass('show');
             }
 
-            function demoHideOverlay(cls = null) {
-                if ($('.aiz-demos').hasClass('show')) {
+            function demoHideOverlay(cls=null){
+                if($('.aiz-demos').hasClass('show')){
                     $('.aiz-demos').removeClass('show');
                     $('.top-banner').delay(800).removeClass('z-1').addClass('z-1035');
                     $('.top-navbar').delay(800).removeClass('z-1').addClass('z-1035');
@@ -1303,7 +1345,7 @@
                 }
             }
         </script>
-
+        
     @endif
 
     @if (get_setting('header_element') == 5 || get_setting('header_element') == 6)
@@ -1331,86 +1373,90 @@
     @endif
 
     <script>
-        function fixSlickVisibility() {
-            $('.slick-slide').css('visibility', 'visible');
-            $('.slick-track').css('opacity', '1');
+    function fixSlickVisibility() {
+        $('.slick-slide').css('visibility', 'visible');
+        $('.slick-track').css('opacity', '1');
+    }
+
+    // Call after fullscreen exit
+    $(window).on('resize', function() {
+        setTimeout(function() {
+            $('.product-gallery').slick('setPosition');
+            $('.product-gallery-thumb').slick('setPosition');
+            fixSlickVisibility();
+        }, 300);
+    });
+    </script>
+    @if(get_setting('show_custom_product_sale_alert')==1)
+    <script>
+    const saleAlertProducts = @json(get_all_sale_alert_products());
+
+        function showSaleAlert() {
+            if (!saleAlertProducts || saleAlertProducts.length === 0) return;
+            const randomProduct = saleAlertProducts[Math.floor(Math.random() * saleAlertProducts.length)];
+            const html = `
+                <div class="alert  bg-white alert-dismissible rounded-2" role="alert" style="display: none; box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
+                    <div class="d-flex align-items-center">
+                        <img src="${randomProduct.image}" class="h-50px w-50px img-fit mr-2 rounded" alt="${randomProduct.title}">
+                        <div>
+                            <span class="text-truncate-2">
+                                <a href="${randomProduct.url}" class="text-dark font-weight-bold">${randomProduct.title}</a>
+                            </span>
+                             — {{ translate('ordered just now') }}!
+                        </div>
+                        <button type="button" class="close ml-auto hov-text-primary set-session" data-parent=".alert">
+                            <i class="la la-close fs-20"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            const $container = $('#aiz-custom-sale-alert');
+            @if ( get_setting('custom_alert_location')  == 'top-left' || get_setting('custom_alert_location') == 'top-right')
+            const $alert = $(html).appendTo($container);
+            @else
+            const $alert = $(html).prependTo($container);
+            @endif
+            $alert.stop(true, true).fadeIn(600);
+
+            const displayMs = 4000;
+            const fadeOutTimeout = setTimeout(() => {
+                smoothlyRemoveElement($alert);
+            }, displayMs);
+
+             $alert.find('.set-session').on('click', function() {
+                clearTimeout(fadeOutTimeout);
+                smoothlyRemoveElement($alert);
+             });
         }
 
-        // Call after fullscreen exit
-        $(window).on('resize', function () {
-            setTimeout(function () {
-                $('.product-gallery').slick('setPosition');
-                $('.product-gallery-thumb').slick('setPosition');
-                fixSlickVisibility();
-            }, 300);
-        });
-    </script>
-    @if(get_setting('show_custom_product_sale_alert') == 1)
-        <script>
-            const saleAlertProducts = @json(get_all_sale_alert_products());
 
-            function showSaleAlert() {
-                if (!saleAlertProducts || saleAlertProducts.length === 0) return;
-                const randomProduct = saleAlertProducts[Math.floor(Math.random() * saleAlertProducts.length)];
-                const html = `
-                        <div class="alert  bg-white alert-dismissible rounded-0" role="alert" style="display: none; box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.24);">
-                            <div class="d-flex align-items-center">
-                                <img src="${randomProduct.image}" class="h-50px w-50px img-fit mr-2 rounded" alt="${randomProduct.title}">
-                                <div>
-                                    <span class="text-truncate-2">
-                                        <a href="${randomProduct.url}" class="text-dark font-weight-bold">${randomProduct.title}</a>
-                                    </span>
-                                     — {{ translate('ordered just now') }}!
-                                </div>
-                                <button type="button" class="close ml-auto hov-text-primary set-session" data-parent=".alert">
-                                    <i class="la la-close fs-20"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                const $container = $('#aiz-custom-sale-alert');
-                const $alert = $(html).appendTo($container);
-                $alert.stop(true, true).fadeIn(600);
+        function startRandomAlerts() {
+            const min = parseInt(`{{ get_setting('sale_alert_min_time') }}`)  * 1000; 
+            const max = parseInt(`{{ get_setting('sale_alert_max_time') }}`)  * 1000;
+            const randomDelay = Math.random() * (max - min) + min;
 
-                const displayMs = 4000;
-                const fadeOutTimeout = setTimeout(() => {
-                    $alert.fadeOut(600, function () { $(this).remove(); });
-                }, displayMs);
-
-                $alert.find('.close').on('click', function () {
-                    const $parent = $(this).closest('.alert');
-                    $parent.fadeOut(600, function () { $(this).remove(); });
-                });
-            }
-
-
-            function startRandomAlerts() {
-                const min = parseInt(`{{ get_setting('sale_alert_min_time') }}`) * 1000;
-                const max = parseInt(`{{ get_setting('sale_alert_max_time') }}`) * 1000;
-                const randomDelay = Math.random() * (max - min) + min;
-
-                setTimeout(() => {
-                    showSaleAlert();
-                    startRandomAlerts();
-                }, randomDelay);
-            }
-
-            // start only if there are products
-            if (Array.isArray(saleAlertProducts) && saleAlertProducts.length) {
+            setTimeout(() => {
+                showSaleAlert();
                 startRandomAlerts();
-            }
-        </script>
+            }, randomDelay);
+        }
+        if (Array.isArray(saleAlertProducts) && saleAlertProducts.length) {
+            startRandomAlerts();
+        }
+    </script>
     @endif
 
-    <script>
-        $(document).ready(function () {
-            // Smooth close button
-            $('.set-session').on('click', function (e) {
+   <script>
+    $(document).ready(function() {
+        $('.set-session').on('click', function(e) {
+            const $target = $(e.currentTarget);
+            const parent = $target.data('parent');
+            if (parent && !$target.closest('.aiz-custom-alert').length) {
                 e.preventDefault();
-                const parent = $(this).data('parent');
-                $(this).closest(parent).fadeOut(600);
-            });
+                $target.closest(parent).fadeOut(600);
+            }
         });
+    });
     </script>
 
     @yield('script')
@@ -1420,5 +1466,4 @@
     @endphp
 
 </body>
-
 </html>

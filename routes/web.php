@@ -1,9 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-
-
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\Auth\LoginController;
@@ -80,298 +76,6 @@ Route::controller(DemoController::class)->group(function () {
     Route::get('/migrate_attribute_values', 'migrate_attribute_values');
 });
 
-Route::get('/list-sql-files', function () {
-    return glob(base_path('sqlupdates/*.sql'));
-});
-
-Route::get('/clear-cache', function () {
-    \Illuminate\Support\Facades\Artisan::call('cache:clear');
-    \Illuminate\Support\Facades\Artisan::call('config:clear');
-    \Illuminate\Support\Facades\Artisan::call('view:clear');
-    \Illuminate\Support\Facades\Artisan::call('route:clear');
-    return '✅ All caches cleared!';
-});
-
-Route::get('/debug-products', function () {
-    try {
-        return app(\App\Http\Controllers\ProductController::class)->create();
-    } catch (\Throwable $e) {
-        return response("<b>Error:</b> " . $e->getMessage() . " <i>in file " . $e->getFile() . " on line " . $e->getLine() . "</i><br><br><pre>" . $e->getTraceAsString() . "</pre>", 500);
-    }
-});
-
-Route::get('/debug-env', function () {
-    $menuLinks = json_decode(get_setting('header_menu_links'), true) ?? [];
-    $firstLink = array_values($menuLinks)[0] ?? '(none)';
-    return response()->json([
-        'app_url' => config('app.url'),
-        'system_website_link' => get_setting('system_website_link'),
-        'first_nav_link_raw' => $firstLink,
-        'first_nav_link_fixed' => rewrite_nav_link($firstLink),
-        'current_host' => request()->getHost(),
-    ]);
-});
-
-Route::get('/fix-nav-links', function () {
-    $currentOrigin = rtrim(config('app.url'), '/');
-    $currentHost = parse_url($currentOrigin, PHP_URL_HOST);
-    $fixed = [];
-
-    // Settings keys that may contain absolute URLs pointing to the old domain
-    $settingKeys = ['header_menu_links', 'system_website_link', 'frontend_website_link'];
-
-    foreach ($settingKeys as $key) {
-        $setting = \App\Models\Setting::where('type', $key)->first();
-        if (!$setting)
-            continue;
-
-        $original = $setting->value;
-
-        // Replace any http(s)://non-current-host with current origin
-        $updated = preg_replace_callback(
-            '#https?://([^/"\'\s]+)#',
-            function ($match) use ($currentHost, $currentOrigin) {
-                $host = parse_url($match[0], PHP_URL_HOST);
-                if ($host && $host !== $currentHost) {
-                    return str_replace($match[1], $currentHost, $match[0]);
-                }
-                return $match[0];
-            },
-            $original
-        );
-
-        if ($updated !== $original) {
-            $setting->value = $updated;
-            $setting->save();
-            $fixed[$key] = ['old' => $original, 'new' => $updated];
-        }
-    }
-
-    // Also clear all caches after DB update
-    \Illuminate\Support\Facades\Artisan::call('cache:clear');
-    \Illuminate\Support\Facades\Artisan::call('route:clear');
-
-    return response()->json([
-        'status' => '✅ Nav links fixed in database!',
-        'current_origin' => $currentOrigin,
-        'fixed_settings' => $fixed ?: 'No changes needed',
-    ]);
-});
-
-
-Route::get('/import-shop-sql', function () {
-    $sqlFile = base_path('shop.sql');
-    if (!file_exists($sqlFile)) {
-        return 'ERROR: shop.sql not found at ' . $sqlFile;
-    }
-
-    $output = [];
-    $output[] = 'Found shop.sql (' . number_format(filesize($sqlFile)) . ' bytes)';
-
-    try {
-        // Read and split SQL into individual statements
-        $sql = file_get_contents($sqlFile);
-        // Remove comments
-        $sql = preg_replace('/--[^\n]*\n/', "\n", $sql);
-        $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
-        // Split by semicolons
-        $statements = array_filter(array_map('trim', explode(';', $sql)));
-
-        $success = 0;
-        $errors = 0;
-        foreach ($statements as $statement) {
-            if (empty($statement) || strlen($statement) < 3)
-                continue;
-            try {
-                DB::statement($statement);
-                $success++;
-            } catch (\Exception $e) {
-                $errors++;
-                if ($errors <= 10) {
-                    $output[] = 'Error: ' . substr($e->getMessage(), 0, 200);
-                }
-            }
-        }
-        $output[] = "Done! Success: {$success}, Errors: {$errors}";
-
-        // Clear all caches after import
-        Cache::flush();
-        $output[] = 'Cache cleared.';
-    } catch (\Exception $e) {
-        $output[] = 'FATAL: ' . $e->getMessage();
-    }
-
-    return implode('<br>', $output);
-});
-
-Route::get('/import-db-gz', function () {
-    try {
-        $command = 'php ' . base_path('artisan') . ' app:import-db > /dev/null 2>&1 &';
-        exec($command);
-        return 'Import process started in the background via Artisan queue! Please check /check-db in 2-3 minutes to verify if categories appear.';
-    } catch (\Exception $e) {
-        return "FATAL: " . $e->getMessage();
-    }
-});
-
-Route::get('/check-db', function () {
-    $output = [];
-    try {
-        $tables = DB::select('SHOW TABLES');
-        $output[] = "Total tables: " . count($tables);
-
-        if (Schema::hasTable('business_settings')) {
-            $settings = DB::table('business_settings')->whereIn('type', ['system_default_currency', 'home_default_currency', 'homepage_select', 'authentication_layout_select'])->get();
-            $output[] = "Settings:";
-            foreach ($settings as $s) {
-                $output[] = $s->type . " = " . $s->value;
-            }
-        }
-
-        if (Schema::hasTable('currencies')) {
-            $currencies = DB::table('currencies')->get();
-            $output[] = "Total currencies: " . count($currencies);
-            foreach ($currencies as $c) {
-                $output[] = "Currency ID {$c->id}: {$c->name} ({$c->code}) - Status: {$c->status}";
-            }
-        }
-
-        if (Schema::hasTable('categories')) {
-            $categories = DB::table('categories')->get();
-            $output[] = "Total categories: " . count($categories);
-            foreach ($categories->take(10) as $c) {
-                $output[] = "Category ID {$c->id}: " . htmlspecialchars($c->name);
-            }
-        }
-    } catch (\Exception $e) {
-        $output[] = "Error: " . $e->getMessage();
-    }
-    return implode('<br>', $output);
-});
-Route::get('/debug-paths', function () {
-    $info = [];
-    $info['base_path'] = base_path();
-    $info['public_path'] = public_path();
-    $info['base_path_exists'] = file_exists(base_path('index.php')) ? 'yes' : 'no';
-    $info['public_path_contents'] = scandir(public_path()) ?: 'FAILED';
-    $info['public_assets_exists'] = file_exists(public_path('assets')) ? 'yes' : 'no';
-    $info['public_assets_contents'] = is_dir(public_path('assets')) ? scandir(public_path('assets')) : 'NOT A DIR';
-    $info['asset_url'] = asset('assets/css/vendors.css');
-    $info['my_asset_url'] = my_asset('assets/css/vendors.css');
-    return response()->json($info, 200, [], JSON_PRETTY_PRINT);
-});
-
-Route::get('/show-log', function () {
-    $log = storage_path('logs/laravel.log');
-    if (!file_exists($log))
-        return 'No log file';
-
-    // get last 50 lines
-    $lines = file($log);
-    $last_lines = array_slice($lines, -50);
-    $escaped = array_map('htmlspecialchars', $last_lines);
-    return implode('<br>', $escaped);
-});
-
-Route::get('/fix-homepage', function () {
-    $output = [];
-
-    // Ensure currency exists
-    $currencyCount = DB::table('currencies')->count();
-    if ($currencyCount == 0) {
-        $currencyId = DB::table('currencies')->insertGetId([
-            'name' => 'US Dollar',
-            'symbol' => '$',
-            'code' => 'USD',
-            'exchange_rate' => 1,
-            'status' => 1,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-        $output[] = 'DB: Inserted default USD currency with ID ' . $currencyId;
-    } else {
-        $currencyId = DB::table('currencies')->first()->id;
-    }
-
-    // Fix critical business_settings in DB
-    $critical_settings = [
-        'homepage_select' => 'classic',
-        'authentication_layout_select' => 'boxed',
-        'color_scheme' => '#7EB239',
-        'google_analytics' => '0',
-        'facebook_login' => '0',
-        'google_login' => '0',
-        'system_default_currency' => $currencyId,
-        'home_default_currency' => $currencyId
-    ];
-    foreach ($critical_settings as $type => $value) {
-        $existing = DB::table('business_settings')->where('type', $type)->first();
-        if (!$existing) {
-            DB::table('business_settings')->insert(['type' => $type, 'value' => $value]);
-            $output[] = 'DB: Inserted ' . $type . ' = ' . $value;
-        } else {
-            DB::table('business_settings')->where('type', $type)->update(['value' => $value]);
-            $output[] = 'DB: Fixed ' . $type . ' = ' . $value;
-        }
-    }
-    // Always force homepage_select to classic since home/ view folder does not exist
-    DB::table('business_settings')->where('type', 'homepage_select')->update(['value' => 'classic']);
-    $output[] = 'DB: Forced homepage_select = classic';
-
-    // Clear route cache files directly
-    $cacheDir = base_path('bootstrap/cache');
-    $cacheFiles = glob($cacheDir . '/*.php');
-    foreach ($cacheFiles as $file) {
-        if (basename($file) !== '.gitignore') {
-            @unlink($file);
-            $output[] = 'Deleted cache: ' . basename($file);
-        }
-    }
-
-    // Clear Laravel caches via Artisan
-    try {
-        Artisan::call('route:clear');
-        $output[] = 'route:clear OK';
-    } catch (\Exception $e) {
-        $output[] = 'route:clear error: ' . $e->getMessage();
-    }
-    try {
-        Artisan::call('config:clear');
-        $output[] = 'config:clear OK';
-    } catch (\Exception $e) {
-        $output[] = 'config:clear error: ' . $e->getMessage();
-    }
-    try {
-        Artisan::call('view:clear');
-        $output[] = 'view:clear OK';
-    } catch (\Exception $e) {
-        $output[] = 'view:clear error: ' . $e->getMessage();
-    }
-    try {
-        Artisan::call('cache:clear');
-        $output[] = 'cache:clear OK';
-    } catch (\Exception $e) {
-        $output[] = 'cache:clear error: ' . $e->getMessage();
-    }
-
-    return implode('<br>', $output) . '<br><b>Done! Refresh the homepage now.</b>';
-});
-
-Route::get('/run-sql-updates', function () {
-    $files = glob(base_path('sqlupdates/*.sql'));
-    natsort($files);
-    $output = "";
-    foreach ($files as $file) {
-        try {
-            DB::unprepared(file_get_contents($file));
-            $output .= "Applied: " . basename($file) . "<br>";
-        } catch (\Exception $e) {
-            $output .= "Error: " . basename($file) . " (" . substr($e->getMessage(), 0, 100) . ")<br>";
-        }
-    }
-    return $output . "<br>Finished!";
-});
-
 Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
@@ -385,7 +89,7 @@ Route::controller(AizUploadController::class)->group(function () {
     Route::get('/aiz-uploader/download/{id}', 'attachment_download')->name('download_attachment');
 });
 
-Route::group(['middleware' => ['prevent-back-history', 'handle-demo-login']], function () {
+Route::group(['middleware' => ['prevent-back-history','handle-demo-login']], function () {
     Auth::routes(['verify' => true]);
 });
 
@@ -411,7 +115,7 @@ Route::controller(ShopController::class)->group(function () {
     Route::post('/shop/registration/verification-code-send', 'sendRegVerificationCode')->name('shop-reg.verification_code_send');
     Route::get('/shop/registration/verify-code/{id}', 'regVerifyCode')->name('shop-reg.verify_code');
     Route::post('/shop/registration/verification-code-confirmation', 'regVerifyCodeConfirmation')->name('shop-reg.verify_code_confirmation');
-
+    
 });
 
 Route::controller(HomeController::class)->group(function () {
@@ -452,7 +156,7 @@ Route::controller(HomeController::class)->group(function () {
 
     //Best Selling Page
     Route::get('/best-selling', 'best_selling')->name('best-selling')->middleware('portfolio-view');
-    Route::get('/same-seller-products/{slug}', 'same_sellers_products')->name('same_seller_products')->middleware('portfolio-view');
+    Route::get('/same-seller-products/{slug}','same_sellers_products')->name('same_seller_products')->middleware('portfolio-view');
 
     //Featured Products Page
     Route::get('/featured-products', 'featured_products')->name('featured-products');
@@ -587,6 +291,7 @@ Route::group(['middleware' => ['user', 'verified', 'unbanned']], function () {
         Route::post('/new-user-email', 'update_email')->name('user.change.email');
         Route::post('/user/update-profile', 'userProfileUpdate')->name('user.profile.update');
         Route::post('/user/update-verification', 'userVerifyInfoUpdate')->name('user.verify.update');
+        Route::post('/otp-alert-seen',  'markOtpAlertSeen')->name('otp.alert.seen');
     });
 
     Route::controller(NotificationController::class)->group(function () {
@@ -710,16 +415,124 @@ Route::group(['middleware' => ['auth']], function () {
         Route::post('/addresses/billing/update/{id}', 'billing_update')->name('billing_addresses.update');
         Route::post('/addresses/billing/store', 'billing_store')->name('billing_addresses.store');
     });
+
+    Route::controller(NoteController::class)->group(function () {
+        Route::post('/get-notes', 'getNotes')->name('get_notes');
+        Route::get('/get-single-note/{id}', 'getSingleNote')->name('get-single-note');
+        
+    });
 });
 
-Route::get('/sql-logs', function () {
-    $logFile = storage_path('sql.log');
-    if (!file_exists($logFile)) {
-        return "Log file not found... yet! Go visit the homepage first, then refresh this page.";
-    }
+Route::get('/instamojo/payment/pay-success', [InstamojoController::class, 'success'])->name('instamojo.success');
 
-    $lines = file($logFile);
-    $lastLines = array_slice($lines, -800);
+Route::post('rozer/payment/pay-success', [RazorpayController::class, 'payment'])->name('payment.rozer');
 
-    return response("<pre style='font-size: 11px;'>" . implode("", $lastLines) . "</pre>");
+Route::get('/paystack/payment/callback', [PaystackController::class, 'handleGatewayCallback']);
+Route::get('/paystack/new-callback', [PaystackController::class, 'paystackNewCallback']);
+
+Route::controller(VoguepayController::class)->group(function () {
+    Route::get('/vogue-pay', 'showForm');
+    Route::get('/vogue-pay/success/{id}', 'paymentSuccess');
+    Route::get('/vogue-pay/callback', 'handleCallback');
+    Route::get('/vogue-pay/failure/{id}', 'paymentFailure');
+});
+
+
+//Iyzico
+Route::any('/iyzico/payment/callback/{payment_type}/{amount?}/{payment_method?}/{combined_order_id?}/{customer_package_id?}/{seller_package_id?}', [IyzicoController::class, 'callback'])->name('iyzico.callback');
+
+Route::get('/customer-products/admin', [IyzicoController::class, 'initPayment'])->name('profile.edit');
+
+//payhere below
+Route::controller(PayhereController::class)->group(function () {
+    Route::get('/payhere/checkout/testing', 'checkout_testing')->name('payhere.checkout.testing');
+    Route::get('/payhere/wallet/testing', 'wallet_testing')->name('payhere.checkout.testing');
+    Route::get('/payhere/customer_package/testing', 'customer_package_testing')->name('payhere.customer_package.testing');
+
+    Route::any('/payhere/checkout/notify', 'checkout_notify')->name('payhere.checkout.notify');
+    Route::any('/payhere/checkout/return', 'checkout_return')->name('payhere.checkout.return');
+    Route::any('/payhere/checkout/cancel', 'chekout_cancel')->name('payhere.checkout.cancel');
+
+    Route::any('/payhere/order-re-payment/notify', 'orderRepaymentNotify')->name('payhere.order_re_payment.notify');
+    Route::any('/payhere/order-re-payment/return', 'orderRepaymentReturn')->name('payhere.order_re_payment.return');
+    Route::any('/payhere/order-re-payment/cancel', 'orderRepaymentCancel')->name('payhere.order_re_payment.cancel');
+
+    Route::any('/payhere/wallet/notify', 'wallet_notify')->name('payhere.wallet.notify');
+    Route::any('/payhere/wallet/return', 'wallet_return')->name('payhere.wallet.return');
+    Route::any('/payhere/wallet/cancel', 'wallet_cancel')->name('payhere.wallet.cancel');
+
+    Route::any('/payhere/seller_package_payment/notify', 'sellerPackageNotify')->name('payhere.seller_package_payment.notify');
+    Route::any('/payhere/seller_package_payment/return', 'sellerPackageReturn')->name('payhere.seller_package_payment.return');
+    Route::any('/payhere/seller_package_payment/cancel', 'sellerPackageCancel')->name('payhere.seller_package_payment.cancel');
+
+    Route::any('/payhere/customer_package_payment/notify', 'customer_package_notify')->name('payhere.customer_package_payment.notify');
+    Route::any('/payhere/customer_package_payment/return', 'customer_package_return')->name('payhere.customer_package_payment.return');
+    Route::any('/payhere/customer_package_payment/cancel', 'customer_package_cancel')->name('payhere.customer_package_payment.cancel');
+});
+
+//N-genius
+Route::controller(NgeniusController::class)->group(function () {
+    Route::any('ngenius/cart_payment_callback', 'cart_payment_callback')->name('ngenius.cart_payment_callback');
+    Route::any('ngenius/order_re_payment_callback', 'order_re_payment_callback')->name('ngenius.order_re_payment_callback');
+    Route::any('ngenius/wallet_payment_callback', 'wallet_payment_callback')->name('ngenius.wallet_payment_callback');
+    Route::any('ngenius/customer_package_payment_callback', 'customer_package_payment_callback')->name('ngenius.customer_package_payment_callback');
+    Route::any('ngenius/seller_package_payment_callback', 'seller_package_payment_callback')->name('ngenius.seller_package_payment_callback');
+});
+
+Route::controller(BkashController::class)->group(function () {
+    Route::get('/bkash/create-payment', 'create_payment')->name('bkash.create_payment');
+    Route::get('/bkash/callback', 'callback')->name('bkash.callback');
+    Route::get('/bkash/success', 'success')->name('bkash.success');
+});
+
+Route::get('/checkout-payment-detail', [StripeController::class, 'checkout_payment_detail']);
+
+//Nagad
+Route::get('/nagad/callback', [NagadController::class, 'verify'])->name('nagad.callback');
+
+//aamarpay
+Route::controller(AamarpayController::class)->group(function () {
+    Route::post('/aamarpay/success', 'success')->name('aamarpay.success');
+    Route::post('/aamarpay/fail', 'fail')->name('aamarpay.fail');
+});
+
+//Authorize-Net-Payment
+Route::post('/dopay/online', [AuthorizenetController::class, 'handleonlinepay'])->name('dopay.online');
+Route::get('/authorizenet/cardtype', [AuthorizenetController::class, 'cardType'])->name('authorizenet.cardtype');
+
+//payku
+Route::get('/payku/callback/{id}', [PaykuController::class, 'callback'])->name('payku.result');
+
+// Paymob
+Route::any('/paymob/callback', [PaymobController::class, 'callback']);
+
+// tap
+Route::any('/tap/callback', [TapController::class, 'callback'])->name('tap.callback');
+
+//Blog Section
+Route::controller(BlogController::class)->group(function () {
+    Route::get('/blog', 'all_blog')->name('blog');
+    Route::get('/blog/{slug}', 'blog_details')->name('blog.details');
+    Route::post('/blog/generate-slug', 'generateSlug')->name('generate.slug');
+
+});
+
+Route::controller(PageController::class)->group(function () {
+    //mobile app balnk page for webview
+    Route::get('/mobile-page/{slug}', 'mobile_custom_page')->name('mobile.custom-pages');
+
+    //Custom page
+    Route::get('/{slug}', 'show_custom_page')->name('custom-pages.show_custom_page');
+});
+Route::controller(ContactController::class)->group(function () {
+    Route::post('/contact', 'contact')->name('contact');
+});
+
+Route::controller(PaymentInformationController::class)->group(function () {
+    Route::post('/payment-informations/store', 'store')->name('payment_informations.store');
+    Route::get('/payment-informations/edit/{id}', 'edit')->name('payment_informations.edit');
+    Route::post('/payment-informations/update/{id}', 'update')->name('payment_informations.update');
+    Route::get('/payment-informations/destroy/{id}', 'destroy')->name('payment_informations.destroy');
+    Route::get('/payment-informations/set-default/{id}', 'set_default')->name('payment_informations.set_default');
+
 });
