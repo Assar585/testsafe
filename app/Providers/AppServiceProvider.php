@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
       if (!$currentHost)
         return;
 
-      $setting = \App\Models\Setting::where('type', 'header_menu_links')->first();
+      $setting = \App\Models\BusinessSetting::where('type', 'header_menu_links')->first();
 
       if (!$setting || !$setting->value)
         return;
