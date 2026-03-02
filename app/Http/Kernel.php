@@ -47,7 +47,7 @@ class Kernel extends HttpKernel
             // \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\Language::class,
+            \App\Http\Middleware\Localization::class,
             \App\Http\Middleware\HttpsProtocol::class,
             \App\Http\Middleware\CheckForMaintenanceMode::class
         ],
@@ -94,6 +94,7 @@ class Kernel extends HttpKernel
         'prevent-back-history' => \App\Http\Middleware\PreventBackHistory::class,
         'handle-demo-login' => \App\Http\Middleware\HandleDemoLogin::class,
         'portfolio-view' => \App\Http\Middleware\PortfolioView::class,
+        'set_locale' => \App\Http\Middleware\Localization::class,
     ];
 
     /**

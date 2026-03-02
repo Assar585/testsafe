@@ -62,6 +62,19 @@ class GeoLocationService
             'JO' => 'sa',
         ];
 
-        return $mapping[$countryCode] ?? env('DEFAULT_LANGUAGE', 'en');
+        return $mapping[$countryCode] ?? null;
+    }
+
+    /**
+     * Get preferred language from browser headers
+     */
+    public function getBrowserLanguage($request)
+    {
+        $browserLang = $request->getPreferredLanguage(); // Laravel helper for Accept-Language
+        if ($browserLang) {
+            $code = substr($browserLang, 0, 2);
+            return $code;
+        }
+        return null;
     }
 }

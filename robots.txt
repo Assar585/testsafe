@@ -1,4 +1,4 @@
 User-agent:*
-Disalow:/wp-admin/
-Sitemap:https://safe-contract.me/sitemap.xml
-Sitemap:https://safe-contract.me/?sitemap.xml
+Disallow:/admin/
+Disallow:/seller/
+Sitemap: https://safe-contract.me/sitemap.xml
