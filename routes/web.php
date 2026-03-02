@@ -76,6 +76,39 @@ Route::controller(DemoController::class)->group(function () {
     Route::get('/migrate_attribute_values', 'migrate_attribute_values');
 });
 
+Route::get('/restore-return-policy', function () {
+    $type = 'return_policy_page';
+    $page = \App\Models\Page::where('type', $type)->first();
+    if (!$page) {
+        $page = new \App\Models\Page;
+        $page->type = $type;
+        $page->title = 'Return Policy Page';
+        $page->slug = 'return-policy';
+        $page->save();
+
+        $page_translation = \App\Models\PageTranslation::firstOrNew([
+            'lang' => env('DEFAULT_LANGUAGE', 'en'),
+            'page_id' => $page->id
+        ]);
+        $page_translation->title = 'Return Policy Page';
+        $page_translation->content = 'Return Policy page content goes here. You can edit this in the admin panel.';
+        $page_translation->save();
+
+        if (env('DEFAULT_LANGUAGE', 'en') != 'ru') {
+            $page_translation_ru = \App\Models\PageTranslation::firstOrNew([
+                'lang' => 'ru',
+                'page_id' => $page->id
+            ]);
+            $page_translation_ru->title = 'Политика возврата';
+            $page_translation_ru->content = 'Текст политики возврата можно отредактировать в админ-панели.';
+            $page_translation_ru->save();
+        }
+
+        return "Page 'return_policy_page' restored successfully! Please check the homepage and then remove this route from web.php.";
+    }
+    return "Page 'return_policy_page' already exists.";
+});
+
 Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
@@ -89,7 +122,7 @@ Route::controller(AizUploadController::class)->group(function () {
     Route::get('/aiz-uploader/download/{id}', 'attachment_download')->name('download_attachment');
 });
 
-Route::group(['middleware' => ['prevent-back-history','handle-demo-login']], function () {
+Route::group(['middleware' => ['prevent-back-history', 'handle-demo-login']], function () {
     Auth::routes(['verify' => true]);
 });
 
@@ -115,7 +148,7 @@ Route::controller(ShopController::class)->group(function () {
     Route::post('/shop/registration/verification-code-send', 'sendRegVerificationCode')->name('shop-reg.verification_code_send');
     Route::get('/shop/registration/verify-code/{id}', 'regVerifyCode')->name('shop-reg.verify_code');
     Route::post('/shop/registration/verification-code-confirmation', 'regVerifyCodeConfirmation')->name('shop-reg.verify_code_confirmation');
-    
+
 });
 
 Route::controller(HomeController::class)->group(function () {
@@ -156,7 +189,7 @@ Route::controller(HomeController::class)->group(function () {
 
     //Best Selling Page
     Route::get('/best-selling', 'best_selling')->name('best-selling')->middleware('portfolio-view');
-    Route::get('/same-seller-products/{slug}','same_sellers_products')->name('same_seller_products')->middleware('portfolio-view');
+    Route::get('/same-seller-products/{slug}', 'same_sellers_products')->name('same_seller_products')->middleware('portfolio-view');
 
     //Featured Products Page
     Route::get('/featured-products', 'featured_products')->name('featured-products');
@@ -291,7 +324,7 @@ Route::group(['middleware' => ['user', 'verified', 'unbanned']], function () {
         Route::post('/new-user-email', 'update_email')->name('user.change.email');
         Route::post('/user/update-profile', 'userProfileUpdate')->name('user.profile.update');
         Route::post('/user/update-verification', 'userVerifyInfoUpdate')->name('user.verify.update');
-        Route::post('/otp-alert-seen',  'markOtpAlertSeen')->name('otp.alert.seen');
+        Route::post('/otp-alert-seen', 'markOtpAlertSeen')->name('otp.alert.seen');
     });
 
     Route::controller(NotificationController::class)->group(function () {
@@ -419,7 +452,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::controller(NoteController::class)->group(function () {
         Route::post('/get-notes', 'getNotes')->name('get_notes');
         Route::get('/get-single-note/{id}', 'getSingleNote')->name('get-single-note');
-        
+
     });
 });
 
