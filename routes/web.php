@@ -76,39 +76,6 @@ Route::controller(DemoController::class)->group(function () {
     Route::get('/migrate_attribute_values', 'migrate_attribute_values');
 });
 
-Route::get('/restore-return-policy', function () {
-    $type = 'return_policy_page';
-    $page = \App\Models\Page::where('type', $type)->first();
-    if (!$page) {
-        $page = new \App\Models\Page;
-        $page->type = $type;
-        $page->title = 'Return Policy Page';
-        $page->slug = 'return-policy';
-        $page->save();
-
-        $page_translation = \App\Models\PageTranslation::firstOrNew([
-            'lang' => env('DEFAULT_LANGUAGE', 'en'),
-            'page_id' => $page->id
-        ]);
-        $page_translation->title = 'Return Policy Page';
-        $page_translation->content = 'Return Policy page content goes here. You can edit this in the admin panel.';
-        $page_translation->save();
-
-        if (env('DEFAULT_LANGUAGE', 'en') != 'ru') {
-            $page_translation_ru = \App\Models\PageTranslation::firstOrNew([
-                'lang' => 'ru',
-                'page_id' => $page->id
-            ]);
-            $page_translation_ru->title = 'Политика возврата';
-            $page_translation_ru->content = 'Текст политики возврата можно отредактировать в админ-панели.';
-            $page_translation_ru->save();
-        }
-
-        return "Page 'return_policy_page' restored successfully! Please check the homepage and then remove this route from web.php.";
-    }
-    return "Page 'return_policy_page' already exists.";
-});
-
 Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
