@@ -128,7 +128,8 @@
                     {{ translate('API & Integrations') }}
                 </h1>
                 <p class="text-muted fs-12 mb-0 mt-1">
-                    {{ translate('Manage all external service connections from one place') }}</p>
+                    {{ translate('Manage all external service connections from one place') }}
+                </p>
             </div>
         </div>
     </div>
@@ -233,7 +234,7 @@
                             </div>
 
                             <div class="card-body-custom">
-                                <form action="{{ route('api_integrations.store') }}" method="POST" class="needs-validation"
+                                <form action="{{ route('admin.api_integrations.store') }}" method="POST" class="needs-validation"
                                     novalidate>
                                     @csrf
                                     <input type="hidden" name="category" value="{{ $catKey }}">
@@ -285,7 +286,7 @@
                                                 onclick="testConnection({{ $integration->id }}, this)">
                                                 <i class="las la-plug"></i>
                                             </button>
-                                            <form action="{{ route('api_integrations.destroy', $integration->id) }}" method="POST"
+                                            <form action="{{ route('admin.api_integrations.destroy', $integration->id) }}" method="POST"
                                                 class="m-0" onsubmit="return confirm('{{ translate('Remove this integration?') }}')">
                                                 @csrf @method('DELETE')
                                                 <button type="submit" class="btn btn-soft-danger btn-sm"
@@ -330,7 +331,7 @@
                             class="las la-plug text-primary mr-1"></i>{{ translate('Add Custom Integration') }}</h5>
                     <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
                 </div>
-                <form action="{{ route('api_integrations.store') }}" method="POST">
+                <form action="{{ route('admin.api_integrations.store') }}" method="POST">
                     @csrf
                     <div class="modal-body">
                         <input type="hidden" name="category" id="custom-category">
@@ -391,7 +392,7 @@
 
         function toggleIntegration(id, el) {
             if (!id) { el.checked = !el.checked; return; }
-            $.post('{{ route("api_integrations.toggle", "__ID__") }}'.replace('__ID__', id), {
+            $.post('{{ route("admin.api_integrations.toggle", "__ID__") }}'.replace('__ID__', id), {
                 _token: '{{ csrf_token() }}'
             }, function (res) {
                 AIZ.plugins.notify(res.status ? 'success' : 'info',
@@ -406,7 +407,7 @@
             const orig = btn.innerHTML;
             btn.disabled = true;
             btn.innerHTML = '<i class="las la-spinner la-spin"></i>';
-            $.get('{{ route("api_integrations.test", "__ID__") }}'.replace('__ID__', id), function (res) {
+            $.get('{{ route("admin.api_integrations.test", "__ID__") }}'.replace('__ID__', id), function (res) {
                 AIZ.plugins.notify(res.success ? 'success' : 'danger', res.message);
             }).always(function () {
                 btn.disabled = false;
