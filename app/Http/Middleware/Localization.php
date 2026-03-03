@@ -170,6 +170,7 @@ class Localization
 
         // Add more exclusions as needed (e.g., webhooks, uploads)
         $exclusions = [
+            'debug-logs*',
             'view-logs*',
             'aiz-uploader*',
             'social-login*',
