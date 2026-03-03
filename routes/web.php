@@ -5,8 +5,9 @@ Route::get('/debug-logs', function () {
     $paths = [
         storage_path('logs/laravel.log'),
         storage_path('logs/laravel-' . date('Y-m-d') . '.log'),
+        base_path('storage/logs/laravel.log'),
+        '/app/storage/logs/laravel.log',
         '/var/www/html/storage/logs/laravel.log',
-        '/var/www/storage/logs/laravel.log'
     ];
 
     // Try to find ANY log file
