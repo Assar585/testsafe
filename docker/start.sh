@@ -13,6 +13,12 @@ echo "Building Laravel caches..."
 php /var/www/artisan config:clear
 php /var/www/artisan view:cache
 echo "Caches built."
+
+# Write Railway environment variables into a physical .env file to guarantee Laravel reads them
+echo "Writing environment variables to .env file..."
+env | grep -E '^(DB_|REDIS_|APP_|MAIL_)_?' > /var/www/.env
+chmod 644 /var/www/.env
+
 # Start Nginx
 service nginx start
 
