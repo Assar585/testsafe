@@ -732,16 +732,10 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group mb-0">
-                                <select class="form-control aiz-selectpicker" name="hsn_code" id="hsn_code_select"
-                                    data-live-search="true" data-size="8">
-                                    <option value="">{{ translate('Select or type HS Code') }}</option>
-                                    @php $savedHsn = old('hsn_code') @endphp
-                                    @if($savedHsn)
-                                        <option value="{{ $savedHsn }}" selected>{{ $savedHsn }}</option>
-                                    @endif
+                                <select class="form-control w-100" name="hsn_code" id="hsn_code_select" style="width:100%;">
+                                    <option value=""></option>
                                 </select>
-                                <small
-                                    class="text-muted">{{ translate('Used for international shipping and customs. Type to search.') }}</small>
+                                <small class="text-muted">{{ translate('Used for international shipping and customs. Type to search by code or product name.') }}</small>
                             </div>
                         </div>
                     </div>
@@ -1264,6 +1258,26 @@
                     $('.refund-block').toggleClass('d-none', !$(this).is(':checked'));
                 }
             });
+        });
+
+        // HS Code Select2 AJAX autocomplete
+        $(document).ready(function() {
+            if ($('#hsn_code_select').length) {
+                $('#hsn_code_select').select2({
+                    placeholder: '{{ translate("Search by code or product name...") }}',
+                    allowClear: true,
+                    minimumInputLength: 0,
+                    dropdownParent: $('.hs-code-select-wrapper').length ? $('.hs-code-select-wrapper') : $('body'),
+                    ajax: {
+                        url: '{{ route("seller.products.hs_code_search") }}',
+                        dataType: 'json',
+                        delay: 300,
+                        data: function(params) { return { q: params.term || '' }; },
+                        processResults: function(data) { return { results: data }; },
+                        cache: true
+                    }
+                });
+            }
         });
 
         // Load HS Code Autocomplete from JSON

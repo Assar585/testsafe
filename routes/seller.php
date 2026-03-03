@@ -43,6 +43,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::get('/categories-wise-product-discount', 'categoriesWiseProductDiscount')->name('categories_wise_product_discount');
         Route::post('/set-product-discount', 'setProductDiscount')->name('set_product_discount');
         Route::get('/filter-products', 'get_filter_products')->name('products.filter');
+        Route::get('/hs-code-search', 'hs_code_search')->name('products.hs_code_search');
     });
 
 

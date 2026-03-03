@@ -74,7 +74,7 @@ class ProductController extends Controller
         CoreComponentRepository::instantiateShopRepository();
 
         $seller_type = 'admin';
-        $product_types= ['All Products', 'Physical Products', 'Digital Products', 'Drafts'];
+        $product_types = ['All Products', 'Physical Products', 'Digital Products', 'Drafts'];
 
         return view('backend.product.products.index', compact('seller_type', 'product_types'));
     }
@@ -87,20 +87,18 @@ class ProductController extends Controller
     public function seller_products(Request $request, $product_type)
     {
         $seller_type = 'seller';
-        if($product_type === 'physical'){
+        if ($product_type === 'physical') {
             $product_types = ['Physical Products'];
-        }
-        elseif($product_type === 'digital'){
+        } elseif ($product_type === 'digital') {
             $product_types = ['Digital Products'];
-        }
-        else{
+        } else {
             $product_types = ['All Seller Products', 'Physical Products', 'Digital Products'];
         }
-        if (get_setting('product_approve_by_admin')==1){
+        if (get_setting('product_approve_by_admin') == 1) {
             $product_types[] = 'Not Approved';
         }
 
-        
+
 
 
         return view('backend.product.products.index', compact('seller_type', 'product_types'));
@@ -113,29 +111,28 @@ class ProductController extends Controller
         $product_types = [];
         $brand_id = null;
         $category_id = null;
-        $back_to=null;
-        
+        $back_to = null;
+
         $products = Product::where('auction_product', 0)->where('wholesale_product', 0);
         if (get_setting('vendor_system_activation') != 1) {
             $products = $products->where('added_by', 'admin');
         }
         if ($request->has('brand_id') && $request->brand_id != null) {
             $brand_id = $request->brand_id;
-            $back_to='brands';
+            $back_to = 'brands';
             $product_types = ["Products of '{$request->brand_name}' Brand"];
-        }
-        else if($request->has('category_id') && $request->category_id != null) {
+        } else if ($request->has('category_id') && $request->category_id != null) {
             $product_types = ["Products of '{$request->category_name}' Category"];
-            $back_to='categories';
+            $back_to = 'categories';
             $category_id = $request->category_id;
-        }else{
+        } else {
             $product_types = ['All Products', 'Inhouse Products', 'Seller Products', 'Digital Products', 'Physical Products', 'Drafts'];
         }
 
         $products = $products->orderBy('created_at', 'desc')->paginate(15);
         $type = 'all';
 
-        return view('backend.product.products.index', compact( 'seller_type', 'product_types', 'brand_id', 'category_id','back_to'));
+        return view('backend.product.products.index', compact('seller_type', 'product_types', 'brand_id', 'category_id', 'back_to'));
     }
 
     public function get_filter_products(Request $request)
@@ -144,7 +141,7 @@ class ProductController extends Controller
         $col_name = null;
         $query = null;
         $sort_search = null;
-        $products = Product::where('auction_product', 0)->where('wholesale_product', 0);  
+        $products = Product::where('auction_product', 0)->where('wholesale_product', 0);
         if ($request->product_type == 'drafts') {
             $products = $products->where('draft', 1)->where('added_by', 'admin');
         } else {
@@ -164,8 +161,7 @@ class ProductController extends Controller
                     $products = $products->where('digital', 0);
                 } else if ($request->product_type == 'not_approved') {
                     $products = $products->where('approved', 0);
-                }
-                 else if ($request->product_type == 'pos_product_list') {
+                } else if ($request->product_type == 'pos_product_list') {
                     $products = $products->where('pos', 1);
                 }
             }
@@ -210,26 +206,27 @@ class ProductController extends Controller
                 $products->where('published', 1);
             }
         }
-        if ( $request->filled('brand_id')) {
+        if ($request->filled('brand_id')) {
             $products = $products->where('brand_id', $request->brand_id);
-        } 
+        }
         if ($request->filled('category_id')) {
             $products = $products->whereHas('categories', function ($query) use ($request) {
                 $query->where('categories.id', $request->category_id);
             });
         }
 
-        if($request->product_type == 'pos_product_list'){
+        if ($request->product_type == 'pos_product_list') {
             $products = $products->orderBy('updated_at', 'desc')->paginate(15);
-        }else{
+        } else {
             $products = $products->orderBy('created_at', 'desc')->paginate(15);
         }
-        
+
         $type = $request->seller_type;
         $ptoduct_type = $request->product_type;
 
-        $view = view('backend.product.products.products_table',
-            compact('products', 'type', 'col_name', 'query', 'sort_search','ptoduct_type')
+        $view = view(
+            'backend.product.products.products_table',
+            compact('products', 'type', 'col_name', 'query', 'sort_search', 'ptoduct_type')
         )->render();
 
         return response()->json(['html' => $view]);
@@ -249,13 +246,13 @@ class ProductController extends Controller
             ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
-            if (addon_is_activated('gst_system')) {
-                $business_info = admin_business_info();
-                if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
-                    flash(translate('Please Update Your GST Information'))->warning();
-                    return back();
-                }
+        if (addon_is_activated('gst_system')) {
+            $business_info = admin_business_info();
+            if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+                flash(translate('Please Update Your GST Information'))->warning();
+                return back();
             }
+        }
 
         return view('backend.product.products.create', compact('categories'));
     }
@@ -271,6 +268,28 @@ class ProductController extends Controller
         }
 
         echo json_encode($html);
+    }
+
+    public function hs_code_search(Request $request)
+    {
+        $q = strtolower(trim($request->get('q', '')));
+        $jsonPath = public_path('assets/data/hs_codes.json');
+        if (!file_exists($jsonPath)) {
+            return response()->json([]);
+        }
+        $all = json_decode(file_get_contents($jsonPath), true) ?? [];
+        if (empty($q)) {
+            $results = array_slice($all, 0, 50);
+        } else {
+            $results = array_values(array_filter($all, function ($item) use ($q) {
+                return str_contains(strtolower($item['code']), $q)
+                    || str_contains(strtolower($item['desc']), $q);
+            }));
+            $results = array_slice($results, 0, 50);
+        }
+        return response()->json(array_map(function ($item) {
+            return ['id' => $item['code'], 'text' => $item['code'] . ' – ' . $item['desc']];
+        }, $results));
     }
 
     /**
@@ -359,13 +378,13 @@ class ProductController extends Controller
     public function store_as_draft(ProductDraftRequest $request)
     {
         //Log::info('Product stoate Request:', $request->all());
-        if(isset($request->id)) {
+        if (isset($request->id)) {
             $product = Product::find($request->id);
             if ($product && $product->draft != 1) {
                 return response()->json([
-                'success' => false,
-                'message' => translate('Only draft products can be automatically saved as draft.'),
-                'redirect' => ''
+                    'success' => false,
+                    'message' => translate('Only draft products can be automatically saved as draft.'),
+                    'redirect' => ''
                 ]);
             }
         }
@@ -389,7 +408,7 @@ class ProductController extends Controller
             // Add draft-specific fields
             $productData['published'] = 0;
             $productData['draft'] = 1;
-            $productData['name'] = $productData['name'] ? $productData['name']:'Draft  Product';
+            $productData['name'] = $productData['name'] ? $productData['name'] : 'Draft  Product';
             $productData['unit_price'] = $productData['unit_price'] ?? 0.0;
             $productData['current_stock'] = $productData['current_stock'] ?? 0;
             $productData['qty'] = $productData['qty'] ?? 0;
@@ -450,7 +469,7 @@ class ProductController extends Controller
             // Product translations
             ProductTranslation::updateOrCreate(
                 [
-                    'product_id' => $product->id, 
+                    'product_id' => $product->id,
                     'lang' => env('DEFAULT_LANGUAGE', 'en')
                 ],
                 [
@@ -471,7 +490,7 @@ class ProductController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('Draft save failed: '.$e->getMessage(), [
+            \Log::error('Draft save failed: ' . $e->getMessage(), [
                 'request' => $request->all(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -512,13 +531,13 @@ class ProductController extends Controller
         }
 
         if (addon_is_activated('gst_system')) {
-            if($product->added_by=='admin'){
+            if ($product->added_by == 'admin') {
                 $business_info = admin_business_info();
-                if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+                if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                     flash(translate('Please Update Your GST Information'))->warning();
                     return back();
                 }
-            }else{
+            } else {
                 $shop = $product->user->shop;
                 if ($shop && !$shop->gst_verification) {
                     flash(translate('GST verification is pending for This Seller'))->warning();
@@ -554,7 +573,7 @@ class ProductController extends Controller
             }
 
         }
-        
+
         $product = Product::findOrFail($id);
         if ($product->digital == 1) {
             return redirect('digitalproducts/' . $id . '/edit');
@@ -582,13 +601,13 @@ class ProductController extends Controller
         //Log::info('Product Update Request:', $request->all());
         //Product
         if (addon_is_activated('gst_system')) {
-            if($product->added_by=='admin'){
+            if ($product->added_by == 'admin') {
                 $business_info = admin_business_info();
-                if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+                if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                     flash(translate('Please Update Your GST Information'))->warning();
                     return back();
                 }
-            }else{
+            } else {
                 $shop = $product->user->shop;
                 if ($shop && !$shop->gst_verification) {
                     flash(translate('GST verification is pending for This Seller'))->warning();
@@ -677,24 +696,24 @@ class ProductController extends Controller
         Artisan::call('cache:clear');
         $redirrect_url = '';
         if ($request->has('type') && $request->type == 'Seller') {
-             if($product->digital){
-               $redirrect_url = route('products.seller','digital');}
-            else{
-                $redirrect_url = route('products.seller','physical');
+            if ($product->digital) {
+                $redirrect_url = route('products.seller', 'digital');
+            } else {
+                $redirrect_url = route('products.seller', 'physical');
             }
         } else {
-            if($product->digital){
+            if ($product->digital) {
                 $redirrect_url = route('digitalproducts.index');
-            }else{
+            } else {
                 $redirrect_url = route('products.admin');
             }
         }
 
         return response()->json([
-                'success' => true,
-                'message' => translate('Product has been updated successfully'),
-                'redirect' => $redirrect_url
-            ]);
+            'success' => true,
+            'message' => translate('Product has been updated successfully'),
+            'redirect' => $redirrect_url
+        ]);
     }
 
     /**
@@ -705,7 +724,7 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        $result =  $this->single_product_delete($id);
+        $result = $this->single_product_delete($id);
         if ($result) {
             flash(translate('Product has been deleted successfully'))->success();
         } else {
@@ -758,7 +777,7 @@ class ProductController extends Controller
     public function duplicate(Request $request, $id)
     {
         if (env('DEMO_MODE') == 'On') {
-           return response()->json([
+            return response()->json([
                 'success' => false,
                 'message' => translate('This action is disabled in demo mode'),
                 'redirect' => ''
@@ -793,10 +812,10 @@ class ProductController extends Controller
             $redirrect_url = route('products.admin.edit', ['id' => $product_new->id, 'lang' => env('DEFAULT_LANGUAGE')]);
         }
         return response()->json([
-                'success' => true,
-                'message' => translate('Product Copied Successfully. You can now edit and save your new product'),
-                'redirect' => $redirrect_url
-            ]);
+            'success' => true,
+            'message' => translate('Product Copied Successfully. You can now edit and save your new product'),
+            'redirect' => $redirrect_url
+        ]);
     }
 
     public function get_products_by_brand(Request $request)
@@ -848,20 +867,20 @@ class ProductController extends Controller
         }
 
         if (addon_is_activated('gst_system')) {
-            if($product->added_by=='admin'){
+            if ($product->added_by == 'admin') {
                 $business_info = admin_business_info();
-                if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+                if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                     return 3;
                 }
-                if($product->gst_rate==''|| $product->gst_rate==null || $product->hsn_code=='' || $product->hsn_code==null){
+                if ($product->gst_rate == '' || $product->gst_rate == null || $product->hsn_code == '' || $product->hsn_code == null) {
                     return 4;
                 }
-            }else{
+            } else {
                 $shop = $product->user->shop;
                 if ($shop && !$shop->gst_verification) {
                     return 3;
                 }
-                
+
             }
         }
 
@@ -882,7 +901,7 @@ class ProductController extends Controller
                     // skip if already published
                     continue;
                 }
-                
+
 
                 if ($product->added_by == 'seller' && addon_is_activated('seller_subscription')) {
                     $shop = $product->user->shop;
@@ -896,20 +915,20 @@ class ProductController extends Controller
                 }
 
                 if (addon_is_activated('gst_system')) {
-                    if($product->added_by=='admin'){
+                    if ($product->added_by == 'admin') {
                         $business_info = admin_business_info();
-                        if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
-                           continue;
-                        }
-                        if($product->gst_rate==''|| $product->gst_rate==null || $product->hsn_code=='' || $product->hsn_code==null){
+                        if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                             continue;
                         }
-                    }else{
+                        if ($product->gst_rate == '' || $product->gst_rate == null || $product->hsn_code == '' || $product->hsn_code == null) {
+                            continue;
+                        }
+                    } else {
                         $shop = $product->user->shop;
                         if ($shop && !$shop->gst_verification) {
                             continue;
                         }
-                        if($product->gst_rate==''|| $product->gst_rate==null || $product->hsn_code=='' || $product->hsn_code==null){
+                        if ($product->gst_rate == '' || $product->gst_rate == null || $product->hsn_code == '' || $product->hsn_code == null) {
                             continue;
                         }
                     }
@@ -942,11 +961,11 @@ class ProductController extends Controller
 
         $product->save();
 
-        $users                  = User::findMany($product->user_id);
+        $users = User::findMany($product->user_id);
         $data = array();
-        $data['product_type']   = $product->digital ==  0 ? 'physical' : 'digital';
-        $data['status']         = $request->approved == 1 ? 'approved' : 'rejected';
-        $data['product']        = $product;
+        $data['product_type'] = $product->digital == 0 ? 'physical' : 'digital';
+        $data['status'] = $request->approved == 1 ? 'approved' : 'rejected';
+        $data['product'] = $product;
         $data['notification_type_id'] = get_notification_type('seller_product_approved', 'type')->id;
         Notification::send($users, new ShopProductNotification($data));
 
@@ -1067,7 +1086,7 @@ class ProductController extends Controller
     public function get_selected_products(Request $request)
     {
         $products = product::whereIn('id', $request->product_ids)->get();
-        return  view('partials.product.frequently_bought_selected_product', compact('products'));
+        return view('partials.product.frequently_bought_selected_product', compact('products'));
     }
 
     public function setProductDiscount(Request $request)
@@ -1118,7 +1137,7 @@ class ProductController extends Controller
                     $product_stock = new ProductStock;
                     $product_stock->product_id = $request->product_id;
                     $product_stock->variant = '';
-                     $product_stock->price = $product->unit_price;
+                    $product_stock->price = $product->unit_price;
                     $product_stock->sku = NULL;
                 }
                 $product_stock->qty = $qty;
@@ -1129,7 +1148,7 @@ class ProductController extends Controller
             return 1;
         }
     }
-    
+
     public function get_products_byCategory(Request $request)
     {
         $products = $this->productService->products_search($request->except(['_token']));
