@@ -725,15 +725,20 @@
                         </div>
                     </div>
 
-                    <!-- HS Code - Autocomplete -->
+                    <!-- HS Code - Server-side rendered -->
                     <div class="card mt-3">
                         <div class="card-header">
                             <h5 class="mb-0 h6">{{ translate('HS Code') }}</h5>
                         </div>
                         <div class="card-body">
                             <div class="form-group mb-0">
-                                <select class="form-control w-100" name="hsn_code" id="hsn_code_select" style="width:100%;">
-                                    <option value=""></option>
+                                <select class="form-control aiz-selectpicker" name="hsn_code" id="hsn_code_select" data-live-search="true" data-size="8">
+                                    <option value="">{{ translate('Select HS Code...') }}</option>
+                                    @foreach($hsCodes as $hsItem)
+                                        <option value="{{ $hsItem['code'] }}" @selected(old('hsn_code') == $hsItem['code'])>
+                                            {{ $hsItem['code'] }} – {{ $hsItem['desc'] }}
+                                        </option>
+                                    @endforeach
                                 </select>
                                 <small class="text-muted">{{ translate('Used for international shipping and customs. Type to search by code or product name.') }}</small>
                             </div>

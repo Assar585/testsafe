@@ -254,7 +254,13 @@ class ProductController extends Controller
             }
         }
 
-        return view('backend.product.products.create', compact('categories'));
+        $hsCodes = [];
+        $hsJsonPath = resource_path('data/hs_codes.json');
+        if (file_exists($hsJsonPath)) {
+            $hsCodes = json_decode(file_get_contents($hsJsonPath), true) ?? [];
+        }
+
+        return view('backend.product.products.create', compact('categories', 'hsCodes'));
     }
 
     public function add_more_choice_option(Request $request)

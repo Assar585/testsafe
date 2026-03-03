@@ -1,0 +1,966 @@
+[
+    {
+        "code": "0101",
+        "desc": "Live horses, asses, mules"
+    },
+    {
+        "code": "0201",
+        "desc": "Meat of bovine animals, fresh or chilled"
+    },
+    {
+        "code": "0203",
+        "desc": "Meat of swine, fresh, chilled or frozen"
+    },
+    {
+        "code": "0207",
+        "desc": "Meat and edible offal of poultry"
+    },
+    {
+        "code": "0302",
+        "desc": "Fish, fresh or chilled"
+    },
+    {
+        "code": "0401",
+        "desc": "Milk and cream, not concentrated"
+    },
+    {
+        "code": "0402",
+        "desc": "Milk and cream, concentrated or sweetened"
+    },
+    {
+        "code": "0406",
+        "desc": "Cheese and curd"
+    },
+    {
+        "code": "0407",
+        "desc": "Birds' eggs, in shell, fresh"
+    },
+    {
+        "code": "0702",
+        "desc": "Tomatoes, fresh or chilled"
+    },
+    {
+        "code": "0703",
+        "desc": "Onions, shallots, garlic, fresh or chilled"
+    },
+    {
+        "code": "0709",
+        "desc": "Other vegetables, fresh or chilled"
+    },
+    {
+        "code": "0801",
+        "desc": "Coconuts, Brazil nuts, cashew nuts"
+    },
+    {
+        "code": "0802",
+        "desc": "Other tree nuts, fresh or dried"
+    },
+    {
+        "code": "0803",
+        "desc": "Bananas, including plantains"
+    },
+    {
+        "code": "0804",
+        "desc": "Dates, figs, pineapples, avocados"
+    },
+    {
+        "code": "0805",
+        "desc": "Citrus fruit, fresh or dried"
+    },
+    {
+        "code": "0901",
+        "desc": "Coffee, roasted or unroasted"
+    },
+    {
+        "code": "0902",
+        "desc": "Tea"
+    },
+    {
+        "code": "1001",
+        "desc": "Wheat and meslin"
+    },
+    {
+        "code": "1006",
+        "desc": "Rice"
+    },
+    {
+        "code": "1101",
+        "desc": "Wheat or meslin flour"
+    },
+    {
+        "code": "1511",
+        "desc": "Palm oil and its fractions"
+    },
+    {
+        "code": "1601",
+        "desc": "Sausages and similar products of meat"
+    },
+    {
+        "code": "1701",
+        "desc": "Cane or beet sugar"
+    },
+    {
+        "code": "1801",
+        "desc": "Cocoa beans, whole or broken"
+    },
+    {
+        "code": "1901",
+        "desc": "Malt extract; food preparations of flour"
+    },
+    {
+        "code": "2009",
+        "desc": "Fruit juices, unfermented"
+    },
+    {
+        "code": "2101",
+        "desc": "Extracts, essences of coffee, tea or maté"
+    },
+    {
+        "code": "2106",
+        "desc": "Food preparations not elsewhere specified"
+    },
+    {
+        "code": "2201",
+        "desc": "Waters, including natural or artificial mineral waters"
+    },
+    {
+        "code": "2202",
+        "desc": "Waters; sweetened or flavoured"
+    },
+    {
+        "code": "2203",
+        "desc": "Beer made from malt"
+    },
+    {
+        "code": "2204",
+        "desc": "Wine of fresh grapes"
+    },
+    {
+        "code": "2207",
+        "desc": "Undenatured ethyl alcohol"
+    },
+    {
+        "code": "2208",
+        "desc": "Spirits, liqueurs, other spirituous beverages"
+    },
+    {
+        "code": "2301",
+        "desc": "Flours, meals, pellets of meat/fish"
+    },
+    {
+        "code": "2401",
+        "desc": "Unmanufactured tobacco"
+    },
+    {
+        "code": "2402",
+        "desc": "Cigars, cigarettes"
+    },
+    {
+        "code": "2501",
+        "desc": "Salt; sulphur; earths, stone"
+    },
+    {
+        "code": "2504",
+        "desc": "Natural graphite"
+    },
+    {
+        "code": "2601",
+        "desc": "Iron ores and concentrates"
+    },
+    {
+        "code": "2608",
+        "desc": "Zinc ores and concentrates"
+    },
+    {
+        "code": "2609",
+        "desc": "Tin ores and concentrates"
+    },
+    {
+        "code": "2614",
+        "desc": "Titanium ores and concentrates"
+    },
+    {
+        "code": "2701",
+        "desc": "Coal; briquettes from coal"
+    },
+    {
+        "code": "2709",
+        "desc": "Petroleum oils, crude"
+    },
+    {
+        "code": "2710",
+        "desc": "Petroleum oils, refined"
+    },
+    {
+        "code": "2711",
+        "desc": "Petroleum gas and other gaseous hydrocarbons"
+    },
+    {
+        "code": "2716",
+        "desc": "Electrical energy"
+    },
+    {
+        "code": "2801",
+        "desc": "Fluorine, chlorine, bromine and iodine"
+    },
+    {
+        "code": "2804",
+        "desc": "Hydrogen, rare gases and other non-metals"
+    },
+    {
+        "code": "2814",
+        "desc": "Ammonia, anhydrous or in aqueous solution"
+    },
+    {
+        "code": "2815",
+        "desc": "Sodium hydroxide (caustic soda)"
+    },
+    {
+        "code": "2836",
+        "desc": "Carbonates; peroxocarbonates"
+    },
+    {
+        "code": "2903",
+        "desc": "Halogenated derivatives of hydrocarbons"
+    },
+    {
+        "code": "2917",
+        "desc": "Polycarboxylic acids and their derivatives"
+    },
+    {
+        "code": "2933",
+        "desc": "Heterocyclic compounds with nitrogen"
+    },
+    {
+        "code": "3001",
+        "desc": "Glands and organs for organotherapeutic uses"
+    },
+    {
+        "code": "3002",
+        "desc": "Blood; vaccines, toxins and cultures"
+    },
+    {
+        "code": "3003",
+        "desc": "Medicaments (not in measured doses)"
+    },
+    {
+        "code": "3004",
+        "desc": "Medicaments in measured doses"
+    },
+    {
+        "code": "3005",
+        "desc": "First-aid dressings, bandages, sticking plasters"
+    },
+    {
+        "code": "3006",
+        "desc": "Pharmaceutical goods"
+    },
+    {
+        "code": "3102",
+        "desc": "Mineral or chemical fertilizers, nitrogenous"
+    },
+    {
+        "code": "3201",
+        "desc": "Tanning extracts of vegetable origin"
+    },
+    {
+        "code": "3204",
+        "desc": "Synthetic organic colouring matter"
+    },
+    {
+        "code": "3302",
+        "desc": "Mixtures of odoriferous substances"
+    },
+    {
+        "code": "3401",
+        "desc": "Soap; organic surfaceactive products"
+    },
+    {
+        "code": "3402",
+        "desc": "Organic surfaceactive agents"
+    },
+    {
+        "code": "3406",
+        "desc": "Candles, tapers and the like"
+    },
+    {
+        "code": "3506",
+        "desc": "Prepared glues and adhesives"
+    },
+    {
+        "code": "3601",
+        "desc": "Propellant powders"
+    },
+    {
+        "code": "3707",
+        "desc": "Chemical preparations for photographic use"
+    },
+    {
+        "code": "3808",
+        "desc": "Insecticides, rodenticides, fungicides"
+    },
+    {
+        "code": "3811",
+        "desc": "Anti-knock preparations for petroleum"
+    },
+    {
+        "code": "3821",
+        "desc": "Prepared culture media for development of micro-organisms"
+    },
+    {
+        "code": "3824",
+        "desc": "Prepared binders for foundry moulds"
+    },
+    {
+        "code": "3901",
+        "desc": "Polymers of ethylene"
+    },
+    {
+        "code": "3902",
+        "desc": "Polymers of propylene"
+    },
+    {
+        "code": "3904",
+        "desc": "Polymers of vinyl chloride (PVC)"
+    },
+    {
+        "code": "3907",
+        "desc": "Polyacetals, polyethers and other polyoxides"
+    },
+    {
+        "code": "3916",
+        "desc": "Monofilament, plastic rods, sticks"
+    },
+    {
+        "code": "3920",
+        "desc": "Plates, sheets, film of plastics"
+    },
+    {
+        "code": "3923",
+        "desc": "Articles for conveyance or packing of goods, of plastics"
+    },
+    {
+        "code": "4011",
+        "desc": "New pneumatic tyres, of rubber"
+    },
+    {
+        "code": "4015",
+        "desc": "Gloves, mittens and mitts of rubber"
+    },
+    {
+        "code": "4016",
+        "desc": "Articles of vulcanised rubber"
+    },
+    {
+        "code": "4101",
+        "desc": "Raw hides and skins of bovine animals"
+    },
+    {
+        "code": "4106",
+        "desc": "Tanned/crust hides and skins"
+    },
+    {
+        "code": "4202",
+        "desc": "Trunks, suitcases, handbags"
+    },
+    {
+        "code": "4203",
+        "desc": "Articles of apparel and clothing accessories, of leather"
+    },
+    {
+        "code": "4301",
+        "desc": "Raw furskins"
+    },
+    {
+        "code": "4401",
+        "desc": "Fuel wood, in logs, brushwood"
+    },
+    {
+        "code": "4403",
+        "desc": "Wood in the rough"
+    },
+    {
+        "code": "4407",
+        "desc": "Wood sawn or chipped lengthwise"
+    },
+    {
+        "code": "4412",
+        "desc": "Plywood, veneered panels"
+    },
+    {
+        "code": "4415",
+        "desc": "Packing cases, boxes, crates of wood"
+    },
+    {
+        "code": "4418",
+        "desc": "Builders' joinery and carpentry of wood"
+    },
+    {
+        "code": "4802",
+        "desc": "Uncoated paper and paperboard"
+    },
+    {
+        "code": "4811",
+        "desc": "Paper, paperboard, coated or impregnated"
+    },
+    {
+        "code": "4819",
+        "desc": "Cartons, boxes, cases of paper"
+    },
+    {
+        "code": "4820",
+        "desc": "Registers, account books, notebooks"
+    },
+    {
+        "code": "4901",
+        "desc": "Printed books, brochures, leaflets"
+    },
+    {
+        "code": "4902",
+        "desc": "Newspapers, journals and periodicals"
+    },
+    {
+        "code": "5101",
+        "desc": "Wool, not carded or combed"
+    },
+    {
+        "code": "5201",
+        "desc": "Cotton, not carded or combed"
+    },
+    {
+        "code": "5209",
+        "desc": "Woven fabrics of cotton, >=85%, >200g/m²"
+    },
+    {
+        "code": "5407",
+        "desc": "Woven fabrics of synthetic filament yarn"
+    },
+    {
+        "code": "5512",
+        "desc": "Woven fabrics of synthetic staple fibres"
+    },
+    {
+        "code": "5601",
+        "desc": "Wadding of textile materials"
+    },
+    {
+        "code": "5701",
+        "desc": "Carpets and other textile floor coverings, knotted"
+    },
+    {
+        "code": "5801",
+        "desc": "Woven pile fabrics and chenille fabrics"
+    },
+    {
+        "code": "6101",
+        "desc": "Men's overcoats, car-coats, anoraks, of knitted fabric"
+    },
+    {
+        "code": "6102",
+        "desc": "Women's overcoats, car-coats, anoraks, of knitted fabric"
+    },
+    {
+        "code": "6103",
+        "desc": "Men's suits, ensembles of knitted fabric"
+    },
+    {
+        "code": "6104",
+        "desc": "Women's suits, ensembles of knitted fabric"
+    },
+    {
+        "code": "6105",
+        "desc": "Men's shirts of knitted fabric"
+    },
+    {
+        "code": "6106",
+        "desc": "Women's blouses, shirts of knitted fabric"
+    },
+    {
+        "code": "6109",
+        "desc": "T-shirts, singlets, other vests of knitted fabric"
+    },
+    {
+        "code": "6110",
+        "desc": "Jerseys, pullovers, sweatshirts of knitted fabric"
+    },
+    {
+        "code": "6115",
+        "desc": "Panty hose, tights, stockings"
+    },
+    {
+        "code": "6201",
+        "desc": "Men's overcoats, car-coats, anoraks, of fabric"
+    },
+    {
+        "code": "6202",
+        "desc": "Women's overcoats, car-coats, anoraks, of fabric"
+    },
+    {
+        "code": "6203",
+        "desc": "Men's suits, ensembles, jackets, trousers"
+    },
+    {
+        "code": "6204",
+        "desc": "Women's suits, ensembles, jackets, trousers"
+    },
+    {
+        "code": "6205",
+        "desc": "Men's shirts"
+    },
+    {
+        "code": "6206",
+        "desc": "Women's blouses, shirts"
+    },
+    {
+        "code": "6207",
+        "desc": "Men's underpants, briefs, nightshirts, pyjamas"
+    },
+    {
+        "code": "6208",
+        "desc": "Women's slips, petticoats, briefs"
+    },
+    {
+        "code": "6209",
+        "desc": "Babies' garments and clothing accessories"
+    },
+    {
+        "code": "6211",
+        "desc": "Track suits, ski suits, swimwear"
+    },
+    {
+        "code": "6212",
+        "desc": "Brassieres, girdles, corsets"
+    },
+    {
+        "code": "6213",
+        "desc": "Handkerchiefs"
+    },
+    {
+        "code": "6301",
+        "desc": "Electric blankets"
+    },
+    {
+        "code": "6302",
+        "desc": "Bed linen, table linen, toilet linen"
+    },
+    {
+        "code": "6303",
+        "desc": "Curtains, drapes, blinds"
+    },
+    {
+        "code": "6305",
+        "desc": "Sacks and bags for packing"
+    },
+    {
+        "code": "6401",
+        "desc": "Waterproof footwear"
+    },
+    {
+        "code": "6402",
+        "desc": "Other footwear with outer soles and uppers of rubber"
+    },
+    {
+        "code": "6403",
+        "desc": "Footwear with outer soles of rubber, uppers of leather"
+    },
+    {
+        "code": "6404",
+        "desc": "Footwear with outer soles of rubber, uppers of textile"
+    },
+    {
+        "code": "6405",
+        "desc": "Other footwear"
+    },
+    {
+        "code": "6501",
+        "desc": "Hat-forms, hat bodies and hoods of felt"
+    },
+    {
+        "code": "6506",
+        "desc": "Other headgear, whether or not lined"
+    },
+    {
+        "code": "6601",
+        "desc": "Umbrellas and sun umbrellas"
+    },
+    {
+        "code": "6801",
+        "desc": "Setts, curbstones and flagstones of stone"
+    },
+    {
+        "code": "6907",
+        "desc": "Unglazed ceramic flags and paving"
+    },
+    {
+        "code": "6911",
+        "desc": "Tableware, kitchenware of porcelain"
+    },
+    {
+        "code": "7001",
+        "desc": "Cullet and other waste and scrap of glass"
+    },
+    {
+        "code": "7005",
+        "desc": "Float glass and surface ground glass"
+    },
+    {
+        "code": "7010",
+        "desc": "Carboys, bottles, flasks of glass"
+    },
+    {
+        "code": "7013",
+        "desc": "Glassware for table, kitchen"
+    },
+    {
+        "code": "7106",
+        "desc": "Silver, unwrought or in semi-manufactured forms"
+    },
+    {
+        "code": "7108",
+        "desc": "Gold, unwrought or in semi-manufactured forms"
+    },
+    {
+        "code": "7202",
+        "desc": "Ferro-alloys"
+    },
+    {
+        "code": "7208",
+        "desc": "Flat-rolled products of iron or non-alloy steel"
+    },
+    {
+        "code": "7213",
+        "desc": "Bars and rods, hot-rolled, of iron or non-alloy steel"
+    },
+    {
+        "code": "7301",
+        "desc": "Sheet piling of iron or steel"
+    },
+    {
+        "code": "7304",
+        "desc": "Tubes, pipes and hollow profiles of iron or steel"
+    },
+    {
+        "code": "7401",
+        "desc": "Copper mattes; cement copper"
+    },
+    {
+        "code": "7403",
+        "desc": "Refined copper and copper alloys, unwrought"
+    },
+    {
+        "code": "7601",
+        "desc": "Unwrought aluminium"
+    },
+    {
+        "code": "7607",
+        "desc": "Aluminium foil"
+    },
+    {
+        "code": "7801",
+        "desc": "Unwrought lead"
+    },
+    {
+        "code": "8001",
+        "desc": "Unwrought tin"
+    },
+    {
+        "code": "8301",
+        "desc": "Padlocks, locks of base metal"
+    },
+    {
+        "code": "8302",
+        "desc": "Base metal mountings, fittings for furniture"
+    },
+    {
+        "code": "8407",
+        "desc": "Spark-ignition reciprocating piston engines"
+    },
+    {
+        "code": "8408",
+        "desc": "Compression-ignition internal combustion piston engines"
+    },
+    {
+        "code": "8413",
+        "desc": "Pumps for liquids"
+    },
+    {
+        "code": "8414",
+        "desc": "Air or vacuum pumps, compressors"
+    },
+    {
+        "code": "8415",
+        "desc": "Air conditioning machines"
+    },
+    {
+        "code": "8416",
+        "desc": "Furnace burners for liquid fuel"
+    },
+    {
+        "code": "8419",
+        "desc": "Machinery for treating materials by temperature"
+    },
+    {
+        "code": "8421",
+        "desc": "Centrifuges; filtering machinery"
+    },
+    {
+        "code": "8422",
+        "desc": "Dishwashing machines; machinery for cleaning bottles"
+    },
+    {
+        "code": "8424",
+        "desc": "Mechanical appliances for projecting, dispersing liquids"
+    },
+    {
+        "code": "8429",
+        "desc": "Self-propelled bulldozers, graders, levellers"
+    },
+    {
+        "code": "8430",
+        "desc": "Other moving, grading, levelling machinery"
+    },
+    {
+        "code": "8431",
+        "desc": "Parts for machinery of headings 8425 to 8430"
+    },
+    {
+        "code": "8443",
+        "desc": "Printing machinery; machines for ancillary printing purposes"
+    },
+    {
+        "code": "8450",
+        "desc": "Household or laundry-type washing machines"
+    },
+    {
+        "code": "8451",
+        "desc": "Machinery for textile production"
+    },
+    {
+        "code": "8471",
+        "desc": "Automatic data-processing machines (computers)"
+    },
+    {
+        "code": "8473",
+        "desc": "Parts for computers and peripheral machines"
+    },
+    {
+        "code": "8474",
+        "desc": "Machinery for sorting, screening, separating minerals"
+    },
+    {
+        "code": "8477",
+        "desc": "Machinery for working rubber or plastics"
+    },
+    {
+        "code": "8481",
+        "desc": "Taps, cocks, valves for pipes"
+    },
+    {
+        "code": "8482",
+        "desc": "Ball or roller bearings"
+    },
+    {
+        "code": "8483",
+        "desc": "Transmission shafts and cranks"
+    },
+    {
+        "code": "8501",
+        "desc": "Electric motors and generators"
+    },
+    {
+        "code": "8502",
+        "desc": "Electric generating sets and rotary converters"
+    },
+    {
+        "code": "8504",
+        "desc": "Electrical transformers, static converters"
+    },
+    {
+        "code": "8507",
+        "desc": "Electric accumulators (batteries)"
+    },
+    {
+        "code": "8516",
+        "desc": "Electrical instantaneous or storage water heaters"
+    },
+    {
+        "code": "8517",
+        "desc": "Telephone sets; smartphones"
+    },
+    {
+        "code": "8518",
+        "desc": "Microphones; loudspeakers; headphones"
+    },
+    {
+        "code": "8519",
+        "desc": "Sound recording or reproducing apparatus"
+    },
+    {
+        "code": "8525",
+        "desc": "Transmission apparatus for broadcasting"
+    },
+    {
+        "code": "8528",
+        "desc": "Monitors and projectors"
+    },
+    {
+        "code": "8532",
+        "desc": "Electrical capacitors"
+    },
+    {
+        "code": "8536",
+        "desc": "Electrical apparatus for switching circuits"
+    },
+    {
+        "code": "8541",
+        "desc": "Semiconductor devices"
+    },
+    {
+        "code": "8542",
+        "desc": "Electronic integrated circuits"
+    },
+    {
+        "code": "8544",
+        "desc": "Insulated wire, cable"
+    },
+    {
+        "code": "8601",
+        "desc": "Rail locomotives powered by electricity"
+    },
+    {
+        "code": "8701",
+        "desc": "Tractors"
+    },
+    {
+        "code": "8702",
+        "desc": "Motor vehicles for transport of 10 or more persons"
+    },
+    {
+        "code": "8703",
+        "desc": "Motor cars and other motor vehicles for transport of persons"
+    },
+    {
+        "code": "8704",
+        "desc": "Motor vehicles for transport of goods"
+    },
+    {
+        "code": "8708",
+        "desc": "Parts and accessories of motor vehicles"
+    },
+    {
+        "code": "8711",
+        "desc": "Motorcycles, mopeds"
+    },
+    {
+        "code": "8714",
+        "desc": "Parts and accessories of vehicles of headings 8711 to 8713"
+    },
+    {
+        "code": "8716",
+        "desc": "Trailers and semi-trailers; other vehicles, not mechanically propelled"
+    },
+    {
+        "code": "8801",
+        "desc": "Balloons and dirigibles; gliders, hang gliders"
+    },
+    {
+        "code": "8802",
+        "desc": "Aircraft (helicopters, aeroplanes)"
+    },
+    {
+        "code": "8803",
+        "desc": "Parts of aircraft"
+    },
+    {
+        "code": "8901",
+        "desc": "Cruise ships, excursion boats, ferry-boats"
+    },
+    {
+        "code": "9001",
+        "desc": "Optical fibres; optical fibre bundles"
+    },
+    {
+        "code": "9004",
+        "desc": "Spectacles, goggles and the like"
+    },
+    {
+        "code": "9006",
+        "desc": "Photographic cameras"
+    },
+    {
+        "code": "9013",
+        "desc": "Liquid crystal devices; lasers"
+    },
+    {
+        "code": "9018",
+        "desc": "Instruments used in medical, surgical or veterinary sciences"
+    },
+    {
+        "code": "9021",
+        "desc": "Orthopaedic appliances; hearing aids"
+    },
+    {
+        "code": "9101",
+        "desc": "Wrist-watches, pocket-watches"
+    },
+    {
+        "code": "9201",
+        "desc": "Pianos"
+    },
+    {
+        "code": "9207",
+        "desc": "Musical instruments with electrical sound production"
+    },
+    {
+        "code": "9302",
+        "desc": "Revolvers and pistols"
+    },
+    {
+        "code": "9401",
+        "desc": "Seats, whether or not convertible into beds"
+    },
+    {
+        "code": "9403",
+        "desc": "Other furniture and parts thereof"
+    },
+    {
+        "code": "9404",
+        "desc": "Mattress supports; mattresses, duvets, pillows"
+    },
+    {
+        "code": "9405",
+        "desc": "Lamps and lighting fittings"
+    },
+    {
+        "code": "9503",
+        "desc": "Tricycles, scooters, toy figures, puzzles"
+    },
+    {
+        "code": "9504",
+        "desc": "Video games; slot machines"
+    },
+    {
+        "code": "9506",
+        "desc": "Articles for sports; swimming and paddling pools"
+    },
+    {
+        "code": "9507",
+        "desc": "Fishing rods, fish-hooks"
+    },
+    {
+        "code": "9601",
+        "desc": "Worked ivory, bone, tortoise-shell"
+    },
+    {
+        "code": "9608",
+        "desc": "Ball-point pens; felt-tip and other porous-tip pens"
+    },
+    {
+        "code": "9617",
+        "desc": "Vacuum flasks with cases"
+    },
+    {
+        "code": "9619",
+        "desc": "Sanitary towels, diapers"
+    }
+]
