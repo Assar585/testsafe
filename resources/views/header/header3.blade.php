@@ -10,11 +10,6 @@
         <div class="row">
             <div class="col-lg-6 col">
                 <ul class="list-inline d-flex justify-content-between justify-content-lg-start mb-0">
-@php
-    $currentPath = implode('/', array_slice(request()->segments(), request()->segment(1) == $system_language->code ? 1 : 0));
-    $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
-@endphp
-
                     <!-- Language switcher -->
                     @if (get_setting('show_language_switcher') == 'on')
                         <li class="list-inline-item dropdown mr-4 lang-visibility" id="lang-change">
@@ -27,8 +22,7 @@
                             <ul class="dropdown-menu dropdown-menu-left">
                                 @foreach (get_all_active_language() as $key => $language)
                                     <li>
-                                        <a href="{{ url('/') }}/{{ $language->code }}/{{ $currentPath }}{{ $queryString }}" 
-                                            data-flag="{{ $language->code }}"
+                                        <a href="javascript:void(0)" data-flag="{{ $language->code }}"
                                             class="dropdown-item @if ($system_language->code == $language->code) active @endif">
                                             <img src="{{ static_asset('assets/img/placeholder.jpg') }}"
                                                 data-src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"

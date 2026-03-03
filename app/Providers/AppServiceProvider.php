@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
       if (!$currentHost)
         return;
 
-      $setting = \App\Models\BusinessSetting::where('type', 'header_menu_links')->first();
+      $setting = \App\Models\Setting::where('type', 'header_menu_links')->first();
 
       if (!$setting || !$setting->value)
         return;
@@ -87,9 +87,7 @@ class AppServiceProvider extends ServiceProvider
    */
   public function register()
   {
-    $this->app->singleton(\App\Services\GeoLocationService::class, function ($app) {
-      return new \App\Services\GeoLocationService();
-    });
+    //
   }
 }
 

@@ -216,7 +216,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form class="" action="{{ route('customer.conversations.store') }}" method="POST"
+                <form class="" action="{{ route('conversations.store') }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $detailedProduct->id }}">

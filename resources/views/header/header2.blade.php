@@ -2,8 +2,6 @@
     $topHeaderTextColor = get_setting('top_header_text_color');
     $middleHeaderTextColor = get_setting('middle_header_text_color');
     $bottomHeaderTextColor = get_setting('bottom_header_text_color');
-    $currentPath = implode('/', array_slice(request()->segments(), 1));
-    $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
 @endphp
 <div class="top-navbar top-background-color-visibility z-1035 h-35px h-sm-auto"
     style="background-color: {{ get_setting('top_header_bg_color') }}">
@@ -16,13 +14,14 @@
                         <li class="list-inline-item dropdown mr-4 lang-visibility" id="lang-change">
 
                             <a href="javascript:void(0)" class="dropdown-toggle fs-12 py-2 top-text-color-visibility"
-                                style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown" data-display="static">
+                                style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown"
+                                data-display="static">
                                 <span class="">{{ $system_language->name }}</span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-left">
                                 @foreach (get_all_active_language() as $key => $language)
                                     <li>
-                                        <a href="{{ url('/') }}/{{ $language->code }}/{{ $currentPath }}{{ $queryString }}"
+                                        <a href="javascript:void(0)" data-flag="{{ $language->code }}"
                                             class="dropdown-item @if ($system_language->code == $language->code) active @endif text-dark">
                                             <img src="{{ static_asset('assets/img/placeholder.jpg') }}"
                                                 data-src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
@@ -43,14 +42,14 @@
                             @endphp
 
                             <a href="javascript:void(0)" class="dropdown-toggle fs-12 py-2 top-text-color-visibility"
-                                style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown" data-display="static">
+                                style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown"
+                                data-display="static">
                                 {{ $system_currency->name }}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-right dropdown-menu-lg-left">
                                 @foreach (get_all_active_currency() as $key => $currency)
                                     <li>
-                                        <a class="dropdown-item @if ($system_currency->code == $currency->code) active @endif text-dark"
-                                            href="javascript:void(0)"
+                                        <a class="dropdown-item @if ($system_currency->code == $currency->code) active @endif text-dark" href="javascript:void(0)"
                                             data-currency="{{ $currency->code }}">{{ $currency->name }}
                                             ({{ $currency->symbol }})
                                         </a>
@@ -74,14 +73,16 @@
                             <div class="dropdown">
                                 <a href="{{ route(get_setting('seller_registration_verify') === '1' ? 'shop-reg.verification' : 'shops.create') }}"
                                     class="fs-12 dropdown-toggle top-text-color-visibility"
-                                    style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown" aria-haspopup="true"
-                                    aria-expanded="false">
+                                    style="color: {{ $topHeaderTextColor }}" data-toggle="dropdown"
+                                    aria-haspopup="true" aria-expanded="false">
                                     {{ translate('Become a Seller !') }}
                                 </a>
 
                                 <!-- Dropdown Menu -->
                                 <div class="dropdown-menu fs-12 p-0 mt-1">
-                                    <a class="dropdown-item py-2 px-2 text-dark" href="{{ route('seller.login') }}">
+                                    <a class="dropdown-item py-2 px-2 text-dark"
+                                       
+                                        href="{{ route('seller.login') }}">
                                         {{ translate('Login to Seller') }}
                                     </a>
                                 </div>
@@ -141,11 +142,11 @@
                             $header_logo = get_setting('header_logo');
                         @endphp
                         @if ($header_logo != null)
-                            <img id="header-logo-preview" src="{{ uploaded_asset($header_logo) }}"
-                                alt="{{ env('APP_NAME') }}" class="mw-100 h-30px h-md-40px" height="40">
+                            <img id="header-logo-preview" src="{{ uploaded_asset($header_logo) }}" alt="{{ env('APP_NAME') }}"
+                                class="mw-100 h-30px h-md-40px" height="40">
                         @else
-                            <img id="header-logo-preview" src="{{ static_asset('assets/img/logo.png') }}"
-                                alt="{{ env('APP_NAME') }}" class="mw-100 h-30px h-md-40px" height="40">
+                            <img id="header-logo-preview" src="{{ static_asset('assets/img/logo.png') }}" alt="{{ env('APP_NAME') }}"
+                                class="mw-100 h-30px h-md-40px" height="40">
                         @endif
                     </a>
                 </div>
@@ -385,8 +386,7 @@
                             <!-- Image -->
                             <span class="size-40px rounded-circle overflow-hidden border border-transparent nav-user-img">
                                 @if ($user->avatar_original != null)
-                                    <img src="{{ uploaded_asset(Auth::user()->avatar_original) }}" class="img-fit h-100"
-                                        alt="{{ translate('avatar') }}"
+                                    <img src="{{ uploaded_asset(Auth::user()->avatar_original) }}" class="img-fit h-100" alt="{{ translate('avatar') }}"
                                         onerror="this.onerror=null;this.src='{{ static_asset('assets/img/avatar-place.png') }}';">
                                 @else
                                     <img src="{{ static_asset('assets/img/avatar-place.png') }}" class="image"
@@ -395,16 +395,14 @@
                                 @endif
                             </span>
                             <!-- Name -->
-                            <h4 class="h5 fs-14 fw-700 ml-2 mb-0 middle-text-color-visibility"
-                                style="color: {{ $middleHeaderTextColor }}">{{ $user->name }}</h4>
+                            <h4 class="h5 fs-14 fw-700 ml-2 mb-0 middle-text-color-visibility" style="color: {{ $middleHeaderTextColor }}">{{ $user->name }}</h4>
                         </span>
                     @else
                         <!--Login & Registration -->
                         <span class="d-flex align-items-center nav-user-info ml-3">
                             <!-- Image -->
                             <span
-                                class="size-40px rounded-circle overflow-hidden border d-flex align-items-center justify-content-center nav-user-img middle-text-color-visibility"
-                                style="color: {{ $middleHeaderTextColor }}">
+                                class="size-40px rounded-circle overflow-hidden border d-flex align-items-center justify-content-center nav-user-img middle-text-color-visibility" style="color: {{ $middleHeaderTextColor }}">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="19.902" height="20.012"
                                     viewBox="0 0 19.902 20.012">
                                     <path id="fe2df171891038b33e9624c27e96e367"
@@ -413,11 +411,10 @@
                                 </svg>
                             </span>
                             <a href="{{ route('user.login') }}"
-                                class="opacity-60 hov-opacity-100 fs-12 d-inline-block border-right border-soft-light border-width-2 pr-2 ml-3 middle-text-color-visibility"
-                                style="color: {{ $middleHeaderTextColor }}">{{ translate('Login') }}</a>
-                            <a href="{{ route('user.registration') }}" {{-- <a href="{{ route('user.registration') }}" --}}
-                                class="opacity-60 hov-opacity-100 fs-12 d-inline-block py-2 pl-2 middle-text-color-visibility"
-                                style="color: {{ $middleHeaderTextColor }}">{{ translate('Registration') }}</a>
+                                class="opacity-60 hov-opacity-100 fs-12 d-inline-block border-right border-soft-light border-width-2 pr-2 ml-3 middle-text-color-visibility" style="color: {{ $middleHeaderTextColor }}">{{ translate('Login') }}</a>
+                            <a href="{{ route('user.registration') }}"
+                                {{-- <a href="{{ route('user.registration') }}" --}}
+                                class="opacity-60 hov-opacity-100 fs-12 d-inline-block py-2 pl-2 middle-text-color-visibility" style="color: {{ $middleHeaderTextColor }}">{{ translate('Registration') }}</a>
                         </span>
                     @endauth
                 </div>
@@ -628,16 +625,14 @@
     </div>
 
     <!-- Menu Bar -->
-    <div class="d-none d-lg-block position-relative bottom-background-color-visibility h-50px"
-        style="background-color: {{ get_setting('bottom_header_bg_color') }}">
+    <div class="d-none d-lg-block position-relative bottom-background-color-visibility h-50px" style="background-color: {{ get_setting('bottom_header_bg_color') }}">
         <div class="container h-100">
             <div class="d-flex h-100">
                 <!-- Categoty Menu Button -->
                 <div class="d-none d-xl-block all-category has-transition" id="category-menu-bar">
                     <div class="px-3 h-100"
                         style="padding-top: 12px;padding-bottom: 12px; width:270px; cursor: pointer;">
-                        <div class="d-flex align-items-center justify-content-between bottom-text-color-visibility"
-                            style="color: {{ $bottomHeaderTextColor }}">
+                        <div class="d-flex align-items-center justify-content-between bottom-text-color-visibility" style="color: {{ $bottomHeaderTextColor }}">
                             <div>
                                 <span class="fw-700 fs-16 mr-3">{{ translate('Categories') }}</span>
                                 <a href="{{ route('categories.all') }}" class="text-reset categoriesAll">
@@ -651,7 +646,7 @@
                     </div>
                 </div>
                 <!-- Header Menus -->
-
+                
                 <div class="ml-xl-4 w-100 overflow-hidden">
                     <div class="d-flex align-items-center justify-content-center justify-content-xl-start h-100">
                         <ul class="list-inline mb-0 pl-0 hor-swipe c-scrollbar-light">
@@ -660,8 +655,7 @@
                                     <li class="list-inline-item mr-0 animate-underline-white">
                                         <a href="{{ json_decode(get_setting('header_menu_links'), true)[$key] }}"
                                             class="fs-13 px-3 py-3 d-inline-block fw-700 header_menu_links hov-bg-black-10 bottom-text-color-visibility
-                                                                                                                    @if (url()->current() == json_decode(get_setting('header_menu_links'), true)[$key]) active @endif"
-                                            style="color: {{ $bottomHeaderTextColor }}">
+                                                                                                            @if (url()->current() == json_decode(get_setting('header_menu_links'), true)[$key]) active @endif" style="color: {{ $bottomHeaderTextColor }}">
                                             {{ translate($value) }}
                                         </a>
                                     </li>

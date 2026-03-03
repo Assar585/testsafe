@@ -2,8 +2,6 @@
     $topHeaderTextColor = get_setting('top_header_text_color');
     $middleHeaderTextColor = get_setting('middle_header_text_color');
     $bottomHeaderTextColor = get_setting('bottom_header_text_color');
-    $currentPath = implode('/', array_slice(request()->segments(), 1));
-    $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
 @endphp
 <div class="top-navbar z-1035 h-35px h-sm-auto top-background-color-visibility"
     style="background-color: {{  get_setting('top_header_bg_color')  }}">
@@ -23,7 +21,7 @@
                             <ul class="dropdown-menu dropdown-menu-left">
                                 @foreach (get_all_active_language() as $key => $language)
                                     <li>
-                                        <a href="{{ url('/') }}/{{ $language->code }}/{{ $currentPath }}{{ $queryString }}"
+                                        <a href="javascript:void(0)" data-flag="{{ $language->code }}"
                                             class="dropdown-item text-dark @if ($system_language->code == $language->code) active @endif">
                                             <img src="{{ static_asset('assets/img/placeholder.jpg') }}"
                                                 data-src="{{ static_asset('assets/img/flags/' . $language->code . '.png') }}"
