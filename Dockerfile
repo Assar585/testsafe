@@ -58,6 +58,9 @@ RUN chmod +x /start.sh
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 COPY docker/nginx.conf /etc/nginx/sites-enabled/default
 
+# Enable env vars for PHP-FPM workers
+COPY docker/zzz-docker.conf /usr/local/etc/php-fpm.d/zzz-docker.conf
+
 # Expose port and start via script
 EXPOSE 8080
 CMD ["/start.sh"]
