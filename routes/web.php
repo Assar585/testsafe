@@ -205,6 +205,7 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         Route::get('/privacy-policy', 'privacypolicy')->name('privacypolicy');
 
         Route::get('/track-your-order', 'trackOrder')->name('orders.track');
+        Route::get('/dashboard', 'dashboard')->name('dashboard');
 
         // Auth Pages (localized)
         Route::get('/login', 'login')->name('login');
