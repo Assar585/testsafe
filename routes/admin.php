@@ -808,4 +808,15 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
 
 });
 
+// API Integrations
+Route::group(['prefix' => 'admin', 'middleware' => ['admin', 'prevent-back-history'], 'as' => 'admin.'], function () {
+    Route::controller(\App\Http\Controllers\ApiIntegrationController::class)->prefix('api-integrations')->group(function () {
+        Route::get('/', 'index')->name('api_integrations.index');
+        Route::post('/', 'store')->name('api_integrations.store');
+        Route::post('/{apiIntegration}/toggle', 'toggle')->name('api_integrations.toggle');
+        Route::get('/{apiIntegration}/test', 'test_connection')->name('api_integrations.test');
+        Route::delete('/{apiIntegration}', 'destroy')->name('api_integrations.destroy');
+    });
+});
+
 Route::get('/system/sitemap-item-add/{item}', [AdminController::class, 'SitemapItems'])->name('sitemap_item_add');
