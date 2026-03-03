@@ -37,22 +37,52 @@ class LocalizationController extends Controller
 
         // 2. Browser Accept-Language
         $browserLang = $this->geoLocationService->getBrowserLanguage($request);
-        if ($browserLang && Language::where('code', $browserLang)->where('is_active', 1)->exists()) {
-            return $browserLang;
+        if ($browserLang) {
+            try {
+                if (Language::where('code', $browserLang)->where('is_active', 1)->exists()) {
+                    return $browserLang;
+                }
+            } catch (\Exception $e) {
+                try {
+                    if (Language::where('code', $browserLang)->where('status', 1)->exists()) {
+                        return $browserLang;
+                    }
+                } catch (\Exception $e2) {
+                }
+            }
         }
 
-        // 3. IP-Geo
+        // 3. IP-Geo (Commented out temporarily for performance/timeout investigation)
+        /*
         $ip = $request->ip();
         $countryCode = $this->geoLocationService->getCountryCode($ip);
         if ($countryCode) {
             $geoLang = $this->geoLocationService->getLanguageByCountry($countryCode);
-            if ($geoLang && Language::where('code', $geoLang)->where('is_active', 1)->exists()) {
-                return $geoLang;
+            if ($geoLang) {
+                try {
+                    if (Language::where('code', $geoLang)->where('is_active', 1)->exists()) {
+                        return $geoLang;
+                    }
+                } catch (\Exception $e) {
+                    try {
+                        if (Language::where('code', $geoLang)->where('status', 1)->exists()) {
+                            return $geoLang;
+                        }
+                    } catch (\Exception $e2) {}
+                }
             }
         }
+        */
 
         // 4. Default from DB
-        $defaultLang = Language::where('is_default', 1)->where('is_active', 1)->first();
+        try {
+            $defaultLang = Language::where('is_default', 1)->where('is_active', 1)->first();
+            if (!$defaultLang) {
+                $defaultLang = Language::where('is_default', 1)->first();
+            }
+        } catch (\Exception $e) {
+            $defaultLang = Language::first();
+        }
         return $defaultLang ? $defaultLang->code : env('DEFAULT_LANGUAGE', 'en');
     }
 }

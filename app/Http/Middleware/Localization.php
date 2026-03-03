@@ -121,6 +121,7 @@ class Localization
         }
 
         // 3. IP-Geo
+        /*
         $ip = $request->ip();
         $countryCode = $this->geoLocationService->getCountryCode($ip);
         if ($countryCode) {
@@ -143,6 +144,7 @@ class Localization
                 }
             }
         }
+        */
 
         // 4. Default from DB
         try {
