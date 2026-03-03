@@ -42,14 +42,6 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
-        // TEMP DEBUG - remove after fixing
-        echo "<pre style='font-family:monospace;background:#fff;color:#333;padding:20px;text-align:left'>";
-        echo "<b>Error:</b> " . htmlspecialchars($e->getMessage()) . "\n";
-        echo "<b>File:</b> " . htmlspecialchars($e->getFile()) . ":" . $e->getLine() . "\n\n";
-        echo htmlspecialchars($e->getTraceAsString());
-        echo "</pre>";
-        exit;
-
         if ($e instanceof Redirectingexception) {
             return redirect()->back();
         }
