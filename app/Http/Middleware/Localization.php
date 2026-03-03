@@ -164,7 +164,7 @@ class Localization
     protected function shouldRedirect($request)
     {
         // Don't redirect if it's an AJAX request, an API request, or an Admin request
-        if ($request->ajax() || $request->is('api/*') || $request->is('admin/*') || $request->is('seller/*')) {
+        if ($request->ajax() || $request->is('api*') || $request->is('admin*') || $request->is('seller*')) {
             return false;
         }
 

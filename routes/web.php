@@ -414,3 +414,15 @@ Route::controller(PageController::class)->group(function () {
     // Re-added for the cases where no locale is present, but they will be redirected anyway by middleware
     Route::get('/{slug}', 'show_custom_page')->name('custom-pages.show_without_locale');
 });
+
+Route::get('/view-logs', function () {
+    $file = storage_path('logs/laravel.log');
+    if (file_exists($file)) {
+        return response()->file($file);
+    }
+    $files = glob(storage_path('logs/laravel-*.log'));
+    if (!empty($files)) {
+        return response()->file(end($files));
+    }
+    return "Log file not found in " . storage_path('logs');
+});
