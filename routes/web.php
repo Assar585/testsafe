@@ -105,7 +105,7 @@ Route::group(['middleware' => ['prevent-back-history', 'handle-demo-login']], fu
 
 // Login
 Route::controller(LoginController::class)->group(function () {
-    Route::get('/logout', 'logout');
+    Route::get('/logout', 'logout')->name('logout');
     Route::get('/social-login/redirect/{provider}', 'redirectToProvider')->name('social.login');
     Route::get('/social-login/{provider}/callback', 'handleProviderCallback')->name('social.callback');
     //Apple Callback
@@ -211,6 +211,17 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         Route::get('/delivery-boy-login', 'login')->name('deliveryboy.login');
         Route::get('/registration', 'registration')->name('user.registration');
     });
+
+    // Compare
+    Route::controller(\App\Http\Controllers\CompareController::class)->group(function () {
+        Route::get('/compare', 'index')->name('compare');
+        Route::post('/compare/add', 'addToCompare')->name('compare.add');
+        Route::get('/compare/reset', 'reset')->name('compare.reset');
+        Route::get('/compare/details/{unique_identifier}', 'details')->name('compare.details');
+    });
+
+    // Customer Notifications
+    Route::get('/all-notifications', [\App\Http\Controllers\NotificationController::class, 'customerIndex'])->name('customer.all-notifications');
 
     // Language Switch
     Route::post('/language', [LanguageController::class, 'changeLanguage'])->name('language.change');
