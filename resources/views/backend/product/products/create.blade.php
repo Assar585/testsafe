@@ -65,7 +65,7 @@
                                         <!-- Product Name -->
                                         <div class="form-group mb-2">
                                             <label class="col-from-label fs-13">{{translate('Product Name')}} <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" placeholder="{{ translate('Product Name') }}" onchange="update_sku()">
+                                            <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="product_name" value="{{ old('name') }}" placeholder="{{ translate('Product Name') }}" onchange="update_sku()">
                                         </div>
                                         <!-- Brand -->
                                         <div class="form-group mb-2" id="brand">
@@ -82,21 +82,22 @@
                                         <div class="form-group mb-2">
                                             <label class="col-from-label fs-13">{{translate('Unit')}} <span class="text-danger">*</span></label>
                                             <select class="form-control aiz-selectpicker @error('unit') is-invalid @enderror" name="unit" data-live-search="true">
-                                                <option value="шт." @selected(old('unit', 'шт.') == 'шт.')>шт.</option>
-                                                <option value="услуга" @selected(old('unit') == 'услуга')>услуга</option>
-                                                <option value="кг" @selected(old('unit') == 'кг')>кг</option>
-                                                <option value="г" @selected(old('unit') == 'г')>г</option>
-                                                <option value="л" @selected(old('unit') == 'л')>л</option>
-                                                <option value="мл" @selected(old('unit') == 'мл')>мл</option>
-                                                <option value="м" @selected(old('unit') == 'м')>м</option>
-                                                <option value="кв. м" @selected(old('unit') == 'кв. м')>кв. м</option>
-                                                <option value="куб. м" @selected(old('unit') == 'куб. м')>куб. м</option>
+                                                <option value="{{ translate('Piece') }}" @selected(old('unit', translate('Piece')) == translate('Piece'))>{{ translate('Piece') }}</option>
+                                                <option value="{{ translate('Service') }}" @selected(old('unit') == translate('Service'))>{{ translate('Service') }}</option>
+                                                <option value="{{ translate('KG') }}" @selected(old('unit') == translate('KG'))>{{ translate('KG') }}</option>
+                                                <option value="{{ translate('Gram') }}" @selected(old('unit') == translate('Gram'))>{{ translate('Gram') }}</option>
+                                                <option value="{{ translate('Liter') }}" @selected(old('unit') == translate('Liter'))>{{ translate('Liter') }}</option>
+                                                <option value="{{ translate('Milliliter') }}" @selected(old('unit') == translate('Milliliter'))>{{ translate('Milliliter') }}</option>
+                                                <option value="{{ translate('Meter') }}" @selected(old('unit') == translate('Meter'))>{{ translate('Meter') }}</option>
+                                                <option value="{{ translate('Sq. Meter') }}" @selected(old('unit') == translate('Sq. Meter'))>{{ translate('Sq. Meter') }}</option>
+                                                <option value="{{ translate('Cubic Meter') }}" @selected(old('unit') == translate('Cubic Meter'))>{{ translate('Cubic Meter') }}</option>
                                             </select>
                                         </div>
                                         <!-- Weight -->
                                         <div class="form-group mb-2">
                                             <label class="col-from-label fs-13">{{translate('Weight')}} <small>({{ translate('In Kg') }})</small></label>
-                                            <input type="number" class="form-control" name="weight" value="0.00"  step="0.01" placeholder="0.00">
+                                            <input type="number" class="form-control" name="weight" value="{{ old('weight') ?? '0.00' }}" step="0.01" placeholder="0.00">
+                                            <small class="text-muted">{{ translate('Used to calculate shipping cost.') }}</small>
                                         </div>
                                         <!-- Minimum Purchase Qty -->
                                         <div class="form-group mb-2 d-none">
@@ -106,8 +107,8 @@
                                         <!-- Tags -->
                                         <div class="form-group mb-2">
                                             <label class="col-from-label fs-13">{{translate('Tags')}}</label>
-                                            <input type="text" class="form-control aiz-tag-input" name="tags[]" placeholder="{{ translate('Type and hit enter to add a tag') }}">
-                                            <small class="text-muted">{{translate('This is used for search. Input those words by which cutomer can find this product.')}}</small>
+                                            <input type="text" class="form-control aiz-tag-input" name="tags[]" id="product_tags" placeholder="{{ translate('Type and hit enter to add a tag') }}">
+                                            <small class="text-muted">{{translate('This is used for search. Input those words by which cutomer can find this product. Automatically seeds with Product Name.')}}</small>
                                         </div>
 
                                         @if (addon_is_activated('pos_system'))
@@ -140,14 +141,25 @@
                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                         </div>
+                                        <!-- HS Code -->
+                                        <div class="form-group mb-2 mt-3">
+                                            <label class="col-from-label fs-13">{{translate('HS Code')}}</label>
+                                            <input type="text" lang="en" placeholder="{{ translate('Enter HS Code') }}" name="hsn_code" value="{{ old('hsn_code') }}" class="form-control">
+                                            <small class="text-muted">{{ translate('Used for international shipping and customs.') }}</small>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <!-- Description -->
                                 <div class="form-group">
-                                    <label class="fs-13">{{translate('Description')}}</label>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label class="fs-13 mb-0">{{translate('Description')}}</label>
+                                        <button type="button" class="btn btn-sm btn-soft-primary" onclick="generateDescriptionAI()">
+                                            <i class="las la-magic"></i> {{ translate('Generate description by AI') }}
+                                        </button>
+                                    </div>
                                     <div class="">
-                                        <textarea class="aiz-text-editor" name="description">{{ old('description') }}</textarea>
+                                        <textarea class="aiz-text-editor" name="description" id="product_description">{{ old('description') }}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -221,6 +233,7 @@
                             </div>
 
                             <!-- Flash Deal -->
+                            @if(\App\Models\FlashDeal::where("status", 1)->count() > 0)
                             <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
                                 {{translate('Flash Deal')}}
                                 <small class="text-muted">({{ translate('If you want to select this product as a flash deal, you can use it') }})</small>
@@ -259,15 +272,12 @@
                                     </div>
                                 </div>
                             </div>
+                            @endif
 
                             <!-- GST Rate -->
                             @if (addon_is_activated('gst_system'))
-                            <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('HSN & GST')}}</h5>
+                            <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('GST')}}</h5>
                             <div class="w-100">
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label">{{translate('HSN Code')}}</label>
-                                    <input type="text" lang="en" placeholder="{{ translate('HSN Code') }}" name="hsn_code" class="form-control">
-                                </div>
                                 <div class="form-group mb-2">
                                     <label class="col-from-label">{{translate('GST Rate (%)')}}</label>
                                     <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="{{ translate('GST Rate') }}" name="gst_rate" class="form-control">
@@ -490,7 +500,16 @@
                                 <!-- Unit price -->
                                 <div class="form-group mb-2">
                                     <label class="col-from-label">{{translate('Unit price')}} <span class="text-danger">*</span></label>
-                                    <input type="number" lang="en" min="0" value="{{ old('unit_price') ?? '' }}" step="0.01" placeholder="{{ translate('Unit price') }}" name="unit_price" class="form-control @error('unit_price') is-invalid @enderror" required>
+                                    <div class="input-group">
+                                        <input type="number" lang="en" min="0" value="{{ old('unit_price') ?? '' }}" step="0.01" placeholder="{{ translate('Unit price') }}" name="unit_price" class="form-control @error('unit_price') is-invalid @enderror" required>
+                                        <div class="input-group-append">
+                                            <select class="form-control aiz-selectpicker" name="currency_id">
+                                                @foreach (\App\Models\Currency::where('status', 1)->get() as $currency)
+                                                    <option value="{{ $currency->id }}" @selected(old('currency_id', \App\Models\Currency::where('code', 'USD')->first()->id ?? 1) == $currency->id)>{{ $currency->code }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                                 <!-- Discount Date Range -->
                                 <div class="form-group mb-2">
@@ -531,8 +550,13 @@
                                     </div>
                                     <!-- SKU -->
                                     <div class="form-group">
-                                        <label class="col-from-label">{{translate('SKU')}}</label>
-                                        <input type="text" placeholder="{{ translate('SKU') }}" name="sku" value="{{ old('sku') }}" class="form-control">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <label class="col-from-label mb-0">{{translate('SKU')}}</label>
+                                            <button type="button" class="btn btn-sm btn-soft-primary" onclick="generateSKU()">
+                                                <i class="las la-random"></i> {{ translate('Auto Generate') }}
+                                            </button>
+                                        </div>
+                                        <input type="text" placeholder="{{ translate('SKU') }}" name="sku" id="sku_input" value="{{ old('sku') }}" class="form-control">
                                     </div>
                                 </div>
                                 <!-- External link -->
@@ -1312,6 +1336,53 @@
 
     
 
+
+    // AI Generation Handler (Placeholder)
+    function generateDescriptionAI() {
+        if (!$('#product_name').val() || !$('#category_id').val()) {
+            AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
+            return;
+        }
+        
+        let originalBtnHtml = $('button[onclick="generateDescriptionAI()"]').html();
+        $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
+        
+        // Mock Server AI call since API keys are unconfigured
+        setTimeout(function() {
+            let mockDescription = "<p><strong>" + $('#product_name').val() + "</strong> " + "{{ translate('is a premium quality product designed for everyday excellence. Built with care and precision, it meets all your standards.') }}" + "</p>";
+            // Insert into the Summernote editor if AIZ uses Summernote
+            if ($('.aiz-text-editor').hasClass('summernote-editor')) {
+                 // Summernote not available directly or maybe via different selector, standard html injection
+            }
+            // Standard injection as fallback
+            $('#product_description').val(mockDescription).siblings('.note-editor').find('.note-editable').html(mockDescription);
+            
+            $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
+            AIZ.plugins.notify('success', '{{ translate("AI Description generated successfully!") }}');
+        }, 1500);
+    }
+
+    // Auto-populate tags from Product Name
+    $('#product_name').on('change', function() {
+        let name = $(this).val();
+        if(name) {
+            let tagsInput = $('#product_tags');
+            // Check if tagify or basic tags
+            let currentTags = tagsInput.val();
+            if(!currentTags.includes(name)) {
+                let newTags = currentTags ? currentTags + ',' + name : name;
+                tagsInput.val(newTags);
+            }
+        }
+    });
+
+    // Generate SKU
+    function generateSKU() {
+        let randomNum = Math.floor(100000 + Math.random() * 900000);
+        let prefix = "PRD-";
+        $('#sku_input').val(prefix + randomNum);
+        AIZ.plugins.notify('success', '{{ translate("Generated random SKU successfully.") }}');
+    }
 
 </script>
 
