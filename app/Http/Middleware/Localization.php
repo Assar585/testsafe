@@ -50,6 +50,11 @@ class Localization
             // Set default for URL generator so we don't have to pass it everywhere
             URL::defaults(['locale' => $locale]);
 
+            // Remove locale from route parameters so controllers don't see it as an argument
+            if ($request->route()) {
+                $request->route()->forgetParameter('locale');
+            }
+
             // Update langcode for Carbon and other needs
             $langObj = Language::where('code', $locale)->first();
             if ($langObj) {
@@ -67,8 +72,17 @@ class Localization
         // (Avoid redirecting for admin, api, or ajax requests)
         if ($this->shouldRedirect($request)) {
             $segments = $request->segments();
-            array_unshift($segments, $determinedLocale);
-            return redirect()->to(implode('/', $segments) . ($request->getQueryString() ? '?' . $request->getQueryString() : ''));
+
+            // Safety: If the first segment is already a 2-letter code (but wasn't matched in $languages above)
+            // we replace it instead of adding another prefix to avoid /en/en/ paths.
+            if (count($segments) > 0 && strlen($segments[0]) == 2 && preg_match('/^[a-z]{2}$/', $segments[0])) {
+                $segments[0] = $determinedLocale;
+            } else {
+                array_unshift($segments, $determinedLocale);
+            }
+
+            $redirectUrl = '/' . implode('/', $segments) . ($request->getQueryString() ? '?' . $request->getQueryString() : '');
+            return redirect()->to($redirectUrl);
         }
 
         // Fallback for cases where we don't redirect
@@ -94,8 +108,14 @@ class Localization
                     return $browserLang;
                 }
             } catch (\Exception $e) {
-                if (Language::where('code', $browserLang)->exists()) {
-                    return $browserLang;
+                try {
+                    if (Language::where('code', $browserLang)->where('status', 1)->exists()) {
+                        return $browserLang;
+                    }
+                } catch (\Exception $e2) {
+                    if (Language::where('code', $browserLang)->exists()) {
+                        return $browserLang;
+                    }
                 }
             }
         }
@@ -105,8 +125,22 @@ class Localization
         $countryCode = $this->geoLocationService->getCountryCode($ip);
         if ($countryCode) {
             $geoLang = $this->geoLocationService->getLanguageByCountry($countryCode);
-            if ($geoLang && Language::where('code', $geoLang)->where('is_active', 1)->exists()) {
-                return $geoLang;
+            if ($geoLang) {
+                try {
+                    if (Language::where('code', $geoLang)->where('is_active', 1)->exists()) {
+                        return $geoLang;
+                    }
+                } catch (\Exception $e) {
+                    try {
+                        if (Language::where('code', $geoLang)->where('status', 1)->exists()) {
+                            return $geoLang;
+                        }
+                    } catch (\Exception $e2) {
+                        if (Language::where('code', $geoLang)->exists()) {
+                            return $geoLang;
+                        }
+                    }
+                }
             }
         }
 
@@ -133,7 +167,18 @@ class Localization
         }
 
         // Add more exclusions as needed (e.g., webhooks, uploads)
-        $exclusions = ['aiz-uploader*', 'social-login*', 'apple-callback*', 'sitemap.xml', 'force-cache-clear*', 'db-update*'];
+        $exclusions = [
+            'aiz-uploader*',
+            'social-login*',
+            'apple-callback*',
+            'sitemap.xml',
+            'force-cache-clear*',
+            'db-update*',
+            'js/*',
+            'css/*',
+            'assets/*',
+            'public/*'
+        ];
         foreach ($exclusions as $exclusion) {
             if ($request->is($exclusion)) {
                 return false;

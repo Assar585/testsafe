@@ -39,14 +39,7 @@ require __DIR__ . '/vendor/autoload.php';
 
 $app = require_once __DIR__ . '/bootstrap/app.php';
 
-if (isset($_GET['nuclear_clear'])) {
-    try {
-        $app->make('Illuminate\Contracts\Console\Kernel')->call('optimize:clear');
-        die("Nuclear clear success. Please reload without the parameter.");
-    } catch (\Exception $e) {
-        die("Nuclear clear failed: " . $e->getMessage());
-    }
-}
+
 
 /*
 |--------------------------------------------------------------------------

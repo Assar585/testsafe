@@ -19,7 +19,8 @@ class GeoLocationService
         // Cache the IP lookup for 24 hours to reduce API calls
         return Cache::remember('geoip_country_' . $ip, 86400, function () use ($ip) {
             try {
-                $response = Http::timeout(5)->get("http://ip-api.com/json/{$ip}");
+                // Reduced timeout to 2 seconds to avoid 502/504 on slow external APIs
+                $response = Http::timeout(2)->get("http://ip-api.com/json/{$ip}");
                 if ($response->successful()) {
                     $details = $response->json();
                     if ($details && isset($details['status']) && $details['status'] === 'success') {
@@ -27,7 +28,8 @@ class GeoLocationService
                     }
                 }
             } catch (\Exception $e) {
-                Log::error("GeoLocationService error: " . $e->getMessage());
+                // Return null but log the error so we know if the service is down
+                Log::warning("GeoLocationService failed for IP {$ip}: " . $e->getMessage());
             }
             return null;
         });
