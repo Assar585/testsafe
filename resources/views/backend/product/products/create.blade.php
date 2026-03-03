@@ -62,7 +62,8 @@
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- Product Information -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{translate('Product Information')}}</h5>
+                                    {{translate('Product Information')}}
+                                </h5>
                                 <div class="w-100">
                                     <div class="row">
                                         <div class="col-xxl-7 col-xl-6">
@@ -82,7 +83,8 @@
                                                     <option value="">{{ translate('Select Brand') }}</option>
                                                     @foreach (\App\Models\Brand::all() as $brand)
                                                         <option value="{{ $brand->id }}" @selected(old('brand_id') == $brand->id)>
-                                                            {{ $brand->getTranslation('name') }}</option>
+                                                            {{ $brand->getTranslation('name') }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
                                                 <small
@@ -99,9 +101,13 @@
                                                     </option>
                                                     <option value="{{ translate('Service') }}"
                                                         @selected(old('unit') == translate('Service'))>
-                                                        {{ translate('Service') }}</option>
+                                                        {{ translate('Service') }}
+                                                    </option>
                                                     <option value="{{ translate('KG') }}"
                                                         @selected(old('unit') == translate('KG'))>{{ translate('KG') }}
+                                                    </option>
+                                                    <option value="{{ translate('Ton') }}"
+                                                        @selected(old('unit') == translate('Ton'))>{{ translate('Ton') }}
                                                     </option>
                                                     <option value="{{ translate('Gram') }}"
                                                         @selected(old('unit') == translate('Gram'))>{{ translate('Gram') }}
@@ -111,16 +117,19 @@
                                                     </option>
                                                     <option value="{{ translate('Milliliter') }}"
                                                         @selected(old('unit') == translate('Milliliter'))>
-                                                        {{ translate('Milliliter') }}</option>
+                                                        {{ translate('Milliliter') }}
+                                                    </option>
                                                     <option value="{{ translate('Meter') }}"
                                                         @selected(old('unit') == translate('Meter'))>{{ translate('Meter') }}
                                                     </option>
                                                     <option value="{{ translate('Sq. Meter') }}"
                                                         @selected(old('unit') == translate('Sq. Meter'))>
-                                                        {{ translate('Sq. Meter') }}</option>
+                                                        {{ translate('Sq. Meter') }}
+                                                    </option>
                                                     <option value="{{ translate('Cubic Meter') }}"
                                                         @selected(old('unit') == translate('Cubic Meter'))>
-                                                        {{ translate('Cubic Meter') }}</option>
+                                                        {{ translate('Cubic Meter') }}
+                                                    </option>
                                                 </select>
                                             </div>
                                             <!-- Weight -->
@@ -175,7 +184,8 @@
                                                     @foreach ($categories as $category)
                                                         <option value="{{ $category->id }}"
                                                             @selected(old('category_id') == $category->id)>
-                                                            {{ $category->getTranslation('name') }}</option>
+                                                            {{ $category->getTranslation('name') }}
+                                                        </option>
                                                         @foreach ($category->childrenCategories as $childCategory)
                                                             <option value="{{ $childCategory->id }}"
                                                                 @selected(old('category_id') == $childCategory->id)>
@@ -185,7 +195,8 @@
                                                                 <option value="{{ $subChildCategory->id }}"
                                                                     @selected(old('category_id') == $subChildCategory->id)>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
-                                                                    {{ $subChildCategory->getTranslation('name') }}</option>
+                                                                    {{ $subChildCategory->getTranslation('name') }}
+                                                                </option>
                                                             @endforeach
                                                         @endforeach
                                                     @endforeach
@@ -196,13 +207,19 @@
                                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                                 @enderror
                                             </div>
-                                            <!-- HS Code -->
+                                            <!-- HS Code - Autocomplete from hs_codes.json -->
                                             <div class="form-group mb-2 mt-3">
                                                 <label class="col-from-label fs-13">{{translate('HS Code')}}</label>
-                                                <input type="text" lang="en" placeholder="{{ translate('Enter HS Code') }}"
-                                                    name="hsn_code" value="{{ old('hsn_code') }}" class="form-control">
+                                                <select class="form-control aiz-selectpicker" name="hsn_code"
+                                                    id="hsn_code_select" data-live-search="true" data-size="8">
+                                                    <option value="">{{ translate('Select or type HS Code') }}</option>
+                                                    @php $savedHsn = old('hsn_code') @endphp
+                                                    @if($savedHsn)
+                                                        <option value="{{ $savedHsn }}" selected>{{ $savedHsn }}</option>
+                                                    @endif
+                                                </select>
                                                 <small
-                                                    class="text-muted">{{ translate('Used for international shipping and customs.') }}</small>
+                                                    class="text-muted">{{ translate('Used for international shipping and customs. Type to search.') }}</small>
                                             </div>
                                         </div>
                                     </div>
@@ -226,7 +243,8 @@
                                 <!-- Refund -->
                                 @if (addon_is_activated('refund_request'))
                                     <h5 class="mb-3 mt-5 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('Refund')}}</h5>
+                                        {{translate('Refund')}}
+                                    </h5>
                                     <div class="w-100">
                                         <!-- Refundable -->
                                         <div class="form-group row">
@@ -266,7 +284,8 @@
 
                                 <!-- Status -->
                                 <h5 class="mb-3 mt-5 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{translate('Status')}}</h5>
+                                    {{translate('Status')}}
+                                </h5>
                                 <div class="w-100">
                                     <!-- Featured -->
                                     <div class="form-group row">
@@ -343,7 +362,8 @@
                                 <!-- GST Rate -->
                                 @if (addon_is_activated('gst_system'))
                                     <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('GST')}}</h5>
+                                        {{translate('GST')}}
+                                    </h5>
                                     <div class="w-100">
                                         <div class="form-group mb-2">
                                             <label class="col-from-label">{{translate('GST Rate (%)')}}</label>
@@ -354,7 +374,8 @@
                                 @else
                                     <!-- Vat & TAX -->
                                     <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('Vat & TAX')}}</h5>
+                                        {{translate('Vat & TAX')}}
+                                    </h5>
                                     <div class="w-100">
                                         @foreach(\App\Models\Tax::where('tax_status', 1)->get() as $tax)
                                             <label for="name">
@@ -490,16 +511,16 @@
                                         <button type="button"
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more" data-content='<div class="row mb-2">
-                                                    <div class="col">
-                                                        <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                        <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                    </div>
-                                                    <div class="col-auto d-flex justify-content-end">
-                                                            <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                <i class="las la-times"></i>
-                                                            </button>
-                                                    </div>
-                                                </div>' data-target=".video-provider-link">
+                                                            <div class="col">
+                                                                <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                            </div>
+                                                            <div class="col-auto d-flex justify-content-end">
+                                                                    <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                        <i class="las la-times"></i>
+                                                                    </button>
+                                                            </div>
+                                                        </div>' data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
                                         </button>
@@ -529,7 +550,8 @@
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- tab Title -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{translate('Product price & stock')}}</h5>
+                                    {{translate('Product price & stock')}}
+                                </h5>
                                 <div class="w-100">
                                     <!-- Colors -->
                                     <div class="form-group row gutters-5">
@@ -568,7 +590,8 @@
                                                 data-placeholder="{{ translate('Choose Attributes') }}">
                                                 @foreach (\App\Models\Attribute::all() as $key => $attribute)
                                                     <option value="{{ $attribute->id }}">
-                                                        {{ $attribute->getTranslation('name') }}</option>
+                                                        {{ $attribute->getTranslation('name') }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -624,9 +647,11 @@
                                             <div class="col-md-3">
                                                 <select class="form-control aiz-selectpicker" name="discount_type">
                                                     <option value="amount" @selected(old('discount_type') == 'amount')>
-                                                        {{translate('Flat')}}</option>
+                                                        {{translate('Flat')}}
+                                                    </option>
                                                     <option value="percent" @selected(old('discount_type') == 'percent')>
-                                                        {{translate('Percent')}}</option>
+                                                        {{translate('Percent')}}
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
@@ -696,7 +721,8 @@
                                 <div class="d-none">
                                     <!-- Low Stock Quantity -->
                                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('Low Stock Quantity Warning')}}</h5>
+                                        {{translate('Low Stock Quantity Warning')}}
+                                    </h5>
                                     <div class="w-100 mb-3">
                                         <div class="form-group mb-2">
                                             <label class="col-from-label">
@@ -709,7 +735,8 @@
 
                                     <!-- Stock Visibility State -->
                                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('Stock Visibility State')}}</h5>
+                                        {{translate('Stock Visibility State')}}
+                                    </h5>
                                     <div class="w-100">
                                         <!-- Show Stock Quantity -->
                                         <div class="form-group row">
@@ -764,7 +791,8 @@
                                 <div class="bg-white p-3 p-sm-2rem">
                                     <!-- tab Title -->
                                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('SEO Meta Tags')}}</h5>
+                                        {{translate('SEO Meta Tags')}}
+                                    </h5>
                                     <div class="w-100">
                                         <!-- Meta Title -->
                                         <div class="form-group mb-2">
@@ -792,7 +820,8 @@
                                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                                 <div class="input-group-prepend">
                                                     <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                        {{ translate('Browse')}}</div>
+                                                        {{ translate('Browse')}}
+                                                    </div>
                                                 </div>
                                                 <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                                 <input type="hidden" name="meta_img" class="selected-files">
@@ -809,7 +838,8 @@
                                 <div class="bg-white p-3 p-sm-2rem">
                                     <!-- Shipping Configuration -->
                                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('Shipping Configuration')}}</h5>
+                                        {{translate('Shipping Configuration')}}
+                                    </h5>
                                     <div class="w-100">
                                         <!-- Cash On Delivery -->
                                         @if (get_setting('cash_payment') == '1')
@@ -887,7 +917,8 @@
 
                                     <!-- Estimate Shipping Time -->
                                     <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('Estimate Shipping Time')}}</h5>
+                                        {{translate('Estimate Shipping Time')}}
+                                    </h5>
                                     <div class="w-100">
                                         <div class="form-group mb-2">
                                             <label class="col-from-label">{{translate('Shipping Days')}}</label>
@@ -909,7 +940,8 @@
                             <div class="card mb-4" id="warranty">
                                 <div class="bg-white p-3 p-sm-2rem">
                                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                        {{translate('Warranty')}}</h5>
+                                        {{translate('Warranty')}}
+                                    </h5>
                                     <div class="form-group row">
                                         <label class="col-md-2 col-from-label">{{translate('Warranty')}}</label>
                                         <div class="col-md-10">
@@ -929,7 +961,8 @@
                                                     @foreach (\App\Models\Warranty::all() as $warranty)
                                                         <option value="{{ $warranty->id }}"
                                                             @selected(old('warranty_id') == $warranty->id)>
-                                                            {{ $warranty->getTranslation('text') }}</option>
+                                                            {{ $warranty->getTranslation('text') }}
+                                                        </option>
                                                     @endforeach
                                                 </select>
 
@@ -937,7 +970,8 @@
 
                                                 <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3"
                                                     style="border-bottom: 1px dashed #e4e5eb;">
-                                                    {{translate('Warranty Note')}}</h5>
+                                                    {{translate('Warranty Note')}}
+                                                </h5>
                                                 <div id="warranty_note" class="">
 
                                                 </div>
@@ -1004,7 +1038,8 @@
                                                                 required>
                                                                 @foreach ($categories as $category)
                                                                     <option value="{{ $category->id }}">
-                                                                        {{ $category->getTranslation('name') }}</option>
+                                                                        {{ $category->getTranslation('name') }}
+                                                                    </option>
                                                                     @foreach ($category->childrenCategories as $childCategory)
                                                                         @include('categories.child_category', ['child_category' => $childCategory])
                                                                     @endforeach
@@ -1068,7 +1103,7 @@
             @if(old("category_ids"))
                 selected_ids = @json(old("category_ids"));
             @endif
-            for (let i = 0; i < selected_ids.length; i++) {
+                    for (let i = 0; i < selected_ids.length; i++) {
                 const element = selected_ids[i];
                 $('#treeview input:checkbox#' + element).prop('checked', true);
                 $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
@@ -1120,17 +1155,17 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                    <div class="form-group row">\
-                        <div class="col-md-3">\
-                            <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                            <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                        </div>\
-                        <div class="col-md-9">\
-                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                '+ obj + '\
-                            </select>\
-                        </div>\
-                    </div>');
+                            <div class="form-group row">\
+                                <div class="col-md-3">\
+                                    <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                    <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                </div>\
+                                <div class="col-md-9">\
+                                    <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                        '+ obj + '\
+                                    </select>\
+                                </div>\
+                            </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1261,6 +1296,21 @@
                 $('#warranty_id').removeAttr('required');
             }
         }
+
+        // Load HS Code Autocomplete from JSON
+        $(document).ready(function () {
+            var $hsnSelect = $('#hsn_code_select');
+            if ($hsnSelect.length) {
+                var savedVal = $hsnSelect.val();
+                $.getJSON('{{ asset('assets/data/hs_codes.json') }}', function (data) {
+                    $.each(data, function (i, item) {
+                        var isSelected = (savedVal === item.code) ? ' selected' : '';
+                        $hsnSelect.append('<option value="' + item.code + '"' + isSelected + '>' + item.code + ' – ' + item.desc + '</option>');
+                    });
+                    AIZ.plugins.bootstrapSelect('refresh');
+                });
+            }
+        });
 
         // Refundable
         function isRefundable() {
