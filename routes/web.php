@@ -306,6 +306,21 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         });
     });
 
+    // Conversations
+    Route::controller(\App\Http\Controllers\ConversationController::class)->group(function () {
+        Route::get('/conversations', 'index')->name('conversations.index');
+        Route::post('/conversations', 'store')->name('conversations.store');
+        Route::get('/conversations/show/{id}', 'show')->name('conversations.show');
+        Route::get('/conversations/refresh', 'refresh')->name('conversations.refresh');
+        Route::get('/conversations/destroy/{id}', 'destroy')->name('conversations.destroy');
+    });
+
+    // Admin Conversations
+    Route::controller(\App\Http\Controllers\ConversationController::class)->group(function () {
+        Route::get('/admin/conversations', 'admin_index')->name('conversations.admin_index');
+        Route::get('/admin/conversations/show/{id}', 'admin_show')->name('conversations.admin_show');
+    });
+
     Route::group(['middleware' => ['customer', 'verified', 'unbanned']], function () {
 
         // Purchase History
