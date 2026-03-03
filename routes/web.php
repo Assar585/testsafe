@@ -206,6 +206,11 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         Route::get('/registration', 'registration')->name('register');
         Route::get('/registration', 'registration')->name('user.registration');
 
+        Route::get('/registration/verification', 'verifyRegEmailorPhone')->name('customer-reg.verification');
+        Route::post('/registration/verification-code-send', 'sendRegVerificationCode')->name('customer-reg.verification_code_send');
+        Route::get('/registration/verify-code/{id}', 'regVerifyCode')->name('customer-reg.verify_code');
+        Route::post('/registration/verification-code-confirmation', 'regVerifyCodeConfirmation')->name('customer-reg.verify_code_confirmation');
+
         // Forgot Password (localized)
         Route::get('/password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
         Route::post('/password/email', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
