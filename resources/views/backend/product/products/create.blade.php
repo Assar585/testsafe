@@ -34,66 +34,9 @@
         </div>
     </div>
 
-    <div class="d-sm-flex">
-        <!-- page side nav -->
-        <div class="page-side-nav c-scrollbar-light px-3 py-2">
-            <ul class="nav nav-tabs flex-sm-column border-0" role="tablist" aria-orientation="vertical">
-                <!-- General -->
-                <li class="nav-item">
-                    <a class="nav-link" id="general-tab" href="#general"
-                        data-toggle="tab" data-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">
-                        {{ translate('General') }}
-                    </a>
-                </li>
-                <!-- Files & Media -->
-                <li class="nav-item">
-                    <a class="nav-link" id="files-and-media-tab" href="#files_and_media"
-                        data-toggle="tab" data-target="#files_and_media" type="button" role="tab" aria-controls="files_and_media" aria-selected="false">
-                        {{ translate("Files & Media") }}
-                    </a>
-                </li>
-                <!-- Price & Stock -->
-                <li class="nav-item">
-                    <a class="nav-link" id="price-and-stocks-tab" href="#price_and_stocks"
-                        data-toggle="tab" data-target="#price_and_stocks" type="button" role="tab" aria-controls="price_and_stocks" aria-selected="false">
-                        {{ translate('Price & Stock') }}
-                    </a>
-                </li>
-                <!-- SEO -->
-                <li class="nav-item">
-                    <a class="nav-link" id="seo-tab" href="#seo"
-                        data-toggle="tab" data-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false">
-                        {{ translate('SEO') }}
-                    </a>
-                </li>
-                <!-- Shipping -->
-                <li class="nav-item">
-                    <a class="nav-link" id="shipping-tab" href="#shipping"
-                        data-toggle="tab" data-target="#shipping" type="button" role="tab" aria-controls="shipping" aria-selected="false">
-                        {{ translate('Shipping') }}
-                    </a>
-                </li>
-
-                <!-- Warranty -->
-                <li class="nav-item">
-                    <a class="nav-link" id="warranty-tab" href="#warranty"
-                        data-toggle="tab" data-target="#warranty" type="button" role="tab" aria-controls="warranty" aria-selected="false">
-                        {{ translate('Warranty') }}
-                    </a>
-                </li>
-
-                <!-- Frequently Bought Product -->
-                <li class="nav-item">
-                    <a class="nav-link" id="frequenty-bought-product-tab" href="#frequenty-bought-product"
-                        data-toggle="tab" data-target="#frequenty-bought-product" type="button" role="tab" aria-controls="frequenty-bought-product" aria-selected="false">
-                        {{ translate('Frequently Bought') }}
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- tab content -->
-        <div class="flex-grow-1 p-sm-3 p-lg-2rem mb-2rem mb-md-0">
+    <div>
+        <!-- Main Form Content -->
+        <div class="p-sm-3 p-lg-2rem mb-2rem mb-md-0">
             <!-- Error Meassages -->
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -110,9 +53,9 @@
 
             <form action="{{route('products.store')}}" method="POST" enctype="multipart/form-data" enctype="multipart/form-data" id="aizSubmitForm">
                 @csrf
-                <div class="tab-content">
+                <div class="product-form-sections">
                     <!-- General -->
-                    <div class="tab-pane fade" id="general" role="tabpanel" aria-labelledby="general-tab">
+                    <div class="card mb-4" id="general">
                         <div class="bg-white p-3 p-sm-2rem">
                             <!-- Product Information -->
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Product Information')}}</h5>
@@ -138,7 +81,17 @@
                                         <!-- Unit -->
                                         <div class="form-group mb-2">
                                             <label class="col-from-label fs-13">{{translate('Unit')}} <span class="text-danger">*</span></label>
-                                            <input type="text" letter-only class="form-control @error('unit') is-invalid @enderror" name="unit" value="{{ old('unit') }}" placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}">
+                                            <select class="form-control aiz-selectpicker @error('unit') is-invalid @enderror" name="unit" data-live-search="true">
+                                                <option value="шт." @selected(old('unit', 'шт.') == 'шт.')>шт.</option>
+                                                <option value="услуга" @selected(old('unit') == 'услуга')>услуга</option>
+                                                <option value="кг" @selected(old('unit') == 'кг')>кг</option>
+                                                <option value="г" @selected(old('unit') == 'г')>г</option>
+                                                <option value="л" @selected(old('unit') == 'л')>л</option>
+                                                <option value="мл" @selected(old('unit') == 'мл')>мл</option>
+                                                <option value="м" @selected(old('unit') == 'м')>м</option>
+                                                <option value="кв. м" @selected(old('unit') == 'кв. м')>кв. м</option>
+                                                <option value="куб. м" @selected(old('unit') == 'куб. м')>куб. м</option>
+                                            </select>
                                         </div>
                                         <!-- Weight -->
                                         <div class="form-group mb-2">
@@ -146,10 +99,9 @@
                                             <input type="number" class="form-control" name="weight" value="0.00"  step="0.01" placeholder="0.00">
                                         </div>
                                         <!-- Minimum Purchase Qty -->
-                                        <div class="form-group mb-2">
+                                        <div class="form-group mb-2 d-none">
                                             <label class="col-from-label fs-13">{{translate('Minimum Purchase Qty')}} <span class="text-danger">*</span></label>
-                                            <input type="number" lang="en" class="form-control @error('min_qty') is-invalid @enderror" name="min_qty" value="{{ old('min_qty') ?? 1 }}" placeholder="1" min="1" step="1" integer-only required>
-                                            <small class="text-muted">{{translate("The minimum quantity needs to be purchased by your customer.")}}</small>
+                                            <input type="number" lang="en" class="form-control @error('min_qty') is-invalid @enderror" name="min_qty" value="{{ old('min_qty', 1) }}" placeholder="1" min="1" step="1" integer-only>
                                         </div>
                                         <!-- Tags -->
                                         <div class="form-group mb-2">
@@ -169,31 +121,25 @@
 
                                     <!-- Product Category -->
                                     <div class="col-xxl-5 col-xl-6">
-                                        <div id="category-card" class="card mb-1 @if($errors->has('category_ids') || $errors->has('category_id')) border border-danger @endif">
-                                            <div class="card-header">
-                                                <h5 class="mb-0 h6">{{ translate('Product Category') }}</h5>
-                                                <h6 class="float-right fs-13 mb-0">
-                                                    {{ translate('Select Main') }}
-                                                    <span class="position-relative main-category-info-icon">
-                                                        <i class="las la-question-circle fs-18 text-info"></i>
-                                                        <span class="main-category-info bg-soft-info p-2 position-absolute d-none border">{{ translate('This will be used for commission based calculations and homepage category wise product Show.') }}</span>
-                                                    </span>
-                                                </h6>
-                                            </div>
-                                            <div class="card-body">
-                                                <div class="h-400px overflow-auto c-scrollbar-light">
-                                                    <ul class="hummingbird-treeview-converter list-unstyled" data-checkbox-name="category_ids[]" data-radio-name="category_id">
-                                                        @foreach ($categories as $category)
-                                                        <li id="{{ $category->id }}">{{ $category->getTranslation('name') }}</li>
-                                                            @foreach ($category->childrenCategories as $childCategory)
-                                                                @include('backend.product.products.child_category', ['child_category' => $childCategory])
-                                                            @endforeach
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label fs-13">{{translate('Product Category')}} <span class="text-danger">*</span></label>
+                                            <select class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror" name="category_id" id="category_id" data-live-search="true" required onchange="$('#category_ids_hidden').val(this.value);">
+                                                <option value="">{{ translate('Select Category') }}</option>
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->getTranslation('name') }}</option>
+                                                    @foreach ($category->childrenCategories as $childCategory)
+                                                        <option value="{{ $childCategory->id }}" @selected(old('category_id') == $childCategory->id)>&nbsp;&nbsp;&nbsp;-- {{ $childCategory->getTranslation('name') }}</option>
+                                                        @foreach ($childCategory->childrenCategories as $subChildCategory)
+                                                            <option value="{{ $subChildCategory->id }}" @selected(old('category_id') == $subChildCategory->id)>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;---- {{ $subChildCategory->getTranslation('name') }}</option>
                                                         @endforeach
-                                                    </ul>
-                                                </div>
-                                            </div>
+                                                    @endforeach
+                                                @endforeach
+                                            </select>
+                                            <input type="hidden" name="category_ids[]" id="category_ids_hidden" value="{{ old('category_id') }}">
+                                            @error('category_ids')
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                            @enderror
                                         </div>
-                                        <div id="category-tree-table-error"></div>
                                     </div>
                                 </div>
 
@@ -355,8 +301,7 @@
                     </div>
 
                    <!-- Files & Media -->
-                    <div class="tab-pane fade" id="files_and_media" role="tabpanel"
-                        aria-labelledby="files-and-media-tab">
+                    <div class="card mb-4" id="files_and_media">
                         <div class="bg-white p-3 p-sm-2rem">
                             <!-- Product Files & Media -->
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -495,7 +440,7 @@
                     </div>
 
                     <!-- Price & Stock -->
-                    <div class="tab-pane fade" id="price_and_stocks" role="tabpanel" aria-labelledby="price-and-stocks-tab">
+                    <div class="card mb-4" id="price_and_stocks">
                         <div class="bg-white p-3 p-sm-2rem">
                             <!-- tab Title -->
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Product price & stock')}}</h5>
@@ -545,7 +490,7 @@
                                 <!-- Unit price -->
                                 <div class="form-group mb-2">
                                     <label class="col-from-label">{{translate('Unit price')}} <span class="text-danger">*</span></label>
-                                    <input type="number" lang="en" min="0" value="0" step="0.01" placeholder="{{ translate('Unit price') }}" name="unit_price" class="form-control @error('unit_price') is-invalid @enderror">
+                                    <input type="number" lang="en" min="0" value="{{ old('unit_price') ?? '' }}" step="0.01" placeholder="{{ translate('Unit price') }}" name="unit_price" class="form-control @error('unit_price') is-invalid @enderror" required>
                                 </div>
                                 <!-- Discount Date Range -->
                                 <div class="form-group mb-2">
@@ -582,7 +527,7 @@
                                     <!-- Quantity -->
                                     <div class="form-group mb-2">
                                         <label class="col-from-label">{{translate('Quantity')}} <span class="text-danger">*</span></label>
-                                        <input type="number" lang="en"  value="0" step="1" integer-only placeholder="{{ translate('Quantity') }}" name="current_stock" class="form-control">
+                                        <input type="number" lang="en"  value="{{ old('current_stock', 1) }}" step="1" integer-only placeholder="{{ translate('Quantity') }}" name="current_stock" class="form-control @error('current_stock') is-invalid @enderror" required>
                                     </div>
                                     <!-- SKU -->
                                     <div class="form-group">
@@ -613,6 +558,7 @@
                                 </div>
                             </div>
 
+                            <div class="d-none">
                             <!-- Low Stock Quantity -->
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Low Stock Quantity Warning')}}</h5>
                             <div class="w-100 mb-3">
@@ -658,11 +604,20 @@
                                     </div>
                                 </div>
                             </div>
+                            </div> <!-- End d-none wrapper -->
                         </div>
                     </div>
 
+                    <!-- Advanced Settings Toggle -->
+                    <div class="text-center mb-4">
+                        <button type="button" class="btn btn-soft-primary px-5 py-2 fw-700 shadow-sm" data-toggle="collapse" href="#advancedSettings" aria-expanded="false" aria-controls="advancedSettings">
+                            <i class="las la-cog mr-2"></i>{{ translate('Advanced Settings') }}
+                        </button>
+                    </div>
+
+                    <div class="collapse" id="advancedSettings">
                     <!-- SEO -->
-                    <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
+                    <div class="card mb-4" id="seo">
                         <div class="bg-white p-3 p-sm-2rem">
                             <!-- tab Title -->
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('SEO Meta Tags')}}</h5>
@@ -701,7 +656,7 @@
                     </div>
 
                     <!-- Shipping -->
-                    <div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="shipping-tab">
+                    <div class="card mb-4" id="shipping">
                         <div class="bg-white p-3 p-sm-2rem">
                             <!-- Shipping Configuration -->
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Shipping Configuration')}}</h5>
@@ -791,7 +746,7 @@
                     </div>
 
                     <!-- Warranty -->
-                    <div class="tab-pane fade" id="warranty" role="tabpanel" aria-labelledby="warranty-tab">
+                    <div class="card mb-4" id="warranty">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">{{translate('Warranty')}}</h5>
                             <div class="form-group row">
@@ -837,7 +792,7 @@
                     </div>
 
                     <!-- Frequently Bought Product -->
-                    <div class="tab-pane fade" id="frequenty-bought-product" role="tabpanel" aria-labelledby="frequenty-bought-product-tab">
+                    <div class="card mb-4" id="frequenty-bought-product">
                         <div class="bg-white p-3 p-sm-2rem">
                             <!-- tab Title -->
                             <h5 class="mb-3 pb-3 fs-17 fw-700">{{translate('Frequently Bought')}}</h5>
@@ -892,6 +847,7 @@
                             </div>
                         </div>
                     </div>
+					</div> <!-- End Advanced Settings Collapse -->
 
                     <!-- Save Button -->
                     <div class="mt-4 text-right">
