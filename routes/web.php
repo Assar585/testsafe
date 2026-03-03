@@ -226,8 +226,11 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
     });
 
     // Customer Notifications
-    Route::get('/all-notifications', [\App\Http\Controllers\NotificationController::class, 'customerIndex'])->name('customer.all-notifications');
-    Route::get('/notification-read/{id}', [\App\Http\Controllers\NotificationController::class, 'nonLinkableNotificationRead'])->name('non-linkable-notification-read');
+    Route::controller(\App\Http\Controllers\NotificationController::class)->group(function () {
+        Route::get('/all-notifications', 'customerIndex')->name('customer.all-notifications');
+        Route::get('/notification-read', 'nonLinkableNotificationRead')->name('non-linkable-notification-read');
+        Route::get('/notification/read-and-redirect/{id}', 'readAndRedirect')->name('notification.read-and-redirect');
+    });
 
     // Language Switch
     Route::post('/language', [LanguageController::class, 'changeLanguage'])->name('language.change');
