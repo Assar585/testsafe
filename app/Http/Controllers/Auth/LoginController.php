@@ -19,6 +19,7 @@ use GuzzleHttp\Client;
 use Storage;
 use App\Rules\Recaptcha;
 use Illuminate\Validation\Rule;
+use Auth;
 
 class LoginController extends Controller
 {
@@ -37,43 +38,48 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-        die('LoginController@login reached');
-        \Log::info('Login attempt started', $request->except('password'));
+        \Log::info('Login attempt details', [
+            'url' => $request->fullUrl(),
+            'method' => $request->method(),
+            'ip' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+            'inputs' => $request->except('password'),
+            'session_has_token' => $request->session()->has('_token'),
+            'token_match' => $request->session()->token() === $request->input('_token'),
+        ]);
+
+        if (Auth::check()) {
+            \Log::info('User already authenticated', ['user_id' => Auth::id()]);
+            return redirect()->route('home');
+        }
 
         try {
             $this->validateLogin($request);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            \Log::error('Login validation failed', ['errors' => $e->errors()]);
+            \Log::error('Login validation failed', [
+                'errors' => $e->errors(),
+                'inputs' => $request->except('password')
+            ]);
             throw $e;
         }
 
-        // If the class is using the ThrottlesLogins trait, we can automatically throttle
-        // the login attempts for this application. We'll key this by the username and
-        // the IP address of the client making these requests into this application.
         if (
             method_exists($this, 'hasTooManyLoginAttempts') &&
             $this->hasTooManyLoginAttempts($request)
         ) {
+            \Log::warning('Too many login attempts', ['ip' => $request->ip()]);
             $this->fireLockoutEvent($request);
-
             return $this->sendLockoutResponse($request);
         }
 
         if ($this->attemptLogin($request)) {
-            \Log::info('Login attempt successful', ['user_id' => auth()->id()]);
-            if ($request->hasSession()) {
-                $request->session()->put('auth.password_confirmed_at', time());
-            }
-
+            \Log::info('Login successful', ['user' => Auth::user()->only('id', 'name', 'user_type')]);
             return $this->sendLoginResponse($request);
         }
 
-        // If the login attempt was unsuccessful we will increment the number of attempts
-        // to login and redirect the user back to the login form. Of course, when this
-        // user surpasses their maximum number of attempts they will get locked out.
         $this->incrementLoginAttempts($request);
 
-        \Log::warning('Login attempt failed - invalid credentials');
+        \Log::warning('Login failed - invalid credentials', ['inputs' => $request->except('password')]);
         return $this->sendFailedLoginResponse($request);
     }
 
