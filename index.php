@@ -23,20 +23,6 @@ define('LARAVEL_START', microtime(true));
 |
 */
 
-if (isset($_GET['debug-env']) && $_GET['debug-env'] === 'railway') {
-    echo "<div style='font-family: monospace; background: #fff; color: #333; padding: 20px; text-align: left;'>";
-    echo "<h2>Environment Variables Debug:</h2>";
-    echo "<b>DB_HOST:</b> " . getenv('DB_HOST') . " (from \$_ENV: " . ($_ENV['DB_HOST'] ?? 'null') . ", from \$_SERVER: " . ($_SERVER['DB_HOST'] ?? 'null') . ")<br>";
-    echo "<b>DB_USERNAME:</b> " . getenv('DB_USERNAME') . " (from \$_ENV: " . ($_ENV['DB_USERNAME'] ?? 'null') . ", from \$_SERVER: " . ($_SERVER['DB_USERNAME'] ?? 'null') . ")<br>";
-    echo "<b>DB_DATABASE:</b> " . getenv('DB_DATABASE') . " (from \$_ENV: " . ($_ENV['DB_DATABASE'] ?? 'null') . ", from \$_SERVER: " . ($_SERVER['DB_DATABASE'] ?? 'null') . ")<br>";
-    echo "<b>File /var/www/.env exists:</b> " . (file_exists(__DIR__ . '/.env') ? 'Yes' : 'No') . "<br>";
-    if (file_exists(__DIR__ . '/.env')) {
-        echo "<b>Content of .env:</b><br><pre>" . htmlspecialchars(file_get_contents(__DIR__ . '/.env')) . "</pre>";
-    }
-    echo "</div>";
-    exit;
-}
-
 require __DIR__ . '/vendor/autoload.php';
 
 /*
