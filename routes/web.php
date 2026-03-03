@@ -201,10 +201,13 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         // Auth Pages (localized)
         Route::get('/login', 'login')->name('login');
         Route::get('/login', 'login')->name('user.login');
+        Route::post('/login', [LoginController::class, 'login']);
+
         Route::get('/seller-login', 'login')->name('seller.login');
         Route::get('/delivery-boy-login', 'login')->name('deliveryboy.login');
         Route::get('/registration', 'registration')->name('register');
         Route::get('/registration', 'registration')->name('user.registration');
+        Route::post('/registration', [\App\Http\Controllers\Auth\RegisterController::class, 'register']);
 
         Route::get('/registration/verification', 'verifyRegEmailorPhone')->name('customer-reg.verification');
         Route::post('/registration/verification-code-send', 'sendRegVerificationCode')->name('customer-reg.verification_code_send');
