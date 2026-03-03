@@ -56,6 +56,10 @@ RUN mkdir -p storage/framework/sessions storage/framework/views storage/framewor
 COPY docker/start.sh /start.sh
 RUN chmod +x /start.sh
 
+# Copy nginx config
+COPY docker/nginx.conf /etc/nginx/sites-available/default
+COPY docker/nginx.conf /etc/nginx/sites-enabled/default
+
 # Expose port and start via script
 EXPOSE 8080
 CMD ["/start.sh"]
