@@ -1,15 +1,19 @@
 <?php
 
-Route::get('/view-logs', function () {
+Route::get('/debug-logs', function () {
     $file = storage_path('logs/laravel.log');
     if (file_exists($file)) {
-        return response()->file($file);
+        header('Content-Type: text/plain');
+        readfile($file);
+        exit;
     }
     $files = glob(storage_path('logs/laravel-*.log'));
     if (!empty($files)) {
-        return response()->file(end($files));
+        header('Content-Type: text/plain');
+        readfile(end($files));
+        exit;
     }
-    return "Log file not found in " . storage_path('logs');
+    die("Log file not found in " . storage_path('logs'));
 });
 
 use App\Http\Controllers\AddressController;
