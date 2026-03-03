@@ -42,20 +42,29 @@ class Handler extends ExceptionHandler
 
     public function render($request, Throwable $e)
     {
+        // TEMPORARY: output exact error for debugging Railway 500
+        if (env('APP_DEBUG', true) || true) {
+            echo "<div style='font-family: monospace; background: #fff; color: #333; padding: 20px; text-align: left;'>";
+            echo "<h2>Fatal Error Details:</h2>";
+            echo "<b>Message:</b> " . htmlspecialchars($e->getMessage()) . "<br>";
+            echo "<b>File:</b> " . htmlspecialchars($e->getFile()) . ":" . $e->getLine() . "<br><br>";
+            echo "<b>Stack Trace:</b><br>";
+            echo "<pre>" . htmlspecialchars($e->getTraceAsString()) . "</pre>";
+            echo "</div>";
+            exit;
+        }
+
         if ($e instanceof Redirectingexception) {
             return redirect()->back();
         }
 
-        if($this->isHttpException($e))
-        {
+        if ($this->isHttpException($e)) {
             if ($request->is('customer-products/admin')) {
                 return NgeniusUtility::initPayment();
             }
-            
+
             return parent::render($request, $e);
-        }
-        else
-        {
+        } else {
             return parent::render($request, $e);
         }
     }
