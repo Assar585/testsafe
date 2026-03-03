@@ -1,5 +1,17 @@
 <?php
 
+Route::get('/view-logs', function () {
+    $file = storage_path('logs/laravel.log');
+    if (file_exists($file)) {
+        return response()->file($file);
+    }
+    $files = glob(storage_path('logs/laravel-*.log'));
+    if (!empty($files)) {
+        return response()->file(end($files));
+    }
+    return "Log file not found in " . storage_path('logs');
+});
+
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\AizUploadController;
 use App\Http\Controllers\Auth\LoginController;
