@@ -120,15 +120,6 @@ Route::controller(VerificationController::class)->group(function () {
     Route::get('/verification-confirmation/{code}', 'verification_confirmation')->name('email.verification.confirmation');
 });
 
-Route::resource('shops', ShopController::class)->middleware('handle-demo-login');
-Route::controller(ShopController::class)->group(function () {
-    Route::get('/shop/registration/verification', 'verifyRegEmailorPhone')->name('shop-reg.verification');
-    Route::post('/shop/registration/verification-code-send', 'sendRegVerificationCode')->name('shop-reg.verification_code_send');
-    Route::get('/shop/registration/verify-code/{id}', 'regVerifyCode')->name('shop-reg.verify_code');
-    Route::post('/shop/registration/verification-code-confirmation', 'regVerifyCodeConfirmation')->name('shop-reg.verify_code_confirmation');
-
-});
-
 // Root Redirect
 Route::get('/', [App\Http\Controllers\LocalizationController::class, 'redirect']);
 
@@ -244,6 +235,9 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
     // Currency Switch
     Route::post('/currency', [CurrencyController::class, 'changeCurrency'])->name('currency.change');
 
+    // Subscribers
+    Route::post('/subscribers', [SubscriberController::class, 'store'])->name('subscribers.store');
+
     // Size Chart Show
     Route::get('/size-charts-show/{id}', [SizeChartController::class, 'show'])->name('size-charts-show');
 
@@ -254,6 +248,15 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         Route::get('/customer-products?city={city_id}', 'search')->name('customer_products.city');
         Route::get('/customer-products?q={search}', 'search')->name('customer_products.search');
         Route::get('/customer-product/{slug}', 'customer_product')->name('customer.product');
+    });
+
+    // Shops
+    Route::resource('shops', ShopController::class)->middleware('handle-demo-login');
+    Route::controller(ShopController::class)->group(function () {
+        Route::get('/shop/registration/verification', 'verifyRegEmailorPhone')->name('shop-reg.verification');
+        Route::post('/shop/registration/verification-code-send', 'sendRegVerificationCode')->name('shop-reg.verification_code_send');
+        Route::get('/shop/registration/verify-code/{id}', 'regVerifyCode')->name('shop-reg.verify_code');
+        Route::post('/shop/registration/verification-code-confirmation', 'regVerifyCodeConfirmation')->name('shop-reg.verify_code_confirmation');
     });
 
     // Search
