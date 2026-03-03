@@ -337,7 +337,7 @@
                                                 placeholder="{{ translate('Unit price') }}" name="unit_price" class="form-control"
                                                 required>
                                             <div class="input-group-append">
-                                                <select class="form-control aiz-selectpicker" name="currency_id">
+                                                <select class="form-control aiz-selectpicker" name="currency_id" data-width="118px">
                                                     @foreach (\App\Models\Currency::where('status', 1)->get() as $currency)
                                                         <option value="{{ $currency->id }}" @selected(old('currency_id', \App\Models\Currency::where('code', 'USD')->first()->id ?? 1) == $currency->id)>{{ $currency->code }}</option>
                                                     @endforeach
@@ -1222,11 +1222,22 @@
             $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
 
             setTimeout(function() {
-                let mockDescription = "<p><strong>" + $('#product_name').val() + "</strong> " + "{{ translate('is a premium quality product designed for everyday excellence. Built with care and precision, it meets all your standards.') }}" + "</p>";
+                let productName = $('#product_name').val();
+                let mockDescription = "<p><strong>" + productName + "</strong> " + "{{ translate('is a premium quality product designed for everyday excellence. Built with care and precision, it meets all your standards.') }}" + "</p>";
                 $('#product_description').val(mockDescription).siblings('.note-editor').find('.note-editable').html(mockDescription);
 
+                // Auto-Generate SEO Tags without user intervention
+                $('input[name="meta_title"]').val(productName + " - Premium");
+                $('textarea[name="meta_description"]').val("Buy " + productName + " at the best price. Premium quality guaranteed.");
+                let tags = $('#product_tags').val();
+                $('textarea[name="meta_keywords"]').val(tags);
+
                 $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
-                AIZ.plugins.notify('success', '{{ translate("AI Description generated successfully!") }}');
+                AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
+                
+                // Trigger validation visual update for these fields
+                validateField($('input[name="meta_title"]'));
+                validateField($('textarea[name="meta_description"]'));
             }, 1500);
         }
 
@@ -1239,6 +1250,10 @@
                 if(!currentTags.includes(name)) {
                     let newTags = currentTags ? currentTags + ',' + name : name;
                     tagsInput.val(newTags);
+                    // Also update Meta Keywords if empty
+                    if(!$('textarea[name="meta_keywords"]').val()) {
+                        $('textarea[name="meta_keywords"]').val(newTags);
+                    }
                 }
             }
         });
@@ -1248,8 +1263,64 @@
             let randomNum = Math.floor(100000 + Math.random() * 900000);
             let prefix = "PRD-";
             $('#sku_input').val(prefix + randomNum);
+            validateField($('#sku_input'));
             AIZ.plugins.notify('success', '{{ translate("Generated random SKU successfully.") }}');
         }
+
+        // Validation Highlighting Logic (Green/Red)
+        function validateField(el) {
+            if($(el).val() && $(el).val().length > 0) {
+                $(el).addClass('is-valid').removeClass('is-invalid');
+            } else {
+                $(el).addClass('is-invalid').removeClass('is-valid');
+            }
+        }
+
+        $(document).ready(function() {
+            // Apply instantly on load to highlight empty required fields in red, filled in green
+            $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').each(function() {
+                validateField(this);
+            });
+
+            $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').on('change blur input', function() {
+                validateField(this);
+            });
+
+            // For Aiz Selectpicker (Bootstrap Select) required fields
+            $('.aiz-selectpicker[required]').each(function() {
+                if($(this).val()) {
+                    $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
+                } else {
+                    $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
+                }
+            });
+
+            $('.aiz-selectpicker[required]').on('changed.bs.select', function() {
+                if($(this).val()) {
+                    $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
+                } else {
+                    $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
+                }
+            });
+        });
+
+        // Uploader Modal Tooltips Sequential Display
+        $(document).on('shown.bs.modal', '#aizUploaderModal', function () {
+            let uploadTip = $('a[href="#aiz-upload-new"]').parent();
+            let selectTip = $('a[href="#aiz-select-file"]').parent();
+            
+            // Ensure manual trigger behavior doesn't clash
+            uploadTip.tooltip({trigger: 'manual'}).tooltip('show');
+            
+            setTimeout(function() {
+                uploadTip.tooltip('hide');
+                selectTip.tooltip({trigger: 'manual'}).tooltip('show');
+                
+                setTimeout(function() {
+                    selectTip.tooltip('hide');
+                }, 4000);
+            }, 4000);
+        });
 
     </script>
 @endsection
