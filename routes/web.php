@@ -205,9 +205,11 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
 
         Route::get('/track-your-order', 'trackOrder')->name('orders.track');
 
-        // Login Pages
+        // Auth Pages (localized)
         Route::get('/login', 'login')->name('user.login');
         Route::get('/seller-login', 'login')->name('seller.login');
+        Route::get('/delivery-boy-login', 'login')->name('deliveryboy.login');
+        Route::get('/registration', 'registration')->name('user.registration');
     });
 
     // Language Switch
