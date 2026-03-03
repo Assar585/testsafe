@@ -22,5 +22,6 @@ class Authenticate extends Middleware
                 return '/en/login';
             }
         }
+        return null;
     }
 }
