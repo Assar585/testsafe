@@ -1,44 +1,34 @@
 <?php
 
-Route::get('/debug-logs', function () {
+Route::get('/debug-logs', function (\Illuminate\Http\Request $request) {
     header('Content-Type: text/plain');
+    $query = $request->query('q');
+    $limit = $request->query('limit', 100);
     $paths = [
-        storage_path('logs/laravel.log'),
-        storage_path('logs/laravel-' . date('Y-m-d') . '.log'),
-        base_path('storage/logs/laravel.log'),
         '/app/storage/logs/laravel.log',
-        '/var/www/html/storage/logs/laravel.log',
+        storage_path('logs/laravel.log'),
+        base_path('storage/logs/laravel.log'),
     ];
 
-    // Try to find ANY log file
     $found = false;
     foreach ($paths as $path) {
         if (file_exists($path)) {
             echo "--- CONTENT OF $path ---\n";
-            readfile($path);
+            $lines = file($path);
+            if ($query) {
+                $lines = array_filter($lines, function ($line) use ($query) {
+                    return stripos($line, $query) !== false;
+                });
+            }
+            $lines = array_slice($lines, -$limit);
+            echo implode("", $lines);
             $found = true;
             break;
         }
     }
 
     if (!$found) {
-        echo "Exhaustive search starting...\n";
-        $it = new RecursiveDirectoryIterator(storage_path('logs'));
-        foreach (new RecursiveIteratorIterator($it) as $file) {
-            if (pathinfo($file, PATHINFO_EXTENSION) == 'log') {
-                echo "--- FOUND LOG: $file ---\n";
-                readfile($file);
-                $found = true;
-            }
-        }
-    }
-
-    if (!$found) {
-        echo "No log files found in " . storage_path('logs') . "\n";
-        echo "Disk scan starting...\n";
-        // Check if we can see anything in /var/www
-        exec('find /var/www -name "*.log" 2>/dev/null', $output);
-        print_r($output);
+        echo "No logs found. Paths checked: " . implode(", ", $paths);
     }
     exit;
 });
