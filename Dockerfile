@@ -41,10 +41,8 @@ RUN composer config audit.block-insecure false \
 # Install dependencies (ignoring platform reqs)
 RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs
 
-# Generate optimal Laravel caches (config, view) built into the image
-RUN php artisan config:cache \
-    && php artisan view:cache \
-    || true
+# Generate optimal Laravel views (Do not cache config here as env vars are not present during build)
+RUN php artisan view:cache || true
 
 # Setup storage and cache permissions (Move to after cache generation)
 RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache \
