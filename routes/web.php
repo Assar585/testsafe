@@ -1,19 +1,45 @@
 <?php
 
 Route::get('/debug-logs', function () {
-    $file = storage_path('logs/laravel.log');
-    if (file_exists($file)) {
-        header('Content-Type: text/plain');
-        readfile($file);
-        exit;
+    header('Content-Type: text/plain');
+    $paths = [
+        storage_path('logs/laravel.log'),
+        storage_path('logs/laravel-' . date('Y-m-d') . '.log'),
+        '/var/www/html/storage/logs/laravel.log',
+        '/var/www/storage/logs/laravel.log'
+    ];
+
+    // Try to find ANY log file
+    $found = false;
+    foreach ($paths as $path) {
+        if (file_exists($path)) {
+            echo "--- CONTENT OF $path ---\n";
+            readfile($path);
+            $found = true;
+            break;
+        }
     }
-    $files = glob(storage_path('logs/laravel-*.log'));
-    if (!empty($files)) {
-        header('Content-Type: text/plain');
-        readfile(end($files));
-        exit;
+
+    if (!$found) {
+        echo "Exhaustive search starting...\n";
+        $it = new RecursiveDirectoryIterator(storage_path('logs'));
+        foreach (new RecursiveIteratorIterator($it) as $file) {
+            if (pathinfo($file, PATHINFO_EXTENSION) == 'log') {
+                echo "--- FOUND LOG: $file ---\n";
+                readfile($file);
+                $found = true;
+            }
+        }
     }
-    die("Log file not found in " . storage_path('logs'));
+
+    if (!$found) {
+        echo "No log files found in " . storage_path('logs') . "\n";
+        echo "Disk scan starting...\n";
+        // Check if we can see anything in /var/www
+        exec('find /var/www -name "*.log" 2>/dev/null', $output);
+        print_r($output);
+    }
+    exit;
 });
 
 use App\Http\Controllers\AddressController;
