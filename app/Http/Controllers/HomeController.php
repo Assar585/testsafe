@@ -151,6 +151,9 @@ class HomeController extends Controller
 
     public function login()
     {
+        if (request()->isMethod('post')) {
+            die('HomeController@login POST reached');
+        }
         if (Auth::check()) {
             return redirect()->route('home');
         }

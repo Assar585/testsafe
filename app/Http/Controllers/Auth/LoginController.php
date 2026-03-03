@@ -35,6 +35,48 @@ class LoginController extends Controller
 
     use AuthenticatesUsers;
 
+    public function login(Request $request)
+    {
+        die('LoginController@login reached');
+        \Log::info('Login attempt started', $request->except('password'));
+
+        try {
+            $this->validateLogin($request);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Login validation failed', ['errors' => $e->errors()]);
+            throw $e;
+        }
+
+        // If the class is using the ThrottlesLogins trait, we can automatically throttle
+        // the login attempts for this application. We'll key this by the username and
+        // the IP address of the client making these requests into this application.
+        if (
+            method_exists($this, 'hasTooManyLoginAttempts') &&
+            $this->hasTooManyLoginAttempts($request)
+        ) {
+            $this->fireLockoutEvent($request);
+
+            return $this->sendLockoutResponse($request);
+        }
+
+        if ($this->attemptLogin($request)) {
+            \Log::info('Login attempt successful', ['user_id' => auth()->id()]);
+            if ($request->hasSession()) {
+                $request->session()->put('auth.password_confirmed_at', time());
+            }
+
+            return $this->sendLoginResponse($request);
+        }
+
+        // If the login attempt was unsuccessful we will increment the number of attempts
+        // to login and redirect the user back to the login form. Of course, when this
+        // user surpasses their maximum number of attempts they will get locked out.
+        $this->incrementLoginAttempts($request);
+
+        \Log::warning('Login attempt failed - invalid credentials');
+        return $this->sendFailedLoginResponse($request);
+    }
+
     /**
      * Where to redirect users after login.
      *
@@ -183,7 +225,8 @@ class LoginController extends Controller
                 if ((get_email_template_data('customer_reg_email_to_admin', 'status') == 1)) {
                     try {
                         EmailUtility::customer_registration_email('customer_reg_email_to_admin', $newUser, null);
-                    } catch (\Exception $e) {}
+                    } catch (\Exception $e) {
+                    }
                 }
             }
         }
@@ -236,11 +279,11 @@ class LoginController extends Controller
     protected function validateLogin(Request $request)
     {
         $request->validate([
-            'email'    => 'required_without:phone',
-            'phone'    => 'required_without:email',
+            'email' => 'required_without:phone',
+            'phone' => 'required_without:email',
             'password' => 'required|string',
-              'g-recaptcha-response' => [
-                Rule::when(get_setting('google_recaptcha') == 1  && get_setting($request['recaptcha_action']) == 1 , ['required', new Recaptcha()], ['sometimes'])
+            'g-recaptcha-response' => [
+                Rule::when(get_setting('google_recaptcha') == 1 && get_setting($request['recaptcha_action']) == 1, ['required', new Recaptcha()], ['sometimes'])
             ],
         ]);
     }
@@ -260,6 +303,7 @@ class LoginController extends Controller
         }
     }
 
+
     /**
      * Check user's role and redirect user based on their role
      * @return
@@ -267,16 +311,15 @@ class LoginController extends Controller
     public function authenticated()
     {
         if (session('temp_user_id') != null) {
-            if(auth()->user()->user_type == 'customer'){
+            if (auth()->user()->user_type == 'customer') {
                 Cart::where('temp_user_id', session('temp_user_id'))
-                ->update(
-                    [
-                        'user_id' => auth()->user()->id,
-                        'temp_user_id' => null
-                    ]
-                );
-            }
-            else {
+                    ->update(
+                        [
+                            'user_id' => auth()->user()->id,
+                            'temp_user_id' => null
+                        ]
+                    );
+            } else {
                 Cart::where('temp_user_id', session('temp_user_id'))->delete();
             }
             Session::forget('temp_user_id');
@@ -286,8 +329,8 @@ class LoginController extends Controller
             CoreComponentRepository::instantiateShopRepository();
             return redirect()->route('admin.dashboard');
         } elseif (auth()->user()->user_type == 'seller') {
-            
-            if (auth()->user()->shop->registration_approval  == 0) {
+
+            if (auth()->user()->shop->registration_approval == 0) {
                 auth()->logout();
                 flash(translate("Your seller account is under review. We will notify you once approved."));
                 return redirect()->route('home');
