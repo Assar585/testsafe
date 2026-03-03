@@ -46,6 +46,7 @@ use App\Http\Controllers\ProductQueryController;
 use App\Http\Controllers\PurchaseHistoryController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\SubscriberController;
 use App\Http\Controllers\SupportTicketController;
@@ -206,22 +207,35 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         Route::get('/track-your-order', 'trackOrder')->name('orders.track');
 
         // Auth Pages (localized)
+        Route::get('/login', 'login')->name('login');
         Route::get('/login', 'login')->name('user.login');
         Route::get('/seller-login', 'login')->name('seller.login');
         Route::get('/delivery-boy-login', 'login')->name('deliveryboy.login');
+        Route::get('/registration', 'registration')->name('register');
         Route::get('/registration', 'registration')->name('user.registration');
+
+        // Forgot Password (localized)
+        Route::get('/password/reset', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+        Route::post('/password/email', [\App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+        Route::get('/password/reset/{token}', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::post('/password/reset', [\App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
     });
+
+    // Cart Login Submit
+    Route::post('/cart-login', [LoginController::class, 'login'])->name('cart.login.submit');
 
     // Compare
     Route::controller(\App\Http\Controllers\CompareController::class)->group(function () {
         Route::get('/compare', 'index')->name('compare');
         Route::post('/compare/add', 'addToCompare')->name('compare.add');
+        Route::post('/compare/add', 'addToCompare')->name('compare.addToCompare');
         Route::get('/compare/reset', 'reset')->name('compare.reset');
         Route::get('/compare/details/{unique_identifier}', 'details')->name('compare.details');
     });
 
     // Customer Notifications
     Route::get('/all-notifications', [\App\Http\Controllers\NotificationController::class, 'customerIndex'])->name('customer.all-notifications');
+    Route::get('/notification-read/{id}', [\App\Http\Controllers\NotificationController::class, 'nonLinkableNotificationRead'])->name('non-linkable-notification-read');
 
     // Language Switch
     Route::post('/language', [LanguageController::class, 'changeLanguage'])->name('language.change');
@@ -266,6 +280,7 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
     Route::group(['prefix' => 'checkout'], function () {
         Route::controller(CheckoutController::class)->group(function () {
             Route::get('/', 'index')->name('checkout');
+            Route::get('/shipping_info', 'get_shipping_info')->name('checkout.shipping_info');
             Route::any('/delivery-info', 'store_shipping_info')->name('checkout.store_shipping_infostore');
             Route::post('/payment-select', 'store_delivery_info')->name('checkout.store_delivery_info');
             Route::post('/payment', 'checkout')->name('payment.checkout');
@@ -331,6 +346,9 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         Route::post('/product-review-modal', [ReviewController::class, 'product_review_modal'])->name('product_review_modal');
 
         Route::post('/order/re-payment', [CheckoutController::class, 'orderRePayment'])->name('order.re_payment');
+
+        // Product Query
+        Route::resource('product-queries', ProductQueryController::class);
     });
 
     Route::controller(PageController::class)->group(function () {
