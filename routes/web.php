@@ -81,6 +81,15 @@ Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
 
+Route::get('/debug-db', function () {
+    try {
+        \DB::connection()->getPdo();
+        return "DB Connection Successful. Host: " . env('DB_HOST');
+    } catch (\Exception $e) {
+        return "DB Connection Failed. Host: " . env('DB_HOST') . ". Error: " . $e->getMessage();
+    }
+});
+
 // AIZ Uploader
 Route::controller(AizUploadController::class)->group(function () {
     Route::post('/aiz-uploader', 'show_uploader');
