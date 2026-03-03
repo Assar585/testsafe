@@ -204,6 +204,10 @@ Route::group(['prefix' => '{locale}', 'where' => ['locale' => '[a-z]{2}']], func
         Route::get('/privacy-policy', 'privacypolicy')->name('privacypolicy');
 
         Route::get('/track-your-order', 'trackOrder')->name('orders.track');
+
+        // Login Pages
+        Route::get('/login', 'login')->name('user.login');
+        Route::get('/seller-login', 'login')->name('seller.login');
     });
 
     // Language Switch
