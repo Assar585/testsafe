@@ -23,8 +23,19 @@
 			@foreach ($combinations as $key => $combination)
 				@php
 					$sku = '';
-					foreach (explode(' ', $product_name) as $key => $value) {
-						$sku .= substr($value, 0, 1);
+					if (isset($base_sku) && !empty($base_sku)) {
+						$sku = $base_sku;
+					} else {
+						// Improved fallback logic matching the JS implementation
+						$name = trim($product_name);
+						$words = explode(' ', $name);
+						if (count($words) >= 3) {
+							$sku = strtoupper($words[0][0] . $words[1][0] . $words[2][0]);
+						} elseif (strlen($name) >= 3) {
+							$sku = strtoupper(substr($name, 0, 3));
+						} else {
+							$sku = 'PRD';
+						}
 					}
 
 					$str = '';

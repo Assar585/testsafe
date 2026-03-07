@@ -307,8 +307,9 @@ class ProductController extends Controller
             }
         }
 
+        $base_sku = $request->sku;
         $combinations = (new CombinationService())->generate_combination($options);
-        return view('backend.product.products.sku_combinations', compact('combinations', 'unit_price', 'colors_active', 'product_name'));
+        return view('backend.product.products.sku_combinations', compact('combinations', 'unit_price', 'colors_active', 'product_name', 'base_sku'));
     }
 
     public function sku_combination_edit(Request $request)
@@ -337,8 +338,9 @@ class ProductController extends Controller
             }
         }
 
+        $base_sku = $request->sku;
         $combinations = (new CombinationService())->generate_combination($options);
-        return view('backend.product.products.sku_combinations_edit', compact('combinations', 'unit_price', 'colors_active', 'product_name', 'product'));
+        return view('backend.product.products.sku_combinations_edit', compact('combinations', 'unit_price', 'colors_active', 'product_name', 'product', 'base_sku'));
     }
 
     public function add_more_choice_option(Request $request)
