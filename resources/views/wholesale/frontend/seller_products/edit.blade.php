@@ -37,7 +37,7 @@
                         <div class="form-group row">
                             <label class="col-lg-3 col-from-label">{{translate('Product Name')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
                             <div class="col-lg-8">
-                                <input type="text" class="form-control" name="name" placeholder="{{translate('Product Name')}}" value="{{ $product->getTranslation('name', $lang) }}" required>
+                                <input type="text" class="form-control" name="name" id="product_name" placeholder="{{translate('Product Name')}}" value="{{ $product->getTranslation('name', $lang) }}" required>
                             </div>
                         </div>
                         <div class="form-group row" id="brand">
@@ -163,7 +163,12 @@
                                     {{translate('SKU')}}
                                 </label>
                                 <div class="col-md-6">
-                                    <input type="text" placeholder="{{ translate('SKU') }}" value="{{ optional($product->stocks->first())->sku }}" name="sku" class="form-control">
+                                    <div class="input-group">
+                                        <input type="text" placeholder="{{ translate('SKU') }}" value="{{ optional($product->stocks->first())->sku }}" name="sku" id="sku_input" class="form-control">
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-soft-secondary" onclick="generateSKU()">{{ translate('Generate') }}</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -935,6 +940,53 @@
         $('#'+noteType+'_note').addClass('border border-gray my-2 p-2');
         $('#note_modal').modal('hide');
     }
+
+    // Generate SKU
+    function generateSKU() {
+        let name = $('#product_name').val();
+        let prefix = "PRD-";
+        if (name && name.trim().length >= 3) {
+            // Get first 3 letters or initials
+            let words = name.trim().split(/\s+/);
+            if (words.length >= 3) {
+                prefix = (words[0][0] + words[1][0] + words[2][0]).toUpperCase() + "-";
+            } else {
+                prefix = name.trim().substring(0, 3).toUpperCase() + "-";
+            }
+        }
+
+        let randomNum = Math.floor(100000 + Math.random() * 900000);
+        $('#sku_input').val(prefix + randomNum);
+        checkSKUAvailability($('#sku_input'));
+        AIZ.plugins.notify('success', '{{ translate("Generated meaningful SKU successfully.") }}');
+    }
+
+    function checkSKUAvailability(el) {
+        let sku = $(el).val();
+        if (!sku || sku.length < 2) {
+            $(el).removeClass('is-invalid is-valid');
+            $(el).next('.invalid-feedback').remove();
+            return;
+        }
+
+        let product_id = $('input[name="id"]').val() || null;
+        
+        $.get('{{ route('seller.wholesale.check_sku_availability') }}', { sku: sku, product_id: product_id }, function(data) {
+            if (data.exists) {
+                $(el).addClass('is-invalid').removeClass('is-valid');
+                if (!$(el).next('.invalid-feedback').length) {
+                    $(el).after('<div class="invalid-feedback text-danger small mt-1">{{ translate("This SKU already exists in your catalog.") }}</div>');
+                }
+            } else {
+                $(el).addClass('is-valid').removeClass('is-invalid');
+                $(el).next('.invalid-feedback').remove();
+            }
+        });
+    }
+
+    $(document).on('change', '#sku_input', function () {
+        checkSKUAvailability(this);
+    });
 
     AIZ.plugins.tagify();
 

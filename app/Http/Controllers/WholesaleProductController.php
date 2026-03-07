@@ -17,7 +17,8 @@ use Artisan;
 
 class WholesaleProductController extends Controller
 {
-    public function __construct() {
+    public function __construct()
+    {
         // Staff Permission Check
         $this->middleware(['permission:view_all_wholesale_products'])->only('all_wholesale_products');
         $this->middleware(['permission:view_inhouse_wholesale_products'])->only('in_house_wholesale_products');
@@ -35,7 +36,7 @@ class WholesaleProductController extends Controller
         $col_name = null;
         $query = null;
         $sort_search = null;
-        $seller_id  = null;
+        $seller_id = null;
 
         $products = Product::where('wholesale_product', 1)->orderBy('created_at', 'desc');
 
@@ -44,22 +45,22 @@ class WholesaleProductController extends Controller
             $seller_id = $request->user_id;
         }
 
-        if ($request->type != null){
+        if ($request->type != null) {
             $var = explode(",", $request->type);
             $col_name = $var[0];
             $query = $var[1];
             $products = $products->orderBy($col_name, $query);
             $sort_type = $request->type;
         }
-        if ($request->search != null){
+        if ($request->search != null) {
             $products = $products
-                        ->where('name', 'like', '%'.$request->search.'%');
+                ->where('name', 'like', '%' . $request->search . '%');
             $sort_search = $request->search;
         }
 
         $products = $products->paginate(15);
 
-        return view('wholesale.products.index', compact('products','type', 'col_name', 'query', 'sort_search','seller_id'));
+        return view('wholesale.products.index', compact('products', 'type', 'col_name', 'query', 'sort_search', 'seller_id'));
     }
 
     public function in_house_wholesale_products(Request $request)
@@ -71,24 +72,24 @@ class WholesaleProductController extends Controller
         $query = null;
         $sort_search = null;
 
-        $products = Product::where('wholesale_product', 1)->where('added_by','admin')->orderBy('created_at', 'desc');
+        $products = Product::where('wholesale_product', 1)->where('added_by', 'admin')->orderBy('created_at', 'desc');
 
-        if ($request->type != null){
+        if ($request->type != null) {
             $var = explode(",", $request->type);
             $col_name = $var[0];
             $query = $var[1];
             $products = $products->orderBy($col_name, $query);
             $sort_type = $request->type;
         }
-        if ($request->search != null){
+        if ($request->search != null) {
             $products = $products
-                        ->where('name', 'like', '%'.$request->search.'%');
+                ->where('name', 'like', '%' . $request->search . '%');
             $sort_search = $request->search;
         }
 
         $products = $products->paginate(15);
 
-        return view('wholesale.products.index', compact('products','type', 'col_name', 'query', 'sort_search'));
+        return view('wholesale.products.index', compact('products', 'type', 'col_name', 'query', 'sort_search'));
     }
 
     public function seller_wholesale_products(Request $request)
@@ -99,31 +100,31 @@ class WholesaleProductController extends Controller
         $col_name = null;
         $query = null;
         $sort_search = null;
-        $seller_id  = null;
+        $seller_id = null;
 
-        $products = Product::where('wholesale_product', 1)->where('added_by','seller')->orderBy('created_at', 'desc');
+        $products = Product::where('wholesale_product', 1)->where('added_by', 'seller')->orderBy('created_at', 'desc');
 
         if ($request->has('user_id') && $request->user_id != null) {
             $products = $products->where('user_id', $request->user_id);
             $seller_id = $request->user_id;
         }
-        
-        if ($request->type != null){
+
+        if ($request->type != null) {
             $var = explode(",", $request->type);
             $col_name = $var[0];
             $query = $var[1];
             $products = $products->orderBy($col_name, $query);
             $sort_type = $request->type;
         }
-        if ($request->search != null){
+        if ($request->search != null) {
             $products = $products
-                        ->where('name', 'like', '%'.$request->search.'%');
+                ->where('name', 'like', '%' . $request->search . '%');
             $sort_search = $request->search;
         }
 
         $products = $products->paginate(15);
 
-        return view('wholesale.products.index', compact('products','type', 'col_name', 'query', 'sort_search','seller_id'));
+        return view('wholesale.products.index', compact('products', 'type', 'col_name', 'query', 'sort_search', 'seller_id'));
     }
 
     // Wholesale Products list in Seller panel 
@@ -132,23 +133,23 @@ class WholesaleProductController extends Controller
         $sort_search = null;
         $col_name = null;
         $query = null;
-        $products = Product::where('wholesale_product',1)->where('user_id',Auth::user()->id)->orderBy('created_at', 'desc');
-        if ($request->type != null){
+        $products = Product::where('wholesale_product', 1)->where('user_id', Auth::user()->id)->orderBy('created_at', 'desc');
+        if ($request->type != null) {
             $var = explode(",", $request->type);
             $col_name = $var[0];
             $query = $var[1];
             $products = $products->orderBy($col_name, $query);
             $sort_type = $request->type;
         }
-        if ($request->search != null){
+        if ($request->search != null) {
             $products = $products
-                        ->where('name', 'like', '%'.$request->search.'%');
+                ->where('name', 'like', '%' . $request->search . '%');
             $sort_search = $request->search;
         }
 
         $products = $products->paginate(15);
 
-        return view('wholesale.frontend.seller_products.index', compact('products', 'sort_search','col_name'));
+        return view('wholesale.frontend.seller_products.index', compact('products', 'sort_search', 'col_name'));
     }
 
     public function product_create_admin()
@@ -160,7 +161,7 @@ class WholesaleProductController extends Controller
             ->with('childrenCategories')
             ->get();
         return view('wholesale.products.create', compact('categories'));
-   
+
     }
 
     public function product_create_seller()
@@ -178,18 +179,17 @@ class WholesaleProductController extends Controller
             }
         }
 
-        if(get_setting('seller_wholesale_product') == 1){
-            if(addon_is_activated('seller_subscription')){
-                if(Auth::user()->shop->seller_package != null && Auth::user()->shop->seller_package->product_upload_limit > Auth::user()->products()->count()){
+        if (get_setting('seller_wholesale_product') == 1) {
+            if (addon_is_activated('seller_subscription')) {
+                if (Auth::user()->shop->seller_package != null && Auth::user()->shop->seller_package->product_upload_limit > Auth::user()->products()->count()) {
                     return view('wholesale.frontend.seller_products.create', compact('categories'));
-                }
-                else {
+                } else {
                     flash(translate('Upload limit has been reached. Please upgrade your package.'))->warning();
                     return back();
                 }
             }
             return view('wholesale.frontend.seller_products.create', compact('categories'));
-        }     
+        }
     }
 
     /**
@@ -199,9 +199,17 @@ class WholesaleProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function product_store_admin(WholesaleProductRequest $request)
-    { 
+    {
         $product = (new WholesaleService)->store($request->except([
-            '_token', 'button', 'flat_shipping_cost', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            '_token',
+            'button',
+            'flat_shipping_cost',
+            'tax_id',
+            'tax',
+            'tax_type',
+            'flash_deal_id',
+            'flash_discount',
+            'flash_discount_type'
         ]));
         $request->merge(['product_id' => $product->id]);
 
@@ -211,24 +219,36 @@ class WholesaleProductController extends Controller
         //VAT & Tax
         if ($request->tax_id) {
             (new productTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id'
             ]));
         }
 
         //Flash Deal
         (new productFlashDealService)->store($request->only([
-            'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            'flash_deal_id',
+            'flash_discount',
+            'flash_discount_type'
         ]), $product);
 
         // Frequently Bought Products
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id'
         ]));
 
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'unit', 'description', 'product_id'
+            'lang',
+            'name',
+            'unit',
+            'description',
+            'product_id'
         ]));
 
         flash(translate('Product has been inserted successfully'))->success();
@@ -258,37 +278,53 @@ class WholesaleProductController extends Controller
                 return back();
             }
         }
-       
+
         $product = (new WholesaleService)->store($request->except([
-            '_token', 'tax_id', 'tax', 'tax_type', 'flash_deal_id', 'flash_discount', 'flash_discount_type'
+            '_token',
+            'tax_id',
+            'tax',
+            'tax_type',
+            'flash_deal_id',
+            'flash_discount',
+            'flash_discount_type'
         ]));
         $request->merge(['product_id' => $product->id]);
 
         //Product categories
         $product->categories()->attach($request->category_ids);
-        
+
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id'
         ]));
-        
+
         //VAT & Tax
         if ($request->tax_id) {
             (new productTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id'
             ]));
         }
 
         // Product Translations
         $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'unit', 'description', 'product_id'
+            'lang',
+            'name',
+            'unit',
+            'description',
+            'product_id'
         ]));
 
         flash(translate('Product has been inserted successfully'))->success();
 
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
-        
+
         return redirect()->route('seller.wholesale_products_list');
     }
 
@@ -300,13 +336,13 @@ class WholesaleProductController extends Controller
         $product = Product::findOrFail($id);
 
         if (addon_is_activated('gst_system')) {
-            if($product->added_by=='admin'){
+            if ($product->added_by == 'admin') {
                 $business_info = admin_business_info();
-                if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+                if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                     flash(translate('Please Update Your GST Information'))->warning();
                     return back();
                 }
-            }else{
+            } else {
                 $shop = $product->user->shop;
                 if ($shop && !$shop->gst_verification) {
                     flash(translate('GST verification is pending for This Seller'))->warning();
@@ -315,7 +351,7 @@ class WholesaleProductController extends Controller
             }
         }
 
-        if($product->digital == 1) {
+        if ($product->digital == 1) {
             return redirect('digitalproducts/' . $id . '/edit');
         }
 
@@ -326,12 +362,12 @@ class WholesaleProductController extends Controller
             ->with('childrenCategories')
             ->get();
 
-        return view('wholesale.products.edit', compact('product', 'categories', 'tags','lang'));
+        return view('wholesale.products.edit', compact('product', 'categories', 'tags', 'lang'));
     }
 
     public function product_edit_seller(Request $request, $id)
     {
-        
+
         $product = Product::findOrFail($id);
 
         if (addon_is_activated('gst_system')) {
@@ -342,7 +378,7 @@ class WholesaleProductController extends Controller
             }
         }
 
-        if($product->digital == 1) {
+        if ($product->digital == 1) {
             return redirect('digitalproducts/' . $id . '/edit');
         }
 
@@ -352,11 +388,11 @@ class WholesaleProductController extends Controller
             ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
-            
-        return view('wholesale.frontend.seller_products.edit', compact('product', 'categories', 'tags','lang'));
+
+        return view('wholesale.frontend.seller_products.edit', compact('product', 'categories', 'tags', 'lang'));
     }
 
-   
+
     public function product_update_admin(WholesaleProductRequest $request, $id)
     {
         (new WholesaleService)->update($request, $id);
@@ -394,7 +430,7 @@ class WholesaleProductController extends Controller
     {
         (new WholesaleService)->destroy($id);
         flash(translate('Product has been deleted successfully'))->success();
-            
+
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
         return back();
@@ -404,9 +440,27 @@ class WholesaleProductController extends Controller
     {
         (new WholesaleService)->destroy($id);
         flash(translate('Product has been deleted successfully'))->success();
-            
+
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
         return back();
+    }
+
+    public function check_sku_availability(Request $request)
+    {
+        $sku = $request->sku;
+        $product_id = $request->product_id;
+        $user_id = Auth::user()->id;
+
+        $query = \App\Models\ProductStock::where('sku', $sku);
+        if ($product_id) {
+            $query->where('product_id', '!=', $product_id);
+        }
+
+        $exists = $query->whereHas('product', function ($q) use ($user_id) {
+            $q->where('user_id', $user_id);
+        })->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 }

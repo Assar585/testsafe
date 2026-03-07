@@ -44,6 +44,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Seller', 'prefix' => 'seller'
         Route::post('/set-product-discount', 'setProductDiscount')->name('set_product_discount');
         Route::get('/filter-products', 'get_filter_products')->name('products.filter');
         Route::get('/hs-code-search', 'hs_code_search')->name('products.hs_code_search');
+        Route::get('/products/check-sku-availability', 'check_sku_availability')->name('products.check-sku-availability');
     });
 
 

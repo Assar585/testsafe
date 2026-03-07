@@ -198,6 +198,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/products-by-cat', 'get_products_byCategory')->name('get_products_byCategory');
         Route::post('/save-as-draft', 'store_as_draft')->name('products.store_as_draft');
         Route::get('/stock/show/{id}', 'stockShow')->name('stock.show');
+        Route::get('/products/check-sku-availability', 'check_sku_availability')->name('products.check-sku-availability');
         Route::get('/hs-code-search', 'hs_code_search')->name('products.hs_code_search');
     });
 

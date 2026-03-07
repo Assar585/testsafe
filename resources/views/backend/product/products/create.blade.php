@@ -515,16 +515,16 @@
                                         <button type="button"
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more" data-content='<div class="row mb-2">
-                                                                                        <div class="col">
-                                                                                            <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                            <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                        </div>
-                                                                                        <div class="col-auto d-flex justify-content-end">
-                                                                                                <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                    <i class="las la-times"></i>
-                                                                                                </button>
-                                                                                        </div>
-                                                                                    </div>'
+                                                                                                <div class="col">
+                                                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                </div>
+                                                                                                <div class="col-auto d-flex justify-content-end">
+                                                                                                        <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                            <i class="las la-times"></i>
+                                                                                                        </button>
+                                                                                                </div>
+                                                                                            </div>'
                                             data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
@@ -1103,7 +1103,7 @@
             @if(old("category_ids"))
                 selected_ids = @json(old("category_ids"));
             @endif
-                                            for (let i = 0; i < selected_ids.length; i++) {
+                                                    for (let i = 0; i < selected_ids.length; i++) {
                 const element = selected_ids[i];
                 $('#treeview input:checkbox#' + element).prop('checked', true);
                 $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
@@ -1155,17 +1155,17 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                    <div class="form-group row">\
-                                                        <div class="col-md-3">\
-                                                            <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                                            <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                        </div>\
-                                                        <div class="col-md-9">\
-                                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                                                '+ obj + '\
-                                                            </select>\
-                                                        </div>\
-                                                    </div>');
+                                                            <div class="form-group row">\
+                                                                <div class="col-md-3">\
+                                                                    <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                                                    <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                                                </div>\
+                                                                <div class="col-md-9">\
+                                                                    <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                                                        '+ obj + '\
+                                                                    </select>\
+                                                                </div>\
+                                                            </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1222,6 +1222,11 @@
                     if (data.trim().length > 1) {
                         $('#show-hide-div').hide();
                         $('input[name="current_stock"]').removeAttr('integer-only');
+
+                        // Check availability for all generated variant SKUs
+                        $('#sku_combination input[name="sku_combinations[]"]').each(function () {
+                            checkSKUAvailability(this);
+                        });
                     }
                     else {
                         $('#show-hide-div').show();
@@ -1323,7 +1328,7 @@
                     var savedOpt = new Option("{{ old('hsn_code') }}", "{{ old('hsn_code') }}", true, true);
                     $('#hsn_code_select').append(savedOpt).trigger('change');
                 @endif
-                                    }
+                                            }
         });
 
         // Load HS Code Autocomplete from JSON
@@ -1622,12 +1627,58 @@
 
         // Generate SKU
         function generateSKU() {
-            let randomNum = Math.floor(100000 + Math.random() * 900000);
+            let name = $('#product_name').val();
             let prefix = "PRD-";
+            if (name && name.trim().length >= 3) {
+                // Get first 3 letters or initials
+                let words = name.trim().split(/\s+/);
+                if (words.length >= 3) {
+                    prefix = (words[0][0] + words[1][0] + words[2][0]).toUpperCase() + "-";
+                } else {
+                    prefix = name.trim().substring(0, 3).toUpperCase() + "-";
+                }
+            }
+
+            let randomNum = Math.floor(100000 + Math.random() * 900000);
             $('#sku_input').val(prefix + randomNum);
             validateField($('#sku_input'));
-            AIZ.plugins.notify('success', '{{ translate("Generated random SKU successfully.") }}');
+            AIZ.plugins.notify('success', '{{ translate("Generated meaningful SKU successfully.") }}');
+
+            if (typeof update_sku === 'function') {
+                update_sku();
+            }
         }
+
+        function checkSKUAvailability(el) {
+            let sku = $(el).val();
+            if (!sku || sku.length < 2) {
+                $(el).removeClass('is-invalid is-valid');
+                $(el).next('.invalid-feedback').remove();
+                return;
+            }
+
+            let product_id = $('input[name="id"]').val() || null;
+
+            $.get('{{ route('products.check-sku-availability') }}', { sku: sku, product_id: product_id }, function (data) {
+                if (data.exists) {
+                    $(el).addClass('is-invalid').removeClass('is-valid');
+                    if (!$(el).next('.invalid-feedback').length) {
+                        $(el).after('<div class="invalid-feedback">{{ translate("This SKU already exists in your catalog.") }}</div>');
+                    }
+                } else {
+                    $(el).addClass('is-valid').removeClass('is-invalid');
+                    $(el).next('.invalid-feedback').remove();
+                }
+            });
+        }
+
+        $(document).on('change', '#sku_input', function () {
+            checkSKUAvailability(this);
+        });
+
+        $(document).on('change', 'input[name="sku_combinations[]"]', function () {
+            checkSKUAvailability(this);
+        });
 
         // Validation Highlighting Logic (Green/Red)
         function validateField(el) {

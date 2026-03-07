@@ -1161,4 +1161,28 @@ class ProductController extends Controller
         $single_select = $request->single_select ?? 0;
         return view('partials.product.multiPick_products', compact('products', 'single_select'));
     }
+
+    public function check_sku_availability(Request $request)
+    {
+        $sku = $request->sku;
+        $product_id = $request->product_id;
+
+        $user = auth()->user();
+        if ($user->user_type == 'admin') {
+            $user_id = \App\Models\User::where('user_type', 'admin')->first()->id;
+        } else {
+            $user_id = $user->id;
+        }
+
+        $query = \App\Models\ProductStock::where('sku', $sku);
+        if ($product_id) {
+            $query->where('product_id', '!=', $product_id);
+        }
+
+        $exists = $query->whereHas('product', function ($q) use ($user_id) {
+            $q->where('user_id', $user_id);
+        })->exists();
+
+        return response()->json(['exists' => $exists]);
+    }
 }
