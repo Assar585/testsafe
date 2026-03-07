@@ -254,16 +254,16 @@
 
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="add-more"
                                         data-content='<div class="row">
-                                                            <div class="col-md-11">
-                                                                <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                            </div>
-                                                            <div class="col-1 d-flex justify-content-end">
-                                                                    <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                        <i class="las la-times"></i>
-                                                                    </button>
-                                                            </div>
-                                                        </div>' data-target=".video-provider-link">
+                                                                <div class="col-md-11">
+                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                </div>
+                                                                <div class="col-1 d-flex justify-content-end">
+                                                                        <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                            <i class="las la-times"></i>
+                                                                        </button>
+                                                                </div>
+                                                            </div>' data-target=".video-provider-link">
                                         {{ translate('Add Another') }}
                                     </button>
                                 </div>
@@ -339,19 +339,9 @@
                                 <label class="col-md-3 col-from-label">{{ translate('Unit price') }} <span
                                         class="text-danger">*</span></label>
                                 <div class="col-md-6">
-                                    <div class="input-group">
-                                        <input type="number" lang="en" min="0" value="0" step="0.01"
-                                            placeholder="{{ translate('Unit price') }}" name="unit_price"
-                                            class="form-control" required>
-                                        <div class="input-group-append">
-                                            <select class="form-control aiz-selectpicker" name="currency_id"
-                                                data-width="118px">
-                                                @foreach (\App\Models\Currency::where('status', 1)->get() as $currency)
-                                                    <option value="{{ $currency->id }}" @selected(old('currency_id', \App\Models\Currency::where('code', 'USD')->first()->id ?? 1) == $currency->id)>{{ $currency->code }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
+                                    <input type="number" lang="en" min="0" value="0" step="0.01"
+                                        placeholder="{{ translate('Unit price') }}" name="unit_price" class="form-control"
+                                        required>
                                 </div>
                             </div>
 
@@ -554,7 +544,8 @@
                                             <input type="hidden" name="refund_note_id" id="refund_note_id">
 
                                             <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3" style="border-bottom: 1px dashed #e4e5eb;">
-                                                {{translate('Refund Note')}}</h5>
+                                                {{translate('Refund Note')}}
+                                            </h5>
                                             <div id="refund_note" class="">
 
                                             </div>
@@ -597,14 +588,16 @@
                                             @foreach (\App\Models\Warranty::all() as $warranty)
                                                 <option value="{{ $warranty->id }}"
                                                     @selected(old('warranty_id') == $warranty->id)>
-                                                    {{ $warranty->getTranslation('text') }}</option>
+                                                    {{ $warranty->getTranslation('text') }}
+                                                </option>
                                             @endforeach
                                         </select>
 
                                         <input type="hidden" name="warranty_note_id" id="warranty_note_id">
 
                                         <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3" style="border-bottom: 1px dashed #e4e5eb;">
-                                            {{translate('Warranty Note')}}</h5>
+                                            {{translate('Warranty Note')}}
+                                        </h5>
                                         <div id="warranty_note" class="">
 
                                         </div>
@@ -671,7 +664,8 @@
                                                         required>
                                                         @foreach ($categories as $category)
                                                             <option value="{{ $category->id }}">
-                                                                {{ $category->getTranslation('name') }}</option>
+                                                                {{ $category->getTranslation('name') }}
+                                                            </option>
                                                             @foreach ($category->childrenCategories as $childCategory)
                                                                 @include('categories.child_category', ['child_category' => $childCategory])
                                                             @endforeach
@@ -702,16 +696,19 @@
                                     <option value="">{{ translate('Select Category') }}</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>
-                                            {{ $category->getTranslation('name') }}</option>
+                                            {{ $category->getTranslation('name') }}
+                                        </option>
                                         @foreach ($category->childrenCategories as $childCategory)
                                             <option value="{{ $childCategory->id }}"
                                                 @selected(old('category_id') == $childCategory->id)>&nbsp;&nbsp;&nbsp;--
-                                                {{ $childCategory->getTranslation('name') }}</option>
+                                                {{ $childCategory->getTranslation('name') }}
+                                            </option>
                                             @foreach ($childCategory->childrenCategories as $subChildCategory)
                                                 <option value="{{ $subChildCategory->id }}"
                                                     @selected(old('category_id') == $subChildCategory->id)>
                                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
-                                                    {{ $subChildCategory->getTranslation('name') }}</option>
+                                                    {{ $subChildCategory->getTranslation('name') }}
+                                                </option>
                                             @endforeach
                                         @endforeach
                                     @endforeach
@@ -732,7 +729,8 @@
                         </div>
                         <div class="card-body">
                             <div class="form-group mb-0">
-                                <select class="form-control aiz-selectpicker" name="hsn_code" id="hsn_code_select" data-live-search="true" data-size="8">
+                                <select class="form-control aiz-selectpicker" name="hsn_code" id="hsn_code_select"
+                                    data-live-search="true" data-size="8">
                                     <option value="">{{ translate('Select HS Code...') }}</option>
                                     @foreach($hsCodes as $hsItem)
                                         <option value="{{ $hsItem['code'] }}" @selected(old('hsn_code') == $hsItem['code'])>
@@ -740,7 +738,8 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                <small class="text-muted">{{ translate('Used for international shipping and customs. Type to search by code or product name.') }}</small>
+                                <small
+                                    class="text-muted">{{ translate('Used for international shipping and customs. Type to search by code or product name.') }}</small>
                             </div>
                         </div>
                     </div>
@@ -1013,18 +1012,18 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                            <div class="form-group row">\
-                                <div class="col-md-3">\
-                                    <input type="hidden" name="choice_no[]" value="' + i + '">\
-                                    <input type="text" class="form-control" name="choice[]" value="' + name +
+                                <div class="form-group row">\
+                                    <div class="col-md-3">\
+                                        <input type="hidden" name="choice_no[]" value="' + i + '">\
+                                        <input type="text" class="form-control" name="choice[]" value="' + name +
                         '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                </div>\
-                                <div class="col-md-8">\
-                                    <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
-                                        ' + obj + '\
-                                    </select>\
-                                </div>\
-                            </div>');
+                                    </div>\
+                                    <div class="col-md-8">\
+                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
+                                            ' + obj + '\
+                                        </select>\
+                                    </div>\
+                                </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1266,7 +1265,7 @@
         });
 
         // HS Code Select2 AJAX autocomplete
-        $(document).ready(function() {
+        $(document).ready(function () {
             if ($('#hsn_code_select').length) {
                 $('#hsn_code_select').select2({
                     placeholder: '{{ translate("Search by code or product name...") }}',
@@ -1277,8 +1276,8 @@
                         url: '{{ route("seller.products.hs_code_search") }}',
                         dataType: 'json',
                         delay: 300,
-                        data: function(params) { return { q: params.term || '' }; },
-                        processResults: function(data) { return { results: data }; },
+                        data: function (params) { return { q: params.term || '' }; },
+                        processResults: function (data) { return { results: data }; },
                         cache: true
                     }
                 });
@@ -1286,130 +1285,130 @@
         });
 
         // Load HS Code Autocomplete from JSON
-            $(document).ready(function() {
-                var $hsnSelect = $('#hsn_code_select');
-                if ($hsnSelect.length) {
-                    var savedVal = $hsnSelect.val();
-                    $.getJSON('{{ asset('assets/data/hs_codes.json') }}', function(data) {
-                        $.each(data, function(i, item) {
-                            var isSelected = (savedVal === item.code) ? ' selected' : '';
-                            $hsnSelect.append('<option value="' + item.code + '"' + isSelected + '>' + item.code + ' – ' + item.desc + '</option>');
-                        });
-                        AIZ.plugins.bootstrapSelect('refresh');
+        $(document).ready(function () {
+            var $hsnSelect = $('#hsn_code_select');
+            if ($hsnSelect.length) {
+                var savedVal = $hsnSelect.val();
+                $.getJSON('{{ asset('assets/data/hs_codes.json') }}', function (data) {
+                    $.each(data, function (i, item) {
+                        var isSelected = (savedVal === item.code) ? ' selected' : '';
+                        $hsnSelect.append('<option value="' + item.code + '"' + isSelected + '>' + item.code + ' – ' + item.desc + '</option>');
                     });
-                }
-            });
+                    AIZ.plugins.bootstrapSelect('refresh');
+                });
+            }
+        });
 
-            // AI Generation Handler (Placeholder)
-            function generateDescriptionAI() {
-                if (!$('#product_name').val() || !$('#category_id').val()) {
-                    AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
-                    return;
-                }
-
-                let originalBtnHtml = $('button[onclick="generateDescriptionAI()"]').html();
-                $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
-
-                setTimeout(function() {
-                    let productName = $('#product_name').val();
-                    let mockDescription = "<p><strong>" + productName + "</strong> " + "{{ translate('is a premium quality product designed for everyday excellence. Built with care and precision, it meets all your standards.') }}" + "</p>";
-                    $('#product_description').val(mockDescription).siblings('.note-editor').find('.note-editable').html(mockDescription);
-
-                    // Auto-Generate SEO Tags without user intervention
-                    $('input[name="meta_title"]').val(productName + " - Premium");
-                    $('textarea[name="meta_description"]').val("Buy " + productName + " at the best price. Premium quality guaranteed.");
-                    let tags = $('#product_tags').val();
-                    $('textarea[name="meta_keywords"]').val(tags);
-
-                    $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
-                    AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
-
-                    // Trigger validation visual update for these fields
-                    validateField($('input[name="meta_title"]'));
-                    validateField($('textarea[name="meta_description"]'));
-                }, 1500);
+        // AI Generation Handler (Placeholder)
+        function generateDescriptionAI() {
+            if (!$('#product_name').val() || !$('#category_id').val()) {
+                AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
+                return;
             }
 
-            // Auto-populate tags from Product Name
-            $('#product_name').on('change', function() {
-                let name = $(this).val();
-                if(name) {
-                    let tagsInput = $('#product_tags');
-                    let currentTags = tagsInput.val();
-                    if(!currentTags.includes(name)) {
-                        let newTags = currentTags ? currentTags + ',' + name : name;
-                        tagsInput.val(newTags);
-                        // Also update Meta Keywords if empty
-                        if(!$('textarea[name="meta_keywords"]').val()) {
-                            $('textarea[name="meta_keywords"]').val(newTags);
-                        }
+            let originalBtnHtml = $('button[onclick="generateDescriptionAI()"]').html();
+            $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
+
+            setTimeout(function () {
+                let productName = $('#product_name').val();
+                let mockDescription = "<p><strong>" + productName + "</strong> " + "{{ translate('is a premium quality product designed for everyday excellence. Built with care and precision, it meets all your standards.') }}" + "</p>";
+                $('#product_description').val(mockDescription).siblings('.note-editor').find('.note-editable').html(mockDescription);
+
+                // Auto-Generate SEO Tags without user intervention
+                $('input[name="meta_title"]').val(productName + " - Premium");
+                $('textarea[name="meta_description"]').val("Buy " + productName + " at the best price. Premium quality guaranteed.");
+                let tags = $('#product_tags').val();
+                $('textarea[name="meta_keywords"]').val(tags);
+
+                $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
+                AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
+
+                // Trigger validation visual update for these fields
+                validateField($('input[name="meta_title"]'));
+                validateField($('textarea[name="meta_description"]'));
+            }, 1500);
+        }
+
+        // Auto-populate tags from Product Name
+        $('#product_name').on('change', function () {
+            let name = $(this).val();
+            if (name) {
+                let tagsInput = $('#product_tags');
+                let currentTags = tagsInput.val();
+                if (!currentTags.includes(name)) {
+                    let newTags = currentTags ? currentTags + ',' + name : name;
+                    tagsInput.val(newTags);
+                    // Also update Meta Keywords if empty
+                    if (!$('textarea[name="meta_keywords"]').val()) {
+                        $('textarea[name="meta_keywords"]').val(newTags);
                     }
                 }
+            }
+        });
+
+        // Generate SKU
+        function generateSKU() {
+            let randomNum = Math.floor(100000 + Math.random() * 900000);
+            let prefix = "PRD-";
+            $('#sku_input').val(prefix + randomNum);
+            validateField($('#sku_input'));
+            AIZ.plugins.notify('success', '{{ translate("Generated random SKU successfully.") }}');
+        }
+
+        // Validation Highlighting Logic (Green/Red)
+        function validateField(el) {
+            if ($(el).val() && $(el).val().length > 0) {
+                $(el).addClass('is-valid').removeClass('is-invalid');
+            } else {
+                $(el).addClass('is-invalid').removeClass('is-valid');
+            }
+        }
+
+        $(document).ready(function () {
+            // Apply instantly on load to highlight empty required fields in red, filled in green
+            $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').each(function () {
+                validateField(this);
             });
 
-            // Generate SKU
-            function generateSKU() {
-                let randomNum = Math.floor(100000 + Math.random() * 900000);
-                let prefix = "PRD-";
-                $('#sku_input').val(prefix + randomNum);
-                validateField($('#sku_input'));
-                AIZ.plugins.notify('success', '{{ translate("Generated random SKU successfully.") }}');
-            }
+            $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').on('change blur input', function () {
+                validateField(this);
+            });
 
-            // Validation Highlighting Logic (Green/Red)
-            function validateField(el) {
-                if($(el).val() && $(el).val().length > 0) {
-                    $(el).addClass('is-valid').removeClass('is-invalid');
+            // For Aiz Selectpicker (Bootstrap Select) required fields
+            $('.aiz-selectpicker[required]').each(function () {
+                if ($(this).val()) {
+                    $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
                 } else {
-                    $(el).addClass('is-invalid').removeClass('is-valid');
+                    $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
                 }
-            }
-
-            $(document).ready(function() {
-                // Apply instantly on load to highlight empty required fields in red, filled in green
-                $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').each(function() {
-                    validateField(this);
-                });
-
-                $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').on('change blur input', function() {
-                    validateField(this);
-                });
-
-                // For Aiz Selectpicker (Bootstrap Select) required fields
-                $('.aiz-selectpicker[required]').each(function() {
-                    if($(this).val()) {
-                        $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
-                    } else {
-                        $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
-                    }
-                });
-
-                $('.aiz-selectpicker[required]').on('changed.bs.select', function() {
-                    if($(this).val()) {
-                        $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
-                    } else {
-                        $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
-                    }
-                });
             });
 
-            // Uploader Modal Tooltips Sequential Display
-            $(document).on('shown.bs.modal', '#aizUploaderModal', function () {
-                let uploadTip = $('a[href="#aiz-upload-new"]').parent();
-                let selectTip = $('a[href="#aiz-select-file"]').parent();
+            $('.aiz-selectpicker[required]').on('changed.bs.select', function () {
+                if ($(this).val()) {
+                    $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
+                } else {
+                    $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
+                }
+            });
+        });
 
-                // Ensure manual trigger behavior doesn't clash
-                uploadTip.tooltip({trigger: 'manual'}).tooltip('show');
+        // Uploader Modal Tooltips Sequential Display
+        $(document).on('shown.bs.modal', '#aizUploaderModal', function () {
+            let uploadTip = $('a[href="#aiz-upload-new"]').parent();
+            let selectTip = $('a[href="#aiz-select-file"]').parent();
 
-                setTimeout(function() {
-                    uploadTip.tooltip('hide');
-                    selectTip.tooltip({trigger: 'manual'}).tooltip('show');
+            // Ensure manual trigger behavior doesn't clash
+            uploadTip.tooltip({ trigger: 'manual' }).tooltip('show');
 
-                    setTimeout(function() {
-                        selectTip.tooltip('hide');
-                    }, 4000);
+            setTimeout(function () {
+                uploadTip.tooltip('hide');
+                selectTip.tooltip({ trigger: 'manual' }).tooltip('show');
+
+                setTimeout(function () {
+                    selectTip.tooltip('hide');
                 }, 4000);
-            });
+            }, 4000);
+        });
 
-        </script>
+    </script>
 @endsection

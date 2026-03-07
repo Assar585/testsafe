@@ -515,16 +515,17 @@
                                         <button type="button"
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more" data-content='<div class="row mb-2">
-                                                                                    <div class="col">
-                                                                                        <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                        <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                    </div>
-                                                                                    <div class="col-auto d-flex justify-content-end">
-                                                                                            <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                <i class="las la-times"></i>
-                                                                                            </button>
-                                                                                    </div>
-                                                                                </div>' data-target=".video-provider-link">
+                                                                                        <div class="col">
+                                                                                            <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                            <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                        </div>
+                                                                                        <div class="col-auto d-flex justify-content-end">
+                                                                                                <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                    <i class="las la-times"></i>
+                                                                                                </button>
+                                                                                        </div>
+                                                                                    </div>'
+                                            data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
                                         </button>
@@ -611,23 +612,12 @@
 
                                     </div>
 
-                                    <!-- Unit price -->
                                     <div class="form-group mb-2">
                                         <label class="col-from-label">{{translate('Unit price')}} <span
                                                 class="text-danger">*</span></label>
-                                        <div class="input-group">
-                                            <input type="number" lang="en" min="0" value="{{ old('unit_price') ?? '' }}"
-                                                step="0.01" placeholder="{{ translate('Unit price') }}" name="unit_price"
-                                                class="form-control @error('unit_price') is-invalid @enderror" required>
-                                            <div class="input-group-append">
-                                                <select class="form-control aiz-selectpicker" name="currency_id"
-                                                    data-width="118px">
-                                                    @foreach (\App\Models\Currency::where('status', 1)->get() as $currency)
-                                                        <option value="{{ $currency->id }}" @selected(old('currency_id', \App\Models\Currency::where('code', 'USD')->first()->id ?? 1) == $currency->id)>{{ $currency->code }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        </div>
+                                        <input type="number" lang="en" min="0" value="{{ old('unit_price') ?? '' }}"
+                                            step="0.01" placeholder="{{ translate('Unit price') }}" name="unit_price"
+                                            class="form-control @error('unit_price') is-invalid @enderror" required>
                                     </div>
                                     <!-- Discount Date Range -->
                                     <div class="form-group mb-2">
@@ -1113,7 +1103,7 @@
             @if(old("category_ids"))
                 selected_ids = @json(old("category_ids"));
             @endif
-                                        for (let i = 0; i < selected_ids.length; i++) {
+                                            for (let i = 0; i < selected_ids.length; i++) {
                 const element = selected_ids[i];
                 $('#treeview input:checkbox#' + element).prop('checked', true);
                 $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
@@ -1165,17 +1155,17 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                <div class="form-group row">\
-                                                    <div class="col-md-3">\
-                                                        <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                                        <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                    </div>\
-                                                    <div class="col-md-9">\
-                                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                                            '+ obj + '\
-                                                        </select>\
-                                                    </div>\
-                                                </div>');
+                                                    <div class="form-group row">\
+                                                        <div class="col-md-3">\
+                                                            <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                                            <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                                        </div>\
+                                                        <div class="col-md-9">\
+                                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                                                '+ obj + '\
+                                                            </select>\
+                                                        </div>\
+                                                    </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1333,7 +1323,7 @@
                     var savedOpt = new Option("{{ old('hsn_code') }}", "{{ old('hsn_code') }}", true, true);
                     $('#hsn_code_select').append(savedOpt).trigger('change');
                 @endif
-                                }
+                                    }
         });
 
         // Load HS Code Autocomplete from JSON
@@ -1598,103 +1588,103 @@
                 $('textarea[name="meta_description"]').val("Buy " + productName + " at the best price. Premium quality guaranteed.");
                 let tags = $('#product_tags').val();
                 let metaKeywords = $('textarea[name="meta_keywords"]');
-                        metaKeywords.val(tags).trigger('change');
+                metaKeywords.val(tags).trigger('change');
 
-                        $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
-                        AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
+                $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
+                AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
 
-                        // Trigger validation visual update for these fields
-                        validateField($('input[name="meta_title"]'));
-                        validateField($('textarea[name="meta_description"]'));
-                    }, 1500);
-                }
+                // Trigger validation visual update for these fields
+                validateField($('input[name="meta_title"]'));
+                validateField($('textarea[name="meta_description"]'));
+            }, 1500);
+        }
 
-                // Auto-populate tags from Product Name
-                // Auto-populate tags from Product Name
-                $('#product_name').on('change', function () {
-                    let name = $(this).val();
-                    if (name) {
-                        let tagsInput = $('#product_tags');
-                        let currentTags = tagsInput.val();
-                        if (!currentTags.includes(name)) {
-                            let newTags = currentTags ? currentTags + ',' + name : name;
-                            // Trigger enter key or change for the tags input plugin to catch it
-                            tagsInput.val(newTags).trigger('change');
+        // Auto-populate tags from Product Name
+        // Auto-populate tags from Product Name
+        $('#product_name').on('change', function () {
+            let name = $(this).val();
+            if (name) {
+                let tagsInput = $('#product_tags');
+                let currentTags = tagsInput.val();
+                if (!currentTags.includes(name)) {
+                    let newTags = currentTags ? currentTags + ',' + name : name;
+                    // Trigger enter key or change for the tags input plugin to catch it
+                    tagsInput.val(newTags).trigger('change');
 
-                            // Also update Meta Keywords if empty
-                            let metaKeywords = $('textarea[name="meta_keywords"]');
-                            if (!metaKeywords.val()) {
-                                metaKeywords.val(newTags).trigger('change');
-                            }
-                        }
-                    }
-                });
-
-                // Generate SKU
-                function generateSKU() {
-                    let randomNum = Math.floor(100000 + Math.random() * 900000);
-                    let prefix = "PRD-";
-                    $('#sku_input').val(prefix + randomNum);
-                    validateField($('#sku_input'));
-                    AIZ.plugins.notify('success', '{{ translate("Generated random SKU successfully.") }}');
-                }
-
-                // Validation Highlighting Logic (Green/Red)
-                function validateField(el) {
-                    if ($(el).val() && $(el).val().length > 0) {
-                        $(el).addClass('is-valid').removeClass('is-invalid');
-                    } else {
-                        $(el).addClass('is-invalid').removeClass('is-valid');
+                    // Also update Meta Keywords if empty
+                    let metaKeywords = $('textarea[name="meta_keywords"]');
+                    if (!metaKeywords.val()) {
+                        metaKeywords.val(newTags).trigger('change');
                     }
                 }
+            }
+        });
 
-                $(document).ready(function () {
-                    // Apply instantly on load to highlight empty required fields in red, filled in green
-                    $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').each(function () {
-                        validateField(this);
-                    });
+        // Generate SKU
+        function generateSKU() {
+            let randomNum = Math.floor(100000 + Math.random() * 900000);
+            let prefix = "PRD-";
+            $('#sku_input').val(prefix + randomNum);
+            validateField($('#sku_input'));
+            AIZ.plugins.notify('success', '{{ translate("Generated random SKU successfully.") }}');
+        }
 
-                    $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').on('change blur input', function () {
-                        validateField(this);
-                    });
+        // Validation Highlighting Logic (Green/Red)
+        function validateField(el) {
+            if ($(el).val() && $(el).val().length > 0) {
+                $(el).addClass('is-valid').removeClass('is-invalid');
+            } else {
+                $(el).addClass('is-invalid').removeClass('is-valid');
+            }
+        }
 
-                    // For Aiz Selectpicker (Bootstrap Select) required fields
-                    $('.aiz-selectpicker[required]').each(function () {
-                        if ($(this).val()) {
-                            $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
-                        } else {
-                            $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
-                        }
-                    });
+        $(document).ready(function () {
+            // Apply instantly on load to highlight empty required fields in red, filled in green
+            $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').each(function () {
+                validateField(this);
+            });
 
-                    $('.aiz-selectpicker[required]').on('changed.bs.select', function () {
-                        if ($(this).val()) {
-                            $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
-                        } else {
-                            $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
-                        }
-                    });
-                });
+            $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').on('change blur input', function () {
+                validateField(this);
+            });
 
-                // Uploader Modal Tooltips Sequential Display
-                $(document).on('shown.bs.modal', '#aizUploaderModal', function () {
-                    let uploadTip = $('a[href="#aiz-upload-new"]').parent();
-                    let selectTip = $('a[href="#aiz-select-file"]').parent();
+            // For Aiz Selectpicker (Bootstrap Select) required fields
+            $('.aiz-selectpicker[required]').each(function () {
+                if ($(this).val()) {
+                    $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
+                } else {
+                    $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
+                }
+            });
 
-                    // Ensure manual trigger behavior doesn't clash
-                    uploadTip.tooltip({ trigger: 'manual' }).tooltip('show');
+            $('.aiz-selectpicker[required]').on('changed.bs.select', function () {
+                if ($(this).val()) {
+                    $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
+                } else {
+                    $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
+                }
+            });
+        });
 
-                    setTimeout(function () {
-                        uploadTip.tooltip('hide');
-                        selectTip.tooltip({ trigger: 'manual' }).tooltip('show');
+        // Uploader Modal Tooltips Sequential Display
+        $(document).on('shown.bs.modal', '#aizUploaderModal', function () {
+            let uploadTip = $('a[href="#aiz-upload-new"]').parent();
+            let selectTip = $('a[href="#aiz-select-file"]').parent();
 
-                        setTimeout(function () {
-                            selectTip.tooltip('hide');
-                        }, 4000);
-                    }, 4000);
-                });
+            // Ensure manual trigger behavior doesn't clash
+            uploadTip.tooltip({ trigger: 'manual' }).tooltip('show');
 
-            </script>
+            setTimeout(function () {
+                uploadTip.tooltip('hide');
+                selectTip.tooltip({ trigger: 'manual' }).tooltip('show');
+
+                setTimeout(function () {
+                    selectTip.tooltip('hide');
+                }, 4000);
+            }, 4000);
+        });
+
+    </script>
 
 
 
