@@ -254,16 +254,16 @@
 
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="add-more"
                                         data-content='<div class="row">
-                                                                        <div class="col-md-11">
-                                                                            <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                            <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                        </div>
-                                                                        <div class="col-1 d-flex justify-content-end">
-                                                                                <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                    <i class="las la-times"></i>
-                                                                                </button>
-                                                                        </div>
-                                                                    </div>' data-target=".video-provider-link">
+                                                                                    <div class="col-md-11">
+                                                                                        <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                        <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                    </div>
+                                                                                    <div class="col-1 d-flex justify-content-end">
+                                                                                            <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                <i class="las la-times"></i>
+                                                                                            </button>
+                                                                                    </div>
+                                                                                </div>' data-target=".video-provider-link">
                                         {{ translate('Add Another') }}
                                     </button>
                                 </div>
@@ -371,6 +371,21 @@
                                 </div>
                             </div>
 
+                            <div class="form-group row">
+                                <div class="col-md-3">
+                                    <label class="col-from-label">
+                                        {{ translate('SKU') }}
+                                    </label>
+                                    <button type="button" class="btn btn-sm btn-soft-primary w-100" onclick="generateSKU()">
+                                        <i class="las la-random"></i> {{ translate('Auto Generate') }}
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" placeholder="{{ translate('SKU') }}" name="sku" id="sku_input"
+                                        class="form-control">
+                                </div>
+                            </div>
+
                             <div id="show-hide-div">
                                 <div class="form-group row">
                                     <label class="col-md-3 col-from-label">{{ translate('Quantity') }} <span
@@ -379,21 +394,6 @@
                                         <input type="number" lang="en" min="0" value="0" step="1"
                                             placeholder="{{ translate('Quantity') }}" name="current_stock"
                                             class="form-control" required>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <div class="col-md-3">
-                                        <label class="col-from-label">
-                                            {{ translate('SKU') }}
-                                        </label>
-                                        <button type="button" class="btn btn-sm btn-soft-primary w-100"
-                                            onclick="generateSKU()">
-                                            <i class="las la-random"></i> {{ translate('Auto Generate') }}
-                                        </button>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="text" placeholder="{{ translate('SKU') }}" name="sku" id="sku_input"
-                                            class="form-control">
                                     </div>
                                 </div>
                             </div>
@@ -1012,18 +1012,18 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                        <div class="form-group row">\
-                                            <div class="col-md-3">\
-                                                <input type="hidden" name="choice_no[]" value="' + i + '">\
-                                                <input type="text" class="form-control" name="choice[]" value="' + name +
+                                                    <div class="form-group row">\
+                                                        <div class="col-md-3">\
+                                                            <input type="hidden" name="choice_no[]" value="' + i + '">\
+                                                            <input type="text" class="form-control" name="choice[]" value="' + name +
                         '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                            </div>\
-                                            <div class="col-md-8">\
-                                                <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
-                                                    ' + obj + '\
-                                                </select>\
-                                            </div>\
-                                        </div>');
+                                                        </div>\
+                                                        <div class="col-md-8">\
+                                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
+                                                                ' + obj + '\
+                                                            </select>\
+                                                        </div>\
+                                                    </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });

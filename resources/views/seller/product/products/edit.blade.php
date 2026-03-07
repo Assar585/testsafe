@@ -394,25 +394,27 @@
                         </div>
                     </div>
 
+                    <div class="form-group row">
+                        <div class="col-md-3">
+                            <label class="col-from-label">
+                                {{ translate('SKU') }}
+                            </label>
+                            <button type="button" class="btn btn-sm btn-soft-primary w-100"
+                                onclick="generateSKU()">
+                                <i class="las la-random"></i> {{ translate('Auto Generate') }}
+                            </button>
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" placeholder="{{ translate('SKU') }}" value="{{ optional($product->stocks->first())->sku ?? '' }}" name="sku" id="sku_input" class="form-control">
+                        </div>
+                    </div>
+
                     <div id="show-hide-div">
                         <div class="form-group row">
                             <label class="col-lg-3 col-from-label">{{translate('Quantity')}}</label>
                             <div class="col-lg-6">
                                 <input type="number" lang="en" value="{{ optional($product->stocks->first())->qty ?? 0 }}" step="1"
                                     placeholder="{{translate('Quantity')}}" name="current_stock" class="form-control">
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label class="col-md-3 col-from-label">
-                                {{translate('SKU')}}
-                            </label>
-                            <div class="col-md-6">
-                                <div class="input-group">
-                                    <input type="text" placeholder="{{ translate('SKU') }}" value="{{ optional($product->stocks->first())->sku ?? '' }}" name="sku" id="sku_input" class="form-control">
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-soft-secondary" onclick="generateSKU()">{{ translate('Generate') }}</button>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -1433,6 +1435,29 @@
 </script>
 
 <script type="text/javascript">
+    function generateSKU() {
+        let name = $('#product_name').val();
+        let prefix = "PRD-";
+        if (name && name.trim().length >= 3) {
+            // Get first 3 letters or initials
+            let words = name.trim().split(/\s+/);
+            if (words.length >= 3) {
+                prefix = (words[0][0] + words[1][0] + words[2][0]).toUpperCase() + "-";
+            } else {
+                prefix = name.trim().substring(0, 3).toUpperCase() + "-";
+            }
+        }
+
+        let randomNum = Math.floor(100000 + Math.random() * 900000);
+        $('#sku_input').val(prefix + randomNum);
+        validateField($('#sku_input'));
+        AIZ.plugins.notify('success', '{{ translate("Generated meaningful SKU successfully.") }}');
+
+        if (typeof update_sku === 'function') {
+            update_sku();
+        }
+    }
+
     $(document).ready(function () {
         warrantySelection();
         isRefundable();
