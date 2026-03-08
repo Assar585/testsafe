@@ -110,7 +110,7 @@ Route::get('/nuclear_clear', function () {
 });
 
 Route::get('/db_init', function () {
-    echo "<h1>Database Initialization & Diagnostic (v1.3.0)</h1>";
+    echo "<h1>Database Initialization & Diagnostic (v1.4.0)</h1>";
     echo "<p>Last Updated: " . date('Y-m-d H:i:s') . " (Build ID: " . substr(md5_file(__FILE__), 0, 8) . ")</p>";
     try {
         echo "Checking connection... ";
@@ -215,6 +215,7 @@ Route::get('/db_init', function () {
             $sql_dir = base_path('sqlupdates');
             $current_ver = $is_force ? '0.0.0' : (\DB::table('business_settings')->where('type', 'current_version')->value('value') ?: '0.0.0');
             echo "Base Version for Sync: $current_ver (Mode: " . ($is_force ? "FORCE ALL" : "AUTO") . ")<br>";
+            set_time_limit(900); // 15 mins
 
             $files = array_diff(scandir($sql_dir), array('.', '..'));
             $pending = [];
@@ -240,16 +241,32 @@ Route::get('/db_init', function () {
             if (empty($pending)) {
                 echo "No updates to run.<br>";
             } else {
+                echo "Running " . count($pending) . " files...<br>";
                 foreach ($pending as $v => $f) {
-                    echo "Executing $f... ";
-                    try {
-                        \DB::unprepared(file_get_contents($sql_dir . '/' . $f));
-                        echo "<span style='color:green'>Success</span><br>";
-                    } catch (\Exception $ex) {
-                        echo "<span style='color:orange'>Notice: " . $ex->getMessage() . "</span><br>";
+                    echo "<b>$f</b>: ";
+                    $sql_content = file_get_contents($sql_dir . '/' . $f);
+                    $statements = array_filter(array_map('trim', explode(';', $sql_content)));
+                    $success_count = 0;
+                    $error_count = 0;
+                    foreach ($statements as $stmt) {
+                        if (empty($stmt))
+                            continue;
+                        try {
+                            \DB::unprepared($stmt . ';');
+                            $success_count++;
+                        } catch (\Exception $ex) {
+                            $error_count++;
+                            if ($error_count == 1) {
+                                $msg = $ex->getMessage();
+                                if (strlen($msg) > 150)
+                                    $msg = substr($msg, 0, 150) . "...";
+                                echo "<span style='color:orange'>Ex: $msg</span> ";
+                            }
+                        }
                     }
+                    echo " <span style='color:green'>Done ($success_count/" . ($success_count + $error_count) . ")</span><br>";
                 }
-                echo "<b>Finished.</b><br>";
+                echo "<br><b>Bulk Sync Finished.</b><br>";
             }
             \Artisan::call('cache:clear');
         }
