@@ -25,7 +25,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
 
 # Install memory-intensive extensions separately to isolate OOM risk and improve cache
 RUN docker-php-ext-install intl
-RUN docker-php-ext-install fileinfo
 RUN docker-php-ext-install iconv
 
 # Setup highly optimized OPcache for production
