@@ -40,12 +40,12 @@ COPY composer.json composer.lock* ./
 ENV COMPOSER_NO_AUDIT=1
 
 # Install dependencies (use update if lock is missing to force sync)
+# Debug: Print composer.json to verify stability
+RUN cat composer.json
+
+# Force update to ensure new stability settings are applied
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
-    && if [ -f composer.lock ]; then \
-    composer install --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist; \
-    else \
-    composer update --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist; \
-    fi
+    && composer update --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
 
 # Copy existing application directory contents
 COPY . /var/www
