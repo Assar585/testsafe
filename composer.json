@@ -37,7 +37,7 @@
         "niklasravnsborg/laravel-pdf": "^4.1",
         "paypal/paypal-checkout-sdk": "dev-master",
         "predis/predis": "^2.1",
-        "psr/log": "^3.0",
+        "psr/log": "3.0.0 as 1.1.4",
         "razorpay/razorpay": "2.*",
         "rmccue/requests": "^2.0",
         "sebacarrasco93/laravel-payku": "^1.0",
