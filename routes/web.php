@@ -109,6 +109,26 @@ Route::get('/nuclear_clear', function () {
     }
 });
 
+Route::get('/db_init', function () {
+    echo "<h1>Database Initialization</h1>";
+    try {
+        echo "Checking connection... ";
+        \DB::connection()->getPdo();
+        echo "Connected.<br>";
+
+        echo "Running migrations... ";
+        \Artisan::call('migrate', ['--force' => true]);
+        echo "Done.<br>";
+        echo "<pre>" . \Artisan::output() . "</pre>";
+
+        echo "<h2>Database initialized successfully!</h2>";
+        echo "<a href='/'>Go to Home</a>";
+    } catch (\Exception $e) {
+        echo "<h2 style='color:red'>Error: " . $e->getMessage() . "</h2>";
+        echo "<pre>" . $e->getTraceAsString() . "</pre>";
+    }
+});
+
 // AIZ Uploader
 Route::controller(AizUploadController::class)->group(function () {
     Route::post('/aiz-uploader', 'show_uploader');
