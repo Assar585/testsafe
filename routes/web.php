@@ -116,6 +116,13 @@ Route::get('/db_init', function () {
         $pdo = \DB::connection()->getPdo();
         echo "Connected.<br>";
 
+        try {
+            $version = \DB::table('business_settings')->where('type', 'current_version')->value('value');
+            echo "<h3>Current DB Version: " . ($version ?: 'Unknown') . "</h3>";
+        } catch (\Exception $v_e) {
+            echo "<h3>Current DB Version: Not found in business_settings</h3>";
+        }
+
         echo "<h3>Existing Tables:</h3>";
         $tables = \DB::select('SHOW TABLES');
         if (empty($tables)) {
@@ -158,6 +165,35 @@ Route::get('/db_init', function () {
         \Artisan::call('migrate', ['--force' => true]);
         echo "Done.<br>";
         echo "<pre>" . \Artisan::output() . "</pre>";
+
+        echo "<h3>SQL Updates:</h3>";
+        $sql_dir = base_path('sqlupdates');
+        if (file_exists($sql_dir)) {
+            $sql_files = array_diff(scandir($sql_dir), array('.', '..'));
+            echo "<ul>";
+            foreach ($sql_files as $file) {
+                if (str_ends_with($file, '.sql')) {
+                    echo "<li>$file - <a href='/db_init?run_sql=" . urlencode($file) . "'>[RUN]</a></li>";
+                }
+            }
+            echo "</ul>";
+        }
+
+        if (request()->has('run_sql')) {
+            $file = request()->get('run_sql');
+            echo "<h3>Running SQL Update: $file</h3>";
+            $sql_path = base_path('sqlupdates/' . $file);
+            if (file_exists($sql_path)) {
+                try {
+                    \DB::unprepared(file_get_contents($sql_path));
+                    echo "<b style='color:green'>Successfully executed $file</b><br>";
+                } catch (\Exception $sql_e) {
+                    echo "<b style='color:red'>Error running $file: " . $sql_e->getMessage() . "</b><br>";
+                }
+            } else {
+                echo "Error: File not found at $sql_path<br>";
+            }
+        }
 
         echo "<h2>Database diagnostic complete!</h2>";
         echo "<p><a href='/db_init?wipe_and_import=1' style='color:red; font-weight:bold; font-size: 1.2em;'>[!] NUCLEAR WIPE & IMPORT shop.sql</a> (Use this to fix missing tables)</p>";
