@@ -41,7 +41,7 @@ COPY composer.json composer.lock ./
 
 # Install dependencies without autoloader first (very memory efficient)
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
-    && composer install --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
+    && composer update --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
 
 # Copy existing application directory contents
 COPY . /var/www
