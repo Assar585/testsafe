@@ -17,3 +17,11 @@
 /remote_sql.txt
 /FlutterEcommerceAPI.postman_collection.json
 /build_logs*.txt
+/documentation
+/sqlupdates
+/nbproject
+/.idea
+/.vscode
+*.pdf
+*.ttf
+/public/assets/documentation
