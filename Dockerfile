@@ -35,10 +35,13 @@ WORKDIR /var/www
 # Copy composer files first for better caching
 COPY composer.json composer.lock ./
 
-# Install dependencies without autoloader first (very memory efficient)
+# Install dependencies (use update if lock is missing to force sync)
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
-    && composer update stichoza/google-translate-php --no-cache --no-interaction --no-plugins --ignore-platform-reqs \
-    && composer install --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
+    && if [ -f composer.lock ]; then \
+    composer install --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist; \
+    else \
+    composer update --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist; \
+    fi
 
 # Copy existing application directory contents
 COPY . /var/www
