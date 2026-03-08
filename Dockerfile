@@ -19,9 +19,14 @@ RUN apt-get update && apt-get install -y \
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install PHP extensions
+# Install common PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache intl fileinfo iconv
+    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache
+
+# Install memory-intensive extensions separately to isolate OOM risk and improve cache
+RUN docker-php-ext-install intl
+RUN docker-php-ext-install fileinfo
+RUN docker-php-ext-install iconv
 
 # Setup highly optimized OPcache for production
 COPY docker/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
@@ -36,8 +41,8 @@ WORKDIR /var/www
 COPY composer.json composer.lock ./
 
 # Install dependencies without autoloader first (very memory efficient)
-RUN export COMPOSER_MEMORY_LIMIT=1G \
-    && composer install --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --ignore-platform-reqs --prefer-dist
+RUN export COMPOSER_MEMORY_LIMIT=-1 \
+    && composer install --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
 
 # Copy existing application directory contents
 COPY . /var/www
