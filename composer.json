@@ -7,6 +7,8 @@
     ],
     "license": "MIT",
     "type": "project",
+    "minimum-stability": "dev",
+    "prefer-stable": false,
     "require": {
         "php": "^8.2",
         "aiz-packages/color-code-converter": "dev-main",
@@ -21,7 +23,7 @@
         "iyzico/iyzipay-php": "^2.0",
         "kingflamez/laravelrave": "dev-master",
         "laracasts/flash": "^3.2",
-        "laravel/framework": "^10.0@dev",
+        "laravel/framework": "^10.0",
         "laravel/sanctum": "^3.2",
         "laravel/socialite": "^5.6",
         "laravel/tinker": "^2.8",
@@ -32,7 +34,7 @@
         "mehedi-iitdu/core-component-repository": "^2.2",
         "mercadopago/dx-php": "^2.5",
         "myfatoorah/laravel-package": "^2.2",
-        "niklasravnsborg/laravel-pdf": "^5.0@dev",
+        "niklasravnsborg/laravel-pdf": "^5.0",
         "paypal/paypal-checkout-sdk": "dev-master",
         "predis/predis": "^2.1",
         "razorpay/razorpay": "2.*",
@@ -98,7 +100,5 @@
         "allow-plugins": {
             "symfony/thanks": true
         }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true
+    }
 }
