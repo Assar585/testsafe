@@ -45,7 +45,7 @@ RUN cat composer.json
 
 # Force update to ensure new stability settings are applied
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
-    && composer update --stability=dev --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
+    && composer update --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
 
 # Copy existing application directory contents
 COPY . /var/www
