@@ -189,7 +189,54 @@ Route::get('/db_init', function () {
         echo "<h3>System Repair:</h3>";
         echo "<ul>";
         echo "<li><a href='/db_init?fix_settings=1'>[RUN] Repair Missing Settings (Homepage, etc.)</a></li>";
+        echo "<li><a href='/db_init?run_all_updates=1'>[RUN] SYNC ALL PENDING SQL UPDATES</a></li>";
         echo "</ul>";
+
+        if (request()->has('run_all_updates')) {
+            echo "<h3>Running Bulk Updates...</h3>";
+            $sql_dir = base_path('sqlupdates');
+            $current_ver = \DB::table('business_settings')->where('type', 'current_version')->value('value') ?: '0.0.0';
+            echo "Current Version: $current_ver<br>";
+
+            $files = array_diff(scandir($sql_dir), array('.', '..'));
+            // Filter and sort files by version number
+            $pending = [];
+            foreach ($files as $file) {
+                if (!str_ends_with($file, '.sql'))
+                    continue;
+                // v9.9.8 -> 9.9.8, v820 -> 8.2.0 (guessing logic)
+                // Actually the files seem to be named v700, v999, v1000
+                $ver_str = str_replace(['v', '.sql'], '', $file);
+                // Convert v998 to 9.9.8 for proper version_compare
+                $normalized_ver = $ver_str;
+                if (strlen($ver_str) == 3)
+                    $normalized_ver = $ver_str[0] . "." . $ver_str[1] . "." . $ver_str[2];
+                if (strlen($ver_str) == 4)
+                    $normalized_ver = substr($ver_str, 0, 2) . "." . $ver_str[2] . "." . $ver_str[3];
+
+                if (version_compare($normalized_ver, $current_ver, '>')) {
+                    $pending[$normalized_ver] = $file;
+                }
+            }
+            uksort($pending, 'version_compare');
+
+            if (empty($pending)) {
+                echo "No pending updates found.<br>";
+            } else {
+                foreach ($pending as $v => $f) {
+                    echo "Executing $f ($v)... ";
+                    try {
+                        \DB::unprepared(file_get_contents($sql_dir . '/' . $f));
+                        echo "<span style='color:green'>Success</span><br>";
+                    } catch (\Exception $ex) {
+                        echo "<span style='color:red'>Error: " . $ex->getMessage() . "</span><br>";
+                        // Continue to next anyway? Better stop if critical
+                    }
+                }
+                echo "<b>Bulk update finished.</b><br>";
+            }
+            \Artisan::call('cache:clear');
+        }
 
         if (request()->has('fix_settings')) {
             echo "<h3>Repairing Settings...</h3>";
