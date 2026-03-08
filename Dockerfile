@@ -32,16 +32,19 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
-# Copy existing application directory contents
-COPY . /var/www
+# Copy composer files first for better caching
+COPY composer.json composer.lock ./
 
 # Disable Composer audit blocks
 RUN composer config audit.block-insecure false \
     && composer config audit.abandoned ignore
 
-# Install dependencies (ignoring platform reqs)
+# Install dependencies
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
     && composer install --verbose --no-interaction --no-dev --no-scripts --optimize-autoloader --ignore-platform-reqs
+
+# Copy existing application directory contents
+COPY . /var/www
 
 # Create necessary directories and set permissions
 RUN mkdir -p /var/www/storage/framework/cache/data \
