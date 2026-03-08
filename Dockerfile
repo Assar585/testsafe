@@ -39,9 +39,9 @@ COPY composer.json composer.lock ./
 RUN composer config audit.block-insecure false \
     && composer config audit.abandoned ignore
 
-# Install dependencies
+# Install dependencies with strict memory limits and no cache to prevent OOM
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
-    && composer install --verbose --no-interaction --no-dev --no-scripts --optimize-autoloader --ignore-platform-reqs
+    && composer install --no-cache --no-interaction --no-dev --no-scripts --optimize-autoloader --ignore-platform-reqs --prefer-dist
 
 # Copy existing application directory contents
 COPY . /var/www
