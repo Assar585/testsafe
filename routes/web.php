@@ -110,7 +110,7 @@ Route::get('/nuclear_clear', function () {
 });
 
 Route::get('/db_init', function () {
-    echo "<h1>Database Initialization & Diagnostic (v1.4.0)</h1>";
+    echo "<h1>Database Initialization & Diagnostic (v1.5.0)</h1>";
     echo "<p>Last Updated: " . date('Y-m-d H:i:s') . " (Build ID: " . substr(md5_file(__FILE__), 0, 8) . ")</p>";
     try {
         echo "Checking connection... ";
@@ -124,17 +124,12 @@ Route::get('/db_init', function () {
             echo "<h3>Current DB Version: Not found in business_settings</h3>";
         }
 
-        echo "<h3>Existing Tables:</h3>";
-        $tables = \DB::select('SHOW TABLES');
-        if (empty($tables)) {
-            echo "No tables found.<br>";
-        } else {
-            echo "<ul>";
-            foreach ($tables as $table) {
-                echo "<li>" . array_values((array) $table)[0] . "</li>";
-            }
-            echo "</ul>";
-        }
+        // Check for specific missing table
+        echo "<h3>Critical Checks:</h3>";
+        $hasCustomAlerts = \DB::select("SHOW TABLES LIKE 'custom_alerts'");
+        echo "Table 'custom_alerts': " . (empty($hasCustomAlerts) ? "<span style='color:red'>MISSING</span>" : "<span style='color:green'>FOUND</span>") . "<br>";
+        $hasElementTypes = \DB::select("SHOW TABLES LIKE 'element_types'");
+        echo "Table 'element_types': " . (empty($hasElementTypes) ? "<span style='color:red'>MISSING</span>" : "<span style='color:green'>FOUND</span>") . "<br>";
 
         if (request()->has('import_sql') || request()->has('wipe_and_import')) {
             echo "<h3>Attempting SQL Import (shop.sql)...</h3>";
@@ -187,11 +182,14 @@ Route::get('/db_init', function () {
             echo "Caches cleared.<br>";
         }
 
-        echo "<h3>System Repair:</h3>";
+        echo "<h3>System Operations:</h3>";
         echo "<ul>";
-        echo "<li><a href='/db_init?fix_settings=1'>[RUN] Repair Missing Settings (Homepage, etc.)</a></li>";
-        echo "<li><a href='/db_init?run_all_updates=1'>[RUN] SYNC ALL PENDING SQL UPDATES</a></li>";
-        echo "<li><a href='/db_init?force_all_updates=1'>[!] FORCE SYNC ALL SQL FILES (Skip v55.sql)</a></li>";
+        echo "<li><a href='/db_init?run_migrations=1'>[RUN] Migrations</a></li>";
+        echo "<li><a href='/db_init?clear_cache=1'>[RUN] Clear Cache</a></li>";
+        echo "<li><a href='/db_init?fix_settings=1'>[RUN] Repair Settings (Themes, etc.)</a></li>";
+        echo "<li><a href='/db_init?show_pending=1'>[DEBUG] Show Pending Updates List</a></li>";
+        echo "<li><a href='/db_init?run_all_updates=1' style='font-weight:bold; color:blue;'>[RUN] SYNC PENDING UPDATES</a></li>";
+        echo "<li><a href='/db_init?force_all_updates=1' style='font-weight:bold; color:red;'>[!] FORCE SYNC ALL (Reset to 0.0.0)</a></li>";
         echo "</ul>";
 
         echo "<h3>Manual Version Fix:</h3>";
@@ -209,64 +207,76 @@ Route::get('/db_init', function () {
             echo "<b style='color:blue'>Version manually set to $new_ver.</b><br>";
         }
 
-        if (request()->has('run_all_updates') || request()->has('force_all_updates')) {
+        if (request()->has('run_all_updates') || request()->has('force_all_updates') || request()->has('show_pending')) {
             $is_force = request()->has('force_all_updates');
-            echo $is_force ? "<h3>Forcing All Updates...</h3>" : "<h3>Running Bulk Updates...</h3>";
+            $is_dry = request()->has('show_pending');
             $sql_dir = base_path('sqlupdates');
-            $current_ver = $is_force ? '0.0.0' : (\DB::table('business_settings')->where('type', 'current_version')->value('value') ?: '0.0.0');
-            echo "Base Version for Sync: $current_ver (Mode: " . ($is_force ? "FORCE ALL" : "AUTO") . ")<br>";
-            set_time_limit(900); // 15 mins
+            $current_ver = ($is_force || $is_dry) ? '0.0.0' : (\DB::table('business_settings')->where('type', 'current_version')->value('value') ?: '0.0.0');
 
-            $files = array_diff(scandir($sql_dir), array('.', '..'));
+            echo $is_dry ? "<h3>Dry Run: Pending Updates</h3>" : ($is_force ? "<h3>Forcing All Updates...</h3>" : "<h3>Syncing Updates...</h3>");
+            echo "Scanning from version: $current_ver (Mode: " . ($is_force ? "FORCE" : "AUTO") . ")<br>";
+            set_time_limit(900);
+
+            $raw_files = array_diff(scandir($sql_dir), array('.', '..'));
             $pending = [];
-            foreach ($files as $file) {
-                if (!str_ends_with($file, '.sql'))
-                    continue;
-                if ($file == 'v55.sql')
+            foreach ($raw_files as $file) {
+                if (!str_ends_with($file, '.sql') || $file == 'v55.sql')
                     continue;
 
                 $ver_str = str_replace(['v', '.sql'], '', $file);
-                $normalized_ver = $ver_str;
-                if (strlen($ver_str) == 3)
-                    $normalized_ver = $ver_str[0] . "." . $ver_str[1] . "." . $ver_str[2];
-                if (strlen($ver_str) == 4)
-                    $normalized_ver = substr($ver_str, 0, 2) . "." . $ver_str[2] . "." . $ver_str[3];
+                $normalized = $ver_str;
+                if (ctype_digit($ver_str)) {
+                    if (strlen($ver_str) == 2)
+                        $normalized = "1." . substr($ver_str, 0, 1) . "." . substr($ver_str, 1, 1);
+                    else if (strlen($ver_str) == 3)
+                        $normalized = $ver_str[0] . "." . $ver_str[1] . "." . $ver_str[2];
+                    else if (strlen($ver_str) == 4)
+                        $normalized = substr($ver_str, 0, 2) . "." . $ver_str[2] . "." . $ver_str[3];
+                }
 
-                if (version_compare($normalized_ver, $current_ver, '>')) {
-                    $pending[$normalized_ver] = $file;
+                if (version_compare($normalized, $current_ver, '>')) {
+                    $pending[] = ['file' => $file, 'ver' => $normalized];
                 }
             }
-            uksort($pending, 'version_compare');
+
+            usort($pending, function ($a, $b) {
+                return version_compare($a['ver'], $b['ver']); });
 
             if (empty($pending)) {
-                echo "No updates to run.<br>";
+                echo "Nothing to do.<br>";
             } else {
-                echo "Running " . count($pending) . " files...<br>";
-                foreach ($pending as $v => $f) {
-                    echo "<b>$f</b>: ";
-                    $sql_content = file_get_contents($sql_dir . '/' . $f);
-                    $statements = array_filter(array_map('trim', explode(';', $sql_content)));
-                    $success_count = 0;
-                    $error_count = 0;
-                    foreach ($statements as $stmt) {
-                        if (empty($stmt))
-                            continue;
-                        try {
-                            \DB::unprepared($stmt . ';');
-                            $success_count++;
-                        } catch (\Exception $ex) {
-                            $error_count++;
-                            if ($error_count == 1) {
-                                $msg = $ex->getMessage();
-                                if (strlen($msg) > 150)
-                                    $msg = substr($msg, 0, 150) . "...";
-                                echo "<span style='color:orange'>Ex: $msg</span> ";
+                echo "Total pending: " . count($pending) . " files.<br>";
+                if ($is_dry) {
+                    echo "<ul>";
+                    foreach ($pending as $info)
+                        echo "<li>" . $info['file'] . " (" . $info['ver'] . ")</li>";
+                    echo "</ul>";
+                } else {
+                    foreach ($pending as $info) {
+                        $f = $info['file'];
+                        echo "<b>$f</b>: ";
+                        $sql_content = file_get_contents($sql_dir . '/' . $f);
+                        $statements = array_filter(array_map('trim', explode(';', $sql_content)));
+                        $s = 0;
+                        $e = 0;
+                        foreach ($statements as $stmt) {
+                            if (empty($stmt))
+                                continue;
+                            try {
+                                \DB::unprepared($stmt . ';');
+                                $s++;
+                            } catch (\Exception $ex) {
+                                $e++;
+                                if ($e == 1) {
+                                    $msg = substr($ex->getMessage(), 0, 100);
+                                    echo "<span style='color:orange; font-size:0.8em;'>Ex: $msg...</span> ";
+                                }
                             }
                         }
+                        echo " <span style='color:green'>Done ($s/" . ($s + $e) . ")</span><br>";
                     }
-                    echo " <span style='color:green'>Done ($success_count/" . ($success_count + $error_count) . ")</span><br>";
+                    echo "<b>Sync Complete!</b><br>";
                 }
-                echo "<br><b>Bulk Sync Finished.</b><br>";
             }
             \Artisan::call('cache:clear');
         }
