@@ -959,13 +959,14 @@
             <div class="card">
                 @if (addon_is_activated('gst_system'))
                 <div class="card-header">
-                    <h5 class="mb-0 h6">{{ translate('HSN & GST') }}</h5>
+                    <h5 class="mb-0 h6">{{ translate('TN VED & GST') }}</h5>
                 </div>
                 <div class="card-body">
                     <div class="form-group mb-2">
-                        <label class="col-from-label">{{ translate('HSN Code') }} <span class="text-danger">*</span></label>
-                        <input type="text" lang="en"
-                            placeholder="{{ translate('HSN Code') }}" name="hsn_code" value="{{ $product->hsn_code }}" class="form-control"
+                        <label class="col-from-label">{{ translate('TN VED (HS Code)') }} <span class="text-danger">*</span></label>
+                        <select class="form-control aiz-selectpicker" name="hsn_code" id="hsn_code_select" data-live-search="true" data-size="5">
+                    <option value="">{{ translate('Search TN VED by code or product name...') }}</option>
+                </select>hsn_code }}" class="form-control"
                             required>
                     </div>
                     <div class="form-group mb-2">
@@ -1474,3 +1475,4 @@
     });
 </script>
 @endsection
+

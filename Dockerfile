@@ -13,14 +13,15 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     libjpeg-dev \
     libfreetype6-dev \
-    libwebp-dev
+    libwebp-dev \
+    libicu-dev
 
 # Clear cache
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache
+    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip opcache intl fileinfo iconv
 
 # Setup highly optimized OPcache for production
 COPY docker/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
@@ -39,15 +40,22 @@ RUN composer config audit.block-insecure false \
     && composer config audit.abandoned ignore
 
 # Install dependencies (ignoring platform reqs)
-RUN composer install --no-interaction --no-dev --optimize-autoloader --ignore-platform-reqs
+RUN export COMPOSER_MEMORY_LIMIT=-1 \
+    && composer update --lock --no-interaction \
+    && composer install --verbose --no-interaction --no-dev --no-scripts --optimize-autoloader --ignore-platform-reqs
 
-# Setup storage and cache permissions
-RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache \
-    && mkdir -p /var/www/public/assets \
-    && chmod -R 775 storage bootstrap/cache public \
-    && chown -R www-data:www-data /var/www \
-    && echo "=== /var/www/public contents ===" \
-    && ls -la /var/www/public/ || echo "WARNING: /var/www/public does not exist!"
+# Create necessary directories and set permissions
+RUN mkdir -p /var/www/html/storage/framework/cache/data \
+    && mkdir -p /var/www/html/storage/framework/app/cache \
+    && mkdir -p /var/www/html/storage/framework/sessions \
+    && mkdir -p /var/www/html/storage/framework/views \
+    && mkdir -p /var/www/html/storage/logs \
+    && mkdir -p /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Switch to root to ensure we can run start.sh with proper permissions if needed
+USER root
 
 # Setup Nginx config
 COPY docker/nginx.conf /etc/nginx/sites-available/default

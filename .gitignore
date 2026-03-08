@@ -18,8 +18,8 @@ yarn-error.log
 .DS_Store
 .idea/
 updates/
-composer.lock
-*.lock
+# composer.lock
+# *.lock
 resources/lang/en.json
 updates.zip
 ecommerce.zip

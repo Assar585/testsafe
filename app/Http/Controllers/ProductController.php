@@ -285,13 +285,13 @@ class ProductController extends Controller
         }
         $all = json_decode(file_get_contents($jsonPath), true) ?? [];
         if (empty($q)) {
-            $results = array_slice($all, 0, 50);
+            $results = array_slice($all, 0, 5);
         } else {
             $results = array_values(array_filter($all, function ($item) use ($q) {
                 return str_contains(strtolower($item['code']), $q)
                     || str_contains(strtolower($item['desc']), $q);
             }));
-            $results = array_slice($results, 0, 50);
+            $results = array_slice($results, 0, 5);
         }
         return response()->json(array_map(function ($item) {
             return ['id' => $item['code'], 'text' => $item['code'] . ' – ' . $item['desc']];

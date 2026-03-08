@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\v2;
+namespace App\Http\Controllers\Api\V2;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\V2\BlogCollection;
@@ -18,7 +18,8 @@ class BlogController extends Controller
         $blogs = Blog::query();
 
         if ($request->has('search')) {
-            $search = $request->search;;
+            $search = $request->search;
+            ;
             $blogs->where(function ($q) use ($search) {
                 foreach (explode(' ', trim($search)) as $word) {
                     $q->where('title', 'like', '%' . $word . '%')

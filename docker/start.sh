@@ -10,9 +10,11 @@ fi
 
 # Pre-warm Laravel caches for production on container boot
 echo "Building Laravel caches..."
+php /var/www/artisan package:discover
 php /var/www/artisan config:cache
 php /var/www/artisan view:cache
-echo "Caches built."
+php /var/www/artisan migrate --force
+echo "Caches built and migrations applied."
 # Start Nginx
 service nginx start
 

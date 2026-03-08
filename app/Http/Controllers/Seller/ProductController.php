@@ -609,6 +609,26 @@ class ProductController extends Controller
             $q->where('user_id', $user_id);
         })->exists();
 
-        return response()->json(['exists' => $exists]);
+    }
+    public function hs_code_search(Request $request)
+    {
+        $q = strtolower(trim($request->get('q', '')));
+        $jsonPath = public_path('assets/data/hs_codes.json');
+        if (!file_exists($jsonPath)) {
+            return response()->json([]);
+        }
+        $all = json_decode(file_get_contents($jsonPath), true) ?? [];
+        if (empty($q)) {
+            $results = array_slice($all, 0, 5);
+        } else {
+            $results = array_values(array_filter($all, function ($item) use ($q) {
+                return str_contains(strtolower($item['code']), $q)
+                    || str_contains(strtolower($item['desc']), $q);
+            }));
+            $results = array_slice($results, 0, 5);
+        }
+        return response()->json(array_map(function ($item) {
+            return ['id' => $item['code'], 'text' => $item['code'] . ' – ' . $item['desc']];
+        }, $results));
     }
 }
