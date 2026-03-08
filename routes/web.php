@@ -110,19 +110,45 @@ Route::get('/nuclear_clear', function () {
 });
 
 Route::get('/db_init', function () {
-    echo "<h1>Database Initialization</h1>";
+    echo "<h1>Database Initialization & Diagnostic</h1>";
     try {
         echo "Checking connection... ";
-        \DB::connection()->getPdo();
+        $pdo = \DB::connection()->getPdo();
         echo "Connected.<br>";
 
-        echo "Running migrations... ";
+        echo "<h3>Existing Tables:</h3>";
+        $tables = \DB::select('SHOW TABLES');
+        if (empty($tables)) {
+            echo "No tables found.<br>";
+        } else {
+            echo "<ul>";
+            foreach ($tables as $table) {
+                echo "<li>" . array_values((array) $table)[0] . "</li>";
+            }
+            echo "</ul>";
+        }
+
+        if (request()->has('import_sql')) {
+            echo "<h3>Attempting SQL Import (shop.sql)...</h3>";
+            $sql_path = base_path('shop.sql');
+            if (file_exists($sql_path)) {
+                echo "File found. Executing (this may take a minute)... ";
+                // Large SQL might need to be split, but let's try direct first
+                \DB::unprepared(file_get_contents($sql_path));
+                echo "Done.<br>";
+            } else {
+                echo "Error: shop.sql not found at " . $sql_path . "<br>";
+            }
+        }
+
+        echo "<h3>Running Migrations:</h3>";
         \Artisan::call('migrate', ['--force' => true]);
         echo "Done.<br>";
         echo "<pre>" . \Artisan::output() . "</pre>";
 
-        echo "<h2>Database initialized successfully!</h2>";
-        echo "<a href='/'>Go to Home</a>";
+        echo "<h2>Database diagnostic complete!</h2>";
+        echo "<p><a href='/db_init?import_sql=1' style='color:red; font-weight:bold;'>[FORCE IMPORT shop.sql]</a> (Use if tables are missing)</p>";
+        echo "<p><a href='/'>Go to Home</a></p>";
     } catch (\Exception $e) {
         echo "<h2 style='color:red'>Error: " . $e->getMessage() . "</h2>";
         echo "<pre>" . $e->getTraceAsString() . "</pre>";
