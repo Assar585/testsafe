@@ -155,6 +155,12 @@ Route::get('/db_init', function () {
         $hasElementTypes = \DB::select("SHOW TABLES LIKE 'element_types'");
         echo "Table 'element_types': " . (empty($hasElementTypes) ? "<span style='color:red'>MISSING</span>" : "<span style='color:green'>FOUND</span>") . "<br>";
 
+        echo "<a href='?run_all_updates=1'>[Bulk Sync] Standard SQL Updates</a> | ";
+        echo "<a href='?force_all_updates=1'>[Bulk Sync] Force All SQL</a> | ";
+        echo "<a href='?show_pending=1'>[Check Pending]</a> | ";
+        echo "<a href='?repair_settings=1'>[REPAIR] Missing Settings</a> | ";
+        echo "<a href='?restore_branding=1' style='color:blue; font-weight:bold;'>[NEW] Restore Safe Contract Branding (Blue Theme)</a> | ";
+        echo "<a href='?check_assets=1'>[DEBUG] Asset Check</a><br><br>";
         echo "<h3>System Operations:</h3>";
         echo "<ul>";
         echo "<li><a href='/db_init?run_migrations=1'>[RUN] Migrations</a></li>";
@@ -181,6 +187,16 @@ Route::get('/db_init', function () {
             }
             \Artisan::call('cache:clear');
             echo "<b style='color:green'>Done. Branding restored. Refresh to see.</b><br>";
+        }
+
+        if (request()->has('check_assets')) {
+            echo "<h3>Asset Physical Check</h3>";
+            $paths = ['public/assets/js/vendors.js', 'public/assets/js/aiz-core.js', 'public/assets/css/vendors.css', 'public/assets/css/aiz-core.css', 'public/uploads/all'];
+            foreach ($paths as $p) {
+                $full = base_path($p);
+                echo "<b>$p</b>: " . (file_exists($full) ? "<span style='color:green'>FOUND</span>" : "<span style='color:red'>MISSING</span>") . "<br>";
+            }
+            echo "URL: " . env('APP_URL') . " / " . asset('/') . "<br>";
         }
 
         if (request()->has('run_all_updates') || request()->has('force_all_updates') || request()->has('show_pending')) {
