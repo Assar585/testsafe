@@ -35,16 +35,15 @@ WORKDIR /var/www
 # Copy composer files first for better caching
 COPY composer.json composer.lock ./
 
-# Disable Composer audit blocks
-RUN composer config audit.block-insecure false \
-    && composer config audit.abandoned ignore
-
-# Install dependencies with strict memory limits and no cache to prevent OOM
-RUN export COMPOSER_MEMORY_LIMIT=-1 \
-    && composer install --no-cache --no-interaction --no-dev --no-scripts --optimize-autoloader --ignore-platform-reqs --prefer-dist
+# Install dependencies without autoloader first (very memory efficient)
+RUN export COMPOSER_MEMORY_LIMIT=1G \
+    && composer install --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --ignore-platform-reqs --prefer-dist
 
 # Copy existing application directory contents
 COPY . /var/www
+
+# Now generate optimized autoloader after code is present
+RUN composer dump-autoload --optimize --no-dev
 
 # Create necessary directories and set permissions
 RUN mkdir -p /var/www/storage/framework/cache/data \
