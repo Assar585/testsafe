@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.4-fpm
 # Cache bust: 2026-03-08 22:20
 
 # Install system dependencies
