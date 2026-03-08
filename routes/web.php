@@ -186,6 +186,29 @@ Route::get('/db_init', function () {
             echo "Caches cleared.<br>";
         }
 
+        echo "<h3>System Repair:</h3>";
+        echo "<ul>";
+        echo "<li><a href='/db_init?fix_settings=1'>[RUN] Repair Missing Settings (Homepage, etc.)</a></li>";
+        echo "</ul>";
+
+        if (request()->has('fix_settings')) {
+            echo "<h3>Repairing Settings...</h3>";
+            $defaults = [
+                'homepage_select' => 'classic',
+                'system_default_currency' => '1',
+                'current_version' => '10.0.0'
+            ];
+            foreach ($defaults as $type => $value) {
+                \DB::table('business_settings')->updateOrInsert(
+                    ['type' => $type],
+                    ['value' => $value, 'updated_at' => now()]
+                );
+                echo "Set $type to $value...<br>";
+            }
+            \Artisan::call('cache:clear');
+            echo "<b>Repair complete and cache cleared.</b><br>";
+        }
+
         echo "<h3>SQL Updates:</h3>";
         $sql_dir = base_path('sqlupdates');
         if (file_exists($sql_dir)) {
