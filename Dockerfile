@@ -1,5 +1,5 @@
 FROM php:8.2-fpm
-# Cache bust: 2026-03-08 21:30
+# Cache bust: 2026-03-08 22:20
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -44,7 +44,8 @@ ENV COMPOSER_NO_AUDIT=1
 RUN cat composer.json
 
 # Force update to ensure new stability settings are applied
-RUN export COMPOSER_MEMORY_LIMIT=-1 \
+RUN echo "DEBUG: RUNNING COMPOSER UPDATE WITHOUT STABILITY FLAG" \
+    && export COMPOSER_MEMORY_LIMIT=-1 \
     && composer update --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
 
 # Copy existing application directory contents
