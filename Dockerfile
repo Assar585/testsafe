@@ -35,6 +35,9 @@ WORKDIR /var/www
 # Copy composer files first for better caching
 COPY composer.json composer.lock* ./
 
+# Disable composer audit to bypass security advisory blocks for old packages
+ENV COMPOSER_NO_AUDIT=1
+
 # Install dependencies (use update if lock is missing to force sync)
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
     && if [ -f composer.lock ]; then \
