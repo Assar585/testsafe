@@ -3,6 +3,9 @@
 .env.*.php
 .env.php
 
+/public/assets/fonts
+/public/assets/documentation
+/public/assets/js
 /node_modules
 /storage/*.key
 /storage/debugbar
@@ -30,3 +33,4 @@ install.zip
 
 # NOTE: /public/* was removed so that public/assets CSS/JS/images
 # get committed to git and copied into Docker container on Railway.
+# However, we are now specifically excluding massive asset folders.
