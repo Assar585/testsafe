@@ -37,6 +37,7 @@ COPY composer.json composer.lock ./
 
 # Install dependencies without autoloader first (very memory efficient)
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
+    && composer update stichoza/google-translate-php --no-cache --no-interaction --no-plugins --ignore-platform-reqs \
     && composer install --no-cache --no-interaction --no-dev --no-scripts --no-autoloader --no-plugins --ignore-platform-reqs --prefer-dist
 
 # Copy existing application directory contents
