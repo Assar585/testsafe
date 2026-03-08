@@ -110,7 +110,7 @@ Route::get('/nuclear_clear', function () {
 });
 
 Route::get('/db_init', function () {
-    echo "<h1>Database Initialization & Diagnostic (v1.2.0)</h1>";
+    echo "<h1>Database Initialization & Diagnostic (v1.3.0)</h1>";
     echo "<p>Last Updated: " . date('Y-m-d H:i:s') . " (Build ID: " . substr(md5_file(__FILE__), 0, 8) . ")</p>";
     try {
         echo "Checking connection... ";
@@ -191,24 +191,40 @@ Route::get('/db_init', function () {
         echo "<ul>";
         echo "<li><a href='/db_init?fix_settings=1'>[RUN] Repair Missing Settings (Homepage, etc.)</a></li>";
         echo "<li><a href='/db_init?run_all_updates=1'>[RUN] SYNC ALL PENDING SQL UPDATES</a></li>";
+        echo "<li><a href='/db_init?force_all_updates=1'>[!] FORCE SYNC ALL SQL FILES (Skip v55.sql)</a></li>";
         echo "</ul>";
 
-        if (request()->has('run_all_updates')) {
-            echo "<h3>Running Bulk Updates...</h3>";
+        echo "<h3>Manual Version Fix:</h3>";
+        echo "<form action='/db_init' method='GET'>";
+        echo "Set Version to: <input type='text' name='set_ver' value='7.0.0'> ";
+        echo "<input type='submit' value='Apply Version'>";
+        echo "</form>";
+
+        if (request()->has('set_ver')) {
+            $new_ver = request()->get('set_ver');
+            \DB::table('business_settings')->updateOrInsert(
+                ['type' => 'current_version'],
+                ['value' => $new_ver, 'updated_at' => now()]
+            );
+            echo "<b style='color:blue'>Version manually set to $new_ver.</b><br>";
+        }
+
+        if (request()->has('run_all_updates') || request()->has('force_all_updates')) {
+            $is_force = request()->has('force_all_updates');
+            echo $is_force ? "<h3>Forcing All Updates...</h3>" : "<h3>Running Bulk Updates...</h3>";
             $sql_dir = base_path('sqlupdates');
-            $current_ver = \DB::table('business_settings')->where('type', 'current_version')->value('value') ?: '0.0.0';
-            echo "Current Version: $current_ver<br>";
+            $current_ver = $is_force ? '0.0.0' : (\DB::table('business_settings')->where('type', 'current_version')->value('value') ?: '0.0.0');
+            echo "Base Version for Sync: $current_ver (Mode: " . ($is_force ? "FORCE ALL" : "AUTO") . ")<br>";
 
             $files = array_diff(scandir($sql_dir), array('.', '..'));
-            // Filter and sort files by version number
             $pending = [];
             foreach ($files as $file) {
                 if (!str_ends_with($file, '.sql'))
                     continue;
-                // v9.9.8 -> 9.9.8, v820 -> 8.2.0 (guessing logic)
-                // Actually the files seem to be named v700, v999, v1000
+                if ($file == 'v55.sql')
+                    continue;
+
                 $ver_str = str_replace(['v', '.sql'], '', $file);
-                // Convert v998 to 9.9.8 for proper version_compare
                 $normalized_ver = $ver_str;
                 if (strlen($ver_str) == 3)
                     $normalized_ver = $ver_str[0] . "." . $ver_str[1] . "." . $ver_str[2];
@@ -222,19 +238,18 @@ Route::get('/db_init', function () {
             uksort($pending, 'version_compare');
 
             if (empty($pending)) {
-                echo "No pending updates found.<br>";
+                echo "No updates to run.<br>";
             } else {
                 foreach ($pending as $v => $f) {
-                    echo "Executing $f ($v)... ";
+                    echo "Executing $f... ";
                     try {
                         \DB::unprepared(file_get_contents($sql_dir . '/' . $f));
                         echo "<span style='color:green'>Success</span><br>";
                     } catch (\Exception $ex) {
-                        echo "<span style='color:red'>Error: " . $ex->getMessage() . "</span><br>";
-                        // Continue to next anyway? Better stop if critical
+                        echo "<span style='color:orange'>Notice: " . $ex->getMessage() . "</span><br>";
                     }
                 }
-                echo "<b>Bulk update finished.</b><br>";
+                echo "<b>Finished.</b><br>";
             }
             \Artisan::call('cache:clear');
         }
@@ -243,8 +258,7 @@ Route::get('/db_init', function () {
             echo "<h3>Repairing Settings...</h3>";
             $defaults = [
                 'homepage_select' => 'classic',
-                'system_default_currency' => '1',
-                'current_version' => '10.0.0'
+                'system_default_currency' => '1'
             ];
             foreach ($defaults as $type => $value) {
                 \DB::table('business_settings')->updateOrInsert(
@@ -254,7 +268,7 @@ Route::get('/db_init', function () {
                 echo "Set $type to $value...<br>";
             }
             \Artisan::call('cache:clear');
-            echo "<b>Repair complete and cache cleared.</b><br>";
+            echo "<b>Repair complete (Version NOT changed).</b><br>";
         }
 
         echo "<h3>SQL Updates:</h3>";
