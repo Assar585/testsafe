@@ -131,9 +131,9 @@
             --soft-white: #b5b5bf;
             --dark: #292933;
             --soft-dark: #1b1b28;
-            --primary: #0c305c;
-            --hov-primary: #0a264a;
-            --soft-primary: rgba(12, 48, 92, 0.15);
+            --primary: #0c305c !important;
+            --hov-primary: #0a264a !important;
+            --soft-primary: rgba(12, 48, 92, 0.15) !important;
         }
 
         body {
