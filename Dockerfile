@@ -41,7 +41,6 @@ RUN composer config audit.block-insecure false \
 
 # Install dependencies (ignoring platform reqs)
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
-    && composer update --lock --no-interaction \
     && composer install --verbose --no-interaction --no-dev --no-scripts --optimize-autoloader --ignore-platform-reqs
 
 # Create necessary directories and set permissions
