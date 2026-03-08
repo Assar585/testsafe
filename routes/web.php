@@ -80,6 +80,35 @@ Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
 
+Route::get('/nuclear_clear', function () {
+    echo "<h1>Nuclear Cache Clear (via Laravel)</h1>";
+    try {
+        echo "Clearing View Cache... ";
+        \Artisan::call('view:clear');
+        echo "Done.<br>";
+
+        echo "Clearing Config Cache... ";
+        \Artisan::call('config:clear');
+        echo "Done.<br>";
+
+        echo "Clearing Route Cache... ";
+        \Artisan::call('route:clear');
+        echo "Done.<br>";
+
+        echo "Clearing Application Cache... ";
+        \Artisan::call('cache:clear');
+        echo "Done.<br>";
+
+        echo "Re-caching Config... ";
+        \Artisan::call('config:cache');
+        echo "Done.<br>";
+
+        echo "<h2>All caches cleared successfully!</h2>";
+    } catch (\Exception $e) {
+        echo "<h2>Error: " . $e->getMessage() . "</h2>";
+    }
+});
+
 // AIZ Uploader
 Route::controller(AizUploadController::class)->group(function () {
     Route::post('/aiz-uploader', 'show_uploader');
