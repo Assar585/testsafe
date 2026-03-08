@@ -161,10 +161,30 @@ Route::get('/db_init', function () {
             }
         }
 
-        echo "<h3>Running Migrations:</h3>";
-        \Artisan::call('migrate', ['--force' => true]);
-        echo "Done.<br>";
-        echo "<pre>" . \Artisan::output() . "</pre>";
+        echo "<h3>Artisan Commands:</h3>";
+        echo "<ul>";
+        echo "<li><a href='/db_init?run_migrations=1'>[RUN] Migrations</a></li>";
+        echo "<li><a href='/db_init?clear_cache=1'>[RUN] Clear Cache</a></li>";
+        echo "</ul>";
+
+        if (request()->has('run_migrations')) {
+            echo "<h3>Running Migrations...</h3>";
+            try {
+                \Artisan::call('migrate', ['--force' => true]);
+                echo "Done.<br>";
+                echo "<pre>" . \Artisan::output() . "</pre>";
+            } catch (\Exception $mig_e) {
+                echo "<b style='color:orange'>Migration Warning: " . $mig_e->getMessage() . "</b><br>";
+            }
+        }
+
+        if (request()->has('clear_cache')) {
+            echo "<h3>Cleaning...</h3>";
+            \Artisan::call('cache:clear');
+            \Artisan::call('view:clear');
+            \Artisan::call('config:clear');
+            echo "Caches cleared.<br>";
+        }
 
         echo "<h3>SQL Updates:</h3>";
         $sql_dir = base_path('sqlupdates');
