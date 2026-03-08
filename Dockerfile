@@ -33,7 +33,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 
 # Copy composer files first for better caching
-COPY composer.json composer.lock ./
+COPY composer.json composer.lock* ./
 
 # Install dependencies (use update if lock is missing to force sync)
 RUN export COMPOSER_MEMORY_LIMIT=-1 \
