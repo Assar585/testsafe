@@ -110,7 +110,7 @@ Route::get('/nuclear_clear', function () {
 });
 
 Route::get('/db_init', function () {
-    echo "<h1>Database Initialization & Diagnostic (v1.5.0)</h1>";
+    echo "<h1>Database Initialization & Diagnostic (v1.6.0)</h1>";
     echo "<p>Last Updated: " . date('Y-m-d H:i:s') . " (Build ID: " . substr(md5_file(__FILE__), 0, 8) . ")</p>";
     try {
         echo "Checking connection... ";
@@ -124,87 +124,63 @@ Route::get('/db_init', function () {
             echo "<h3>Current DB Version: Not found in business_settings</h3>";
         }
 
-        // Check for specific missing table
-        echo "<h3>Critical Checks:</h3>";
+        // Branding Inspection
+        echo "<h3>Branding Inspection:</h3>";
+        $branding_types = ['system_name', 'frontend_color_style', 'header_logo', 'footer_logo', 'homepage_select'];
+        $settings = \DB::table('business_settings')->whereIn('type', $branding_types)->pluck('value', 'type');
+
+        echo "<table border='1' cellpadding='5' style='border-collapse:collapse;'>";
+        echo "<tr><th>Type</th><th>Current Value</th></tr>";
+        foreach ($branding_types as $type) {
+            $val = $settings[$type] ?? 'NOT SET';
+            echo "<tr><td>$type</td><td><b>$val</b></td></tr>";
+        }
+        echo "</table>";
+
+        // Categories Check
+        echo "<h3>Category Data Check:</h3>";
+        $cats = \DB::table('categories')->limit(5)->get();
+        if ($cats->isEmpty()) {
+            echo "No categories found.<br>";
+        } else {
+            echo "First 5 Categories: ";
+            foreach ($cats as $c)
+                echo "<span style='padding:2px 5px; background:#eee; margin-right:5px;'>" . ($c->name ?? 'id:' . $c->id) . "</span> ";
+            echo "<br>";
+        }
+
+        echo "<h3>Critical Tables:</h3>";
         $hasCustomAlerts = \DB::select("SHOW TABLES LIKE 'custom_alerts'");
         echo "Table 'custom_alerts': " . (empty($hasCustomAlerts) ? "<span style='color:red'>MISSING</span>" : "<span style='color:green'>FOUND</span>") . "<br>";
         $hasElementTypes = \DB::select("SHOW TABLES LIKE 'element_types'");
         echo "Table 'element_types': " . (empty($hasElementTypes) ? "<span style='color:red'>MISSING</span>" : "<span style='color:green'>FOUND</span>") . "<br>";
 
-        if (request()->has('import_sql') || request()->has('wipe_and_import')) {
-            echo "<h3>Attempting SQL Import (shop.sql)...</h3>";
-
-            if (request()->has('wipe_and_import')) {
-                echo "Wiping existing tables...<br>";
-                \DB::statement('SET FOREIGN_KEY_CHECKS = 0');
-                $tables = \DB::select('SHOW TABLES');
-                foreach ($tables as $table) {
-                    $tableName = array_values((array) $table)[0];
-                    \DB::statement("DROP TABLE IF EXISTS `$tableName` ");
-                    echo "Dropped $tableName... ";
-                }
-                \DB::statement('SET FOREIGN_KEY_CHECKS = 1');
-                echo "<br><b>Wipe complete.</b><br>";
-            }
-
-            $sql_path = base_path('shop.sql');
-            if (file_exists($sql_path)) {
-                echo "File found. Executing (this may take a minute)... ";
-                \DB::unprepared(file_get_contents($sql_path));
-                echo "Done.<br>";
-            } else {
-                echo "Error: shop.sql not found at " . $sql_path . "<br>";
-            }
-        }
-
-        echo "<h3>Artisan Commands:</h3>";
-        echo "<ul>";
-        echo "<li><a href='/db_init?run_migrations=1'>[RUN] Migrations</a></li>";
-        echo "<li><a href='/db_init?clear_cache=1'>[RUN] Clear Cache</a></li>";
-        echo "</ul>";
-
-        if (request()->has('run_migrations')) {
-            echo "<h3>Running Migrations...</h3>";
-            try {
-                \Artisan::call('migrate', ['--force' => true]);
-                echo "Done.<br>";
-                echo "<pre>" . \Artisan::output() . "</pre>";
-            } catch (\Exception $mig_e) {
-                echo "<b style='color:orange'>Migration Warning: " . $mig_e->getMessage() . "</b><br>";
-            }
-        }
-
-        if (request()->has('clear_cache')) {
-            echo "<h3>Cleaning...</h3>";
-            \Artisan::call('cache:clear');
-            \Artisan::call('view:clear');
-            \Artisan::call('config:clear');
-            echo "Caches cleared.<br>";
-        }
-
         echo "<h3>System Operations:</h3>";
         echo "<ul>";
         echo "<li><a href='/db_init?run_migrations=1'>[RUN] Migrations</a></li>";
         echo "<li><a href='/db_init?clear_cache=1'>[RUN] Clear Cache</a></li>";
-        echo "<li><a href='/db_init?fix_settings=1'>[RUN] Repair Settings (Themes, etc.)</a></li>";
+        echo "<li><a href='/db_init?fix_settings=1'>[RUN] Repair Core Settings</a></li>";
+        echo "<li><a href='/db_init?restore_safe_branding=1' style='font-weight:bold; color:blue;'>[NEW] Restore Safe Contract Branding (Blue Theme)</a></li>";
         echo "<li><a href='/db_init?show_pending=1'>[DEBUG] Show Pending Updates List</a></li>";
         echo "<li><a href='/db_init?run_all_updates=1' style='font-weight:bold; color:blue;'>[RUN] SYNC PENDING UPDATES</a></li>";
         echo "<li><a href='/db_init?force_all_updates=1' style='font-weight:bold; color:red;'>[!] FORCE SYNC ALL (Reset to 0.0.0)</a></li>";
         echo "</ul>";
 
-        echo "<h3>Manual Version Fix:</h3>";
-        echo "<form action='/db_init' method='GET'>";
-        echo "Set Version to: <input type='text' name='set_ver' value='7.0.0'> ";
-        echo "<input type='submit' value='Apply Version'>";
-        echo "</form>";
-
-        if (request()->has('set_ver')) {
-            $new_ver = request()->get('set_ver');
-            \DB::table('business_settings')->updateOrInsert(
-                ['type' => 'current_version'],
-                ['value' => $new_ver, 'updated_at' => now()]
-            );
-            echo "<b style='color:blue'>Version manually set to $new_ver.</b><br>";
+        if (request()->has('restore_safe_branding')) {
+            echo "<h3>Restoring Safe Contract Branding...</h3>";
+            $safe_branding = [
+                'system_name' => 'Safe Contract',
+                'frontend_color_style' => '#0c305c',
+                'header_logo' => '1',
+                'footer_logo' => '1',
+                'homepage_select' => 'classic'
+            ];
+            foreach ($safe_branding as $type => $value) {
+                \DB::table('business_settings')->updateOrInsert(['type' => $type], ['value' => $value, 'updated_at' => now()]);
+                echo "Set $type to $value...<br>";
+            }
+            \Artisan::call('cache:clear');
+            echo "<b style='color:green'>Done. Branding restored. Refresh to see.</b><br>";
         }
 
         if (request()->has('run_all_updates') || request()->has('force_all_updates') || request()->has('show_pending')) {
@@ -240,7 +216,8 @@ Route::get('/db_init', function () {
             }
 
             usort($pending, function ($a, $b) {
-                return version_compare($a['ver'], $b['ver']); });
+                return version_compare($a['ver'], $b['ver']);
+            });
 
             if (empty($pending)) {
                 echo "Nothing to do.<br>";
