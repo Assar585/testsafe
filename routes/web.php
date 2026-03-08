@@ -110,7 +110,8 @@ Route::get('/nuclear_clear', function () {
 });
 
 Route::get('/db_init', function () {
-    echo "<h1>Database Initialization & Diagnostic</h1>";
+    echo "<h1>Database Initialization & Diagnostic (v1.2.0)</h1>";
+    echo "<p>Last Updated: " . date('Y-m-d H:i:s') . " (Build ID: " . substr(md5_file(__FILE__), 0, 8) . ")</p>";
     try {
         echo "Checking connection... ";
         $pdo = \DB::connection()->getPdo();
