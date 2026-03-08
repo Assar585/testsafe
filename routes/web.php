@@ -128,12 +128,25 @@ Route::get('/db_init', function () {
             echo "</ul>";
         }
 
-        if (request()->has('import_sql')) {
+        if (request()->has('import_sql') || request()->has('wipe_and_import')) {
             echo "<h3>Attempting SQL Import (shop.sql)...</h3>";
+
+            if (request()->has('wipe_and_import')) {
+                echo "Wiping existing tables...<br>";
+                \DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+                $tables = \DB::select('SHOW TABLES');
+                foreach ($tables as $table) {
+                    $tableName = array_values((array) $table)[0];
+                    \DB::statement("DROP TABLE IF EXISTS `$tableName` ");
+                    echo "Dropped $tableName... ";
+                }
+                \DB::statement('SET FOREIGN_KEY_CHECKS = 1');
+                echo "<br><b>Wipe complete.</b><br>";
+            }
+
             $sql_path = base_path('shop.sql');
             if (file_exists($sql_path)) {
                 echo "File found. Executing (this may take a minute)... ";
-                // Large SQL might need to be split, but let's try direct first
                 \DB::unprepared(file_get_contents($sql_path));
                 echo "Done.<br>";
             } else {
@@ -147,7 +160,7 @@ Route::get('/db_init', function () {
         echo "<pre>" . \Artisan::output() . "</pre>";
 
         echo "<h2>Database diagnostic complete!</h2>";
-        echo "<p><a href='/db_init?import_sql=1' style='color:red; font-weight:bold;'>[FORCE IMPORT shop.sql]</a> (Use if tables are missing)</p>";
+        echo "<p><a href='/db_init?wipe_and_import=1' style='color:red; font-weight:bold; font-size: 1.2em;'>[!] NUCLEAR WIPE & IMPORT shop.sql</a> (Use this to fix missing tables)</p>";
         echo "<p><a href='/'>Go to Home</a></p>";
     } catch (\Exception $e) {
         echo "<h2 style='color:red'>Error: " . $e->getMessage() . "</h2>";
