@@ -137,6 +137,21 @@ Route::get('/db_init', function () {
         }
         echo "</table>";
 
+        // Table Counts (Production Integrity)
+        echo "<h3>Production Data Integrity:</h3>";
+        try {
+            $p_count = \DB::table('products')->count();
+            $perm_count = \DB::table('permissions')->count();
+            $addon_count = \DB::table('addons')->count();
+            echo "<ul>";
+            echo "<li>Products: <b>$p_count</b></li>";
+            echo "<li>Permissions: <b>$perm_count</b></li>";
+            echo "<li>Addons: <b>$addon_count</b></li>";
+            echo "</ul>";
+        } catch (\Exception $c_e) {
+            echo "<p style='color:red'>Error counting tables: " . $c_e->getMessage() . "</p>";
+        }
+
         // Categories Check
         echo "<h3>Category Data Check:</h3>";
         $cats = \DB::table('categories')->limit(5)->get();
