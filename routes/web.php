@@ -170,6 +170,7 @@ Route::get('/db_init', function () {
         echo "<li><a href='/db_init?show_pending=1'>[DEBUG] Show Pending Updates List</a></li>";
         echo "<li><a href='/db_init?run_all_updates=1' style='font-weight:bold; color:blue;'>[RUN] SYNC PENDING UPDATES</a></li>";
         echo "<li><a href='/db_init?force_all_updates=1' style='font-weight:bold; color:red;'>[!] FORCE SYNC ALL (Reset to 0.0.0)</a></li>";
+        echo "<li><a href='/db_init?check_uploads=1'>[DEBUG] Check Uploaded Files (Logos)</a></li>";
         echo "</ul>";
 
         if (request()->has('restore_safe_branding')) {
@@ -197,6 +198,18 @@ Route::get('/db_init', function () {
                 echo "<b>$p</b>: " . (file_exists($full) ? "<span style='color:green'>FOUND</span>" : "<span style='color:red'>MISSING</span>") . "<br>";
             }
             echo "URL: " . env('APP_URL') . " / " . asset('/') . "<br>";
+        }
+
+        if (request()->has('check_uploads')) {
+            echo "<h3>Recent Uploaded Files (Potential Logos):</h3>";
+            $files = \DB::table('uploads')->orderBy('id', 'desc')->limit(20)->get();
+            echo "<table border='1' cellpadding='5' style='border-collapse:collapse;'>";
+            echo "<tr><th>ID</th><th>File Name</th><th>Type</th><th>Preview</th></tr>";
+            foreach ($files as $f) {
+                $url = uploaded_asset($f->id);
+                echo "<tr><td>{$f->id}</td><td>{$f->file_name}</td><td>{$f->extension}</td><td><img src='$url' height='50'></td></tr>";
+            }
+            echo "</table>";
         }
 
         if (request()->has('run_all_updates') || request()->has('force_all_updates') || request()->has('show_pending')) {
