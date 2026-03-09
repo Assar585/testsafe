@@ -338,10 +338,41 @@ Route::get('/db_init', function () {
             $sql_path = base_path('shop.sql');
             if (file_exists($sql_path)) {
                 try {
-                    \DB::unprepared(file_get_contents($sql_path));
-                    echo "<b style='color:green'>Successfully imported shop.sql</b><br>";
+                    set_time_limit(1800);
+                    $sql_content = file_get_contents($sql_path);
+
+                    // Simple regex to split by semicolon, but try to avoid splitting inside strings
+                    $statements = preg_split("/;(?=(?:[^'\"`]*['\"`][^'\"`]*['\"`])*[^'\"`]*$)/", $sql_content);
+
+                    $total = count($statements);
+                    $success = 0;
+                    $errors = 0;
+
+                    foreach ($statements as $stmt) {
+                        $stmt = trim($stmt);
+                        if (empty($stmt))
+                            continue;
+
+                        // Basic cleanup of comments and problematic SETs if needed
+                        if (str_starts_with($stmt, '--') || str_starts_with($stmt, '/*') || str_starts_with($stmt, 'set ')) {
+                            // Optionally skip or log
+                            // continue;
+                        }
+
+                        try {
+                            \DB::unprepared($stmt . ';');
+                            $success++;
+                        } catch (\Exception $stmt_e) {
+                            $errors++;
+                            if ($errors <= 5) {
+                                echo "<small style='color:orange;'>Skipping statement (Error: " . substr($stmt_e->getMessage(), 0, 100) . "...)</small><br>";
+                            }
+                        }
+                    }
+
+                    echo "<b style='color:green'>Done. Imported $success statements. Errors: $errors.</b><br>";
                 } catch (\Exception $wipe_e) {
-                    echo "<b style='color:red'>Error importing shop.sql: " . $wipe_e->getMessage() . "</b><br>";
+                    echo "<b style='color:red'>Critical Error: " . $wipe_e->getMessage() . "</b><br>";
                 }
             } else {
                 echo "Error: shop.sql not found at $sql_path<br>";
