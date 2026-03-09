@@ -1,5 +1,5 @@
 FROM php:8.4-fpm
-# Cache bust: 2026-03-08 22:20
+# Cache bust: 2026-03-09 17:25
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
