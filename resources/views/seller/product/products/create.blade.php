@@ -254,16 +254,16 @@
 
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="add-more"
                                         data-content='<div class="row">
-                                                                                                        <div class="col-md-11">
-                                                                                                            <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                                            <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                                        </div>
-                                                                                                        <div class="col-1 d-flex justify-content-end">
-                                                                                                                <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                                    <i class="las la-times"></i>
-                                                                                                                </button>
-                                                                                                        </div>
-                                                                                                    </div>'
+                                                                                                            <div class="col-md-11">
+                                                                                                                <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                                <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                            </div>
+                                                                                                            <div class="col-1 d-flex justify-content-end">
+                                                                                                                    <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                                        <i class="las la-times"></i>
+                                                                                                                    </button>
+                                                                                                            </div>
+                                                                                                        </div>'
                                         data-target=".video-provider-link">
                                         {{ translate('Add Another') }}
                                     </button>
@@ -723,22 +723,7 @@
                         </div>
                     </div>
 
-                    <!-- HS Code - Server-side rendered -->
-                    <div class="card mt-3">
-                        <div class="card-header">
-                            <h5 class="mb-0 h6">{{ translate('TN VED (HS Code)') }}</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group mb-0">
-                                <select class="form-control" name="hsn_code" id="hsn_code_select">
-                                    <option value="">{{ translate('Search TN VED by code or product name...') }}</option>
 
-                                </select>
-                                <small
-                                    class="text-muted">{{ translate('Used for international shipping and customs.') }}</small>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="card">
                         <div class="card-header">
@@ -907,9 +892,8 @@
                                 <div class="form-group mb-2">
                                     <label class="col-from-label">{{ translate('TN VED (HS Code)') }} <span
                                             class="text-danger">*</span></label>
-                                    <select class="form-control aiz-selectpicker" name="hsn_code" id="hsn_code_select"
-                                        data-live-search="true" data-size="5">
-                                        <option value="">{{ translate('Search TN VED by code or product name...') }}</option>
+                                    <select class="form-control" name="hsn_code" id="hsn_code_select">
+                                        <option></option>
                                     </select>
                                 </div>
                                 <div class="form-group mb-2">
@@ -1010,18 +994,18 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                                        <div class="form-group row">\
-                                                                            <div class="col-md-3">\
-                                                                                <input type="hidden" name="choice_no[]" value="' + i + '">\
-                                                                                <input type="text" class="form-control" name="choice[]" va                                    lue="' + name +
+                                                                            <div class="form-group row">\
+                                                                                <div class="col-md-3">\
+                                                                                    <input type="hidden" name="choice_no[]" value="' + i + '">\
+                                                                                    <input type="text" class="form-control" name="choice[]" va                                    lue="' + name +
                         '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                                            </div>\
-                                                                            <div class="col-md-8">\
-                                                                                <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
-                                                                                    ' + obj + '\
-                                                                                </select>\
-                                                                            </div>\
-                                                                        </div>');
+                                                                                </div>\
+                                                                                <div class="col-md-8">\
+                                                                                    <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
+                                                                                        ' + obj + '\
+                                                                                    </select>\
+                                                                                </div>\
+                                                                            </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1471,7 +1455,7 @@
                     var savedOpt = new Option("{{ old('hsn_code') }}", "{{ old('hsn_code') }}", true, true);
                     $('#hsn_code_select').append(savedOpt).trigger('change');
                 @endif
-                }
+                    }
         });
     </script>
 @endsection

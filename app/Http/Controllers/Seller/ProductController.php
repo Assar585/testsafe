@@ -24,6 +24,7 @@ use App\Services\ProductFlashDealService;
 use App\Services\ProductStockService;
 use App\Services\FrequentlyBoughtProductService;
 use Illuminate\Support\Facades\Notification;
+use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
@@ -614,21 +615,44 @@ class ProductController extends Controller
     {
         $q = strtolower(trim($request->get('q', '')));
         $jsonPath = public_path('assets/data/hs_codes.json');
+
         if (!file_exists($jsonPath)) {
+            $jsonPath = base_path('resources/data/hs_codes.json');
+            if (!file_exists($jsonPath)) {
+                return response()->json([]);
+            }
+        }
+
+        $jsonStr = file_get_contents($jsonPath);
+        $jsonStr = preg_replace('/^[\xEF\xBB\xBF\xFE\xFF\xFF\xFE]*/', '', $jsonStr);
+        $all = json_decode($jsonStr, true);
+
+        if (!$all || !is_array($all)) {
             return response()->json([]);
         }
-        $all = json_decode(file_get_contents($jsonPath), true) ?? [];
-        if (empty($q)) {
-            $results = array_slice($all, 0, 5);
-        } else {
-            $results = array_values(array_filter($all, function ($item) use ($q) {
-                return (isset($item['code']) && strpos(strtolower($item['code']), $q) !== false)
-                    || (isset($item['desc']) && strpos(strtolower($item['desc']), $q) !== false);
-            }));
-            $results = array_slice($results, 0, 5);
+
+        $results = [];
+        $count = 0;
+        foreach ($all as $item) {
+            if ($count >= 5)
+                break;
+
+            $code = isset($item['code']) ? strval($item['code']) : '';
+            $desc = isset($item['desc']) ? strval($item['desc']) : '';
+
+            if (
+                empty($q) ||
+                strpos(strtolower($code), $q) !== false ||
+                strpos(strtolower($desc), $q) !== false
+            ) {
+                $results[] = [
+                    'id' => $code,
+                    'text' => $code . ' – ' . $desc
+                ];
+                $count++;
+            }
         }
-        return response()->json(array_map(function ($item) {
-            return ['id' => $item['code'], 'text' => $item['code'] . ' – ' . $item['desc']];
-        }, $results));
+
+        return response()->json($results);
     }
 }
