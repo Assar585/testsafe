@@ -964,10 +964,9 @@
                 <div class="card-body">
                     <div class="form-group mb-2">
                         <label class="col-from-label">{{ translate('TN VED (HS Code)') }} <span class="text-danger">*</span></label>
-                        <select class="form-control aiz-selectpicker" name="hsn_code" id="hsn_code_select" data-live-search="true" data-size="5">
-                    <option value="">{{ translate('Search TN VED by code or product name...') }}</option>
-                </select>hsn_code }}" class="form-control"
-                            required>
+                        <select class="form-control" name="hsn_code" id="hsn_code_select" required>
+                            <option value="{{ $product->hsn_code }}" selected>{{ $product->hsn_code }}</option>
+                        </select>
                     </div>
                     <div class="form-group mb-2">
                         <label class="col-from-label">{{ translate('GST Rate') }} <span class="text-danger">*</span></label>
@@ -1472,6 +1471,29 @@
                 $('.refund-block').toggleClass('d-none', !$(this).is(':checked'));
             }
         });
+    });
+
+    // HS Code Select2 AJAX autocomplete
+    $(document).ready(function () {
+        if ($('#hsn_code_select').length) {
+            $('#hsn_code_select').select2({
+                placeholder: '{{ translate("Search by code or product name...") }}',
+                allowClear: true,
+                minimumInputLength: 0,
+                ajax: {
+                    url: '{{ route("seller.products.hs_code_search") }}',
+                    dataType: 'json',
+                    delay: 300,
+                    data: function (params) {
+                        return { q: params.term || '' };
+                    },
+                    processResults: function (data) {
+                        return { results: data };
+                    },
+                    cache: true
+                }
+            });
+        }
     });
 </script>
 @endsection
