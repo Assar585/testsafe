@@ -339,6 +339,7 @@ Route::get('/db_init', function () {
             if (file_exists($sql_path)) {
                 try {
                     set_time_limit(1800);
+                    \DB::statement('SET FOREIGN_KEY_CHECKS = 0;');
                     $handle = fopen($sql_path, "r");
                     if ($handle) {
                         $templine = '';
@@ -368,6 +369,7 @@ Route::get('/db_init', function () {
                             }
                         }
                         fclose($handle);
+                        \DB::statement('SET FOREIGN_KEY_CHECKS = 1;');
                         echo "<b style='color:green'>Done. Imported $success statements. Errors: $errors.</b><br>";
                     } else {
                         echo "Error opening file.<br>";
