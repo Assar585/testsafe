@@ -622,8 +622,8 @@ class ProductController extends Controller
             $results = array_slice($all, 0, 5);
         } else {
             $results = array_values(array_filter($all, function ($item) use ($q) {
-                return str_contains(strtolower($item['code']), $q)
-                    || str_contains(strtolower($item['desc']), $q);
+                return (isset($item['code']) && strpos(strtolower($item['code']), $q) !== false)
+                    || (isset($item['desc']) && strpos(strtolower($item['desc']), $q) !== false);
             }));
             $results = array_slice($results, 0, 5);
         }
