@@ -333,6 +333,21 @@ Route::get('/db_init', function () {
             }
         }
 
+        if (request()->has('wipe_and_import')) {
+            echo "<h3>Nuclear Wipe & Importing shop.sql...</h3>";
+            $sql_path = base_path('shop.sql');
+            if (file_exists($sql_path)) {
+                try {
+                    \DB::unprepared(file_get_contents($sql_path));
+                    echo "<b style='color:green'>Successfully imported shop.sql</b><br>";
+                } catch (\Exception $wipe_e) {
+                    echo "<b style='color:red'>Error importing shop.sql: " . $wipe_e->getMessage() . "</b><br>";
+                }
+            } else {
+                echo "Error: shop.sql not found at $sql_path<br>";
+            }
+        }
+
         echo "<h2>Database diagnostic complete!</h2>";
         echo "<p><a href='/db_init?wipe_and_import=1' style='color:red; font-weight:bold; font-size: 1.2em;'>[!] NUCLEAR WIPE & IMPORT shop.sql</a> (Use this to fix missing tables)</p>";
         echo "<p><a href='/'>Go to Home</a></p>";
