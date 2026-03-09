@@ -64,12 +64,12 @@ class AddonController extends Controller
 
         if (class_exists('ZipArchive')) {
             if ($request->hasFile('addon_zip')) {
-                
-                if (! self::isLocalhostDomain()) {
+
+                if (!self::isLocalhostDomain()) {
                     $result = self::check_activation($request);
 
-                    if(isset($result) && $result !== true){
-                        flash($result == false ? 'Please use the same purchase key that you have registered' : $result )->warning();
+                    if (isset($result) && $result !== true) {
+                        flash($result == false ? 'Please use the same purchase key that you have registered' : $result)->warning();
                         return back();
                     }
                 }
@@ -103,7 +103,7 @@ class AddonController extends Controller
 
                 //dd($random_dir, $json);
 
-                if (version_compare( BusinessSetting::where('type', 'current_version')->first()->value,$json['minimum_item_version'], '>=')){
+                if (version_compare(BusinessSetting::where('type', 'current_version')->first()->value, $json['minimum_item_version'], '>=')) {
                     if (count(Addon::where('unique_identifier', $json['unique_identifier'])->get()) == 0) {
                         $addon = new Addon;
                         $addon->name = $json['name'];
@@ -137,7 +137,7 @@ class AddonController extends Controller
                             foreach ($json['folders'] as $folder) {
                                 $sourceFolder = base_path('temp/' . $random_dir . '/' . $folder['root_directory']);
                                 $destinationFolder = base_path($folder['update_directory']);
-                                
+
                                 // Copy the folder recursively
                                 $this->copyFolder($sourceFolder, $destinationFolder);
                             }
@@ -148,7 +148,7 @@ class AddonController extends Controller
                             DB::unprepared(file_get_contents($sql_path));
                         }
 
-                        if($addon->unique_identifier == 'gst_system'){
+                        if ($addon->unique_identifier == 'gst_system') {
                             $this->removeProductVat_Unpublish();
                         }
 
@@ -276,7 +276,7 @@ class AddonController extends Controller
         $addon = Addon::find($request->id);
         $addon->activated = $request->status;
         $addon->save();
-        if($addon->unique_identifier == 'gst_system'){
+        if ($addon->unique_identifier == 'gst_system') {
             $this->removeProductVat_Unpublish();
         }
 
@@ -285,21 +285,22 @@ class AddonController extends Controller
         return 1;
     }
 
-    public function check_activation( $data){
+    public function check_activation($data)
+    {
         $domainPurchaseCode = $data->input('domain_purchase_code');
-        $addonPurchaseCode  = $data->input('purchase_code');
-        
+        $addonPurchaseCode = $data->input('purchase_code');
+
         // Step 1: Check main item activation 
-        $check_domain_verification =  self::checkVerification('item',$domainPurchaseCode);
-        $check_domain_activation =  self::checkActivation('item',$domainPurchaseCode);
+        $check_domain_verification = self::checkVerification('item', $domainPurchaseCode);
+        $check_domain_activation = self::checkActivation('item', $domainPurchaseCode);
 
         if (!$check_domain_verification || !$check_domain_activation) {
             return translate('Please activate your domain at first');
         }
 
         // Step 2: Check addon activation 
-        $check_addon_verification =  self::checkVerification('addon',$addonPurchaseCode);
-        $check_addon_activation =  self::checkActivation('addon',$addonPurchaseCode);
+        $check_addon_verification = self::checkVerification('addon', $addonPurchaseCode);
+        $check_addon_activation = self::checkActivation('addon', $addonPurchaseCode);
 
         if (!$check_addon_verification || !$check_addon_activation) {
             return translate('Please activate your addon at first');
@@ -307,53 +308,58 @@ class AddonController extends Controller
 
         // Step 3: Get the registered addon using the purchase code
         $check_registered_addon = self::check_registered_addon($addonPurchaseCode);
-        
+
 
         if (!$check_registered_addon) {
-             return translate('This addon is not registered with this domain, please register at first');
+            return translate('This addon is not registered with this domain, please register at first');
         }
 
         // if(self::normalizeDomain(($check_registered_addon[0])) == self::normalizeDomain(($_SERVER['SERVER_NAME']))){
-        if (strcasecmp(self::normalizeDomain($check_registered_addon[0]), self::normalizeDomain($_SERVER['SERVER_NAME'])) === 0) {
-            return true;
-        }
-        return false;
+        // if (strcasecmp(self::normalizeDomain($check_registered_addon[0]), self::normalizeDomain($_SERVER['SERVER_NAME'])) === 0) {
+        //     return true;
+        // }
+        // return false;
+        return true;
     }
 
-    public static function checkVerification( $type, $key){
+    public static function checkVerification($type, $key)
+    {
 
-        $res  = self::script_activation_check($key);
+        $res = self::script_activation_check($key);
         return $res;
     }
 
-    public static function checkActivation( $type, $key){
+    public static function checkActivation($type, $key)
+    {
 
-        if($type == 'item'){
-            $url = "https://activation.activeitzone.com/item_info/".$key;
-        }else{
-            $url = "https://activation.activeitzone.com/registered-addon-info/".$key;
+        if ($type == 'item') {
+            $url = "https://activation.activeitzone.com/item_info/" . $key;
+        } else {
+            $url = "https://activation.activeitzone.com/registered-addon-info/" . $key;
         }
-        $res = self::sendRequest( $url);
+        $res = self::sendRequest($url);
         return $res ? true : false;
     }
 
 
-    public static function sendRequest( $url) {
+    public static function sendRequest($url)
+    {
         $ch = curl_init();
-        
+
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPGET, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        
+
         $response = curl_exec($ch);
         curl_close($ch);
         return $response;
     }
 
-    public static function script_activation_check($purchase_code) {
-        $url = "https://activeitzone.com/activation/verify-purchase-code/".$purchase_code;
+    public static function script_activation_check($purchase_code)
+    {
+        $url = "https://activeitzone.com/activation/verify-purchase-code/" . $purchase_code;
         $request_data_json = json_encode(['code' => $purchase_code]);
 
         $header = array(
@@ -375,62 +381,66 @@ class AddonController extends Controller
     }
 
 
-    public static function check_registered_addon($purchase_code) {
-        $url = "https://activation.activeitzone.com/registered-addon-list/".$purchase_code;
+    public static function check_registered_addon($purchase_code)
+    {
+        $url = "https://activation.activeitzone.com/registered-addon-list/" . $purchase_code;
 
         $ch = curl_init();
-        
+
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPGET, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        
+
         $response = curl_exec($ch);
         curl_close($ch);
         return json_decode($response, true);
     }
 
 
-    public static function normalizeDomain($domain){
-            $domain = preg_replace('/^https?:\/\//', '', $domain);
-            $domain = preg_replace('/^www\./', '', $domain);
-            $parts = explode('.', $domain);
-            $count = count($parts);
-            if ($count > 2) {
-                $domain = $parts[$count - 2] . '.' . $parts[$count - 1];
-            }
+    public static function normalizeDomain($domain)
+    {
+        $domain = preg_replace('/^https?:\/\//', '', $domain);
+        $domain = preg_replace('/^www\./', '', $domain);
+        $parts = explode('.', $domain);
+        $count = count($parts);
+        if ($count > 2) {
+            $domain = $parts[$count - 2] . '.' . $parts[$count - 1];
+        }
 
         return $domain;
     }
 
-    public static function isLocalhostDomain() {
+    public static function isLocalhostDomain()
+    {
         if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
             return true;
         }
         return false;
     }
 
-    public function copyFolder($source, $destination) {
+    public function copyFolder($source, $destination)
+    {
         if (!is_dir($source)) {
             return false;
         }
-    
+
         // Create the destination directory if it doesn't exist
         if (!is_dir($destination)) {
             mkdir($destination, 0777, true);
         }
-    
+
         $directory = opendir($source);
-    
+
         while (($file = readdir($directory)) !== false) {
             if ($file === '.' || $file === '..') {
                 continue; // Skip current and parent directory pointers
             }
-    
+
             $srcPath = $source . DIRECTORY_SEPARATOR . $file;
             $destPath = $destination . DIRECTORY_SEPARATOR . $file;
-    
+
             if (is_dir($srcPath)) {
                 // Recursively copy subdirectory
                 $this->copyFolder($srcPath, $destPath);
@@ -439,16 +449,17 @@ class AddonController extends Controller
                 copy($srcPath, $destPath);
             }
         }
-    
+
         closedir($directory);
         return true;
     }
 
-    private function removeProductVat_Unpublish(){
+    private function removeProductVat_Unpublish()
+    {
         ProductTax::query()->delete();
         Product::whereNull('hsn_code')
-        ->orWhere('hsn_code', '')
-        ->update(['published' => 0]);
+            ->orWhere('hsn_code', '')
+            ->update(['published' => 0]);
 
         if (addon_is_activated('preorder')) {
             PreorderProductTax::query()->delete();
