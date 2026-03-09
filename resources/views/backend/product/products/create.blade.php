@@ -512,16 +512,16 @@
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more"
                                             data-content='<div class="row mb-2">
-                                                                                                                            <div class="col">
-                                                                                                                                <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                                                                <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                                                            </div>
-                                                                                                                            <div class="col-auto d-flex justify-content-end">
-                                                                                                                                    <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                                                        <i class="las la-times"></i>
-                                                                                                                                    </button>
-                                                                                                                            </div>
-                                                                                                                        </div>'
+                                                                                                                                <div class="col">
+                                                                                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                                                </div>
+                                                                                                                                <div class="col-auto d-flex justify-content-end">
+                                                                                                                                        <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                                                            <i class="las la-times"></i>
+                                                                                                                                        </button>
+                                                                                                                                </div>
+                                                                                                                            </div>'
                                             data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
@@ -1101,7 +1101,7 @@
             @if(old("category_ids"))
                 selected_ids = @json(old("category_ids"));
             @endif
-                                                                        for (let i = 0; i < selected_ids.length; i++) {
+                                                                            for (let i = 0; i < selected_ids.length; i++) {
                 const element = selected_ids[i];
                 $('#treeview input:checkbox#' + element).prop('checked', true);
                 $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
@@ -1153,17 +1153,17 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                                                <div class="form-group row">\
-                                                                                    <div class="col-md-3">\
-                                                                                        <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                                                                        <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                                                    </div>\
-                                                                                    <div class="col-md-9">\
-                                                                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                                                                            '+ obj + '\
-                                                                                        </select>\
-                                                                                    </div>\
-                                                                                </div>');
+                                                                                    <div class="form-group row">\
+                                                                                        <div class="col-md-3">\
+                                                                                            <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                                                                            <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                                                                        </div>\
+                                                                                        <div class="col-md-9">\
+                                                                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                                                                                '+ obj + '\
+                                                                                            </select>\
+                                                                                        </div>\
+                                                                                    </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1326,7 +1326,7 @@
                     var savedOpt = new Option("{{ old('hsn_code') }}", "{{ old('hsn_code') }}", true, true);
                     $('#hsn_code_select').append(savedOpt).trigger('change');
                 @endif
-                                                                }
+                }
         });
 
         // Refundable
