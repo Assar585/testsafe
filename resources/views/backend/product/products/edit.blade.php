@@ -392,9 +392,10 @@
                                     <div class="w-100">
                                         <div class="form-group mb-2">
                                             <label class="col-from-label">{{translate('TN VED (HS Code)')}}</label>
-                                            <select class="form-control aiz-selectpicker" name="hsn_code" id="hsn_code_select" data-live-search="true" data-size="5">
-                                                 <option value="{{ $product->hsn_code }}" selected>{{ $product->hsn_code }}</option>
-                                             </select>
+                                            <select class="form-control" name="hsn_code" id="hsn_code_select">
+                                                <option value="{{ $product->hsn_code }}" selected>{{ $product->hsn_code }}
+                                                </option>
+                                            </select>
                                         </div>
                                         <div class="form-group mb-2">
                                             <label class="col-from-label">{{translate('GST Rate (%)')}}</label>
@@ -595,16 +596,16 @@
                                         <button type="button"
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more" data-content='<div class="row mb-2">
-                                                                <div class="col">
-                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                </div>
-                                                                <div class="col-auto d-flex justify-content-end">
-                                                                        <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                            <i class="las la-times"></i>
-                                                                        </button>
-                                                                </div>
-                                                            </div>' data-target=".video-provider-link">
+                                                                        <div class="col">
+                                                                            <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                            <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                        </div>
+                                                                        <div class="col-auto d-flex justify-content-end">
+                                                                                <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                    <i class="las la-times"></i>
+                                                                                </button>
+                                                                        </div>
+                                                                    </div>' data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
                                         </button>
@@ -1338,17 +1339,17 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                <div class="form-group row">\
-                                    <div class="col-md-3">\
-                                        <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                        <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                    </div>\
-                                    <div class="col-md-8">\
-                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                            '+ obj + '\
-                                        </select>\
-                                    </div>\
-                                </div>');
+                                        <div class="form-group row">\
+                                            <div class="col-md-3">\
+                                                <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                                <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                            </div>\
+                                            <div class="col-md-8">\
+                                                <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                                    '+ obj + '\
+                                                </select>\
+                                            </div>\
+                                        </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1770,6 +1771,29 @@
             $(document).on('change', 'input[name="sku_combinations[]"]', function () {
                 checkSKUAvailability(this);
             });
+        });
+
+        // HS Code Select2 AJAX autocomplete
+        $(document).ready(function () {
+            if ($('#hsn_code_select').length) {
+                $('#hsn_code_select').select2({
+                    placeholder: '{{ translate("Search by code or product name...") }}',
+                    allowClear: true,
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: '{{ route("products.hs_code_search") }}',
+                        dataType: 'json',
+                        delay: 300,
+                        data: function (params) {
+                            return { q: params.term || '' };
+                        },
+                        processResults: function (data) {
+                            return { results: data };
+                        },
+                        cache: true
+                    }
+                });
+            }
         });
     </script>
 
