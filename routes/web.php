@@ -339,38 +339,39 @@ Route::get('/db_init', function () {
             if (file_exists($sql_path)) {
                 try {
                     set_time_limit(1800);
-                    $sql_content = file_get_contents($sql_path);
+                    $handle = fopen($sql_path, "r");
+                    if ($handle) {
+                        $templine = '';
+                        $success = 0;
+                        $errors = 0;
 
-                    // Simple regex to split by semicolon, but try to avoid splitting inside strings
-                    $statements = preg_split("/;(?=(?:[^'\"`]*['\"`][^'\"`]*['\"`])*[^'\"`]*$)/", $sql_content);
+                        while (($line = fgets($handle)) !== false) {
+                            // Skip it if it's a comment
+                            if (substr(trim($line), 0, 2) == '--' || trim($line) == '' || substr(trim($line), 0, 2) == '/*')
+                                continue;
 
-                    $total = count($statements);
-                    $success = 0;
-                    $errors = 0;
+                            // Add this line to current segment
+                            $templine .= $line;
 
-                    foreach ($statements as $stmt) {
-                        $stmt = trim($stmt);
-                        if (empty($stmt))
-                            continue;
-
-                        // Basic cleanup of comments and problematic SETs if needed
-                        if (str_starts_with($stmt, '--') || str_starts_with($stmt, '/*') || str_starts_with($stmt, 'set ')) {
-                            // Optionally skip or log
-                            // continue;
-                        }
-
-                        try {
-                            \DB::unprepared($stmt . ';');
-                            $success++;
-                        } catch (\Exception $stmt_e) {
-                            $errors++;
-                            if ($errors <= 5) {
-                                echo "<small style='color:orange;'>Skipping statement (Error: " . substr($stmt_e->getMessage(), 0, 100) . "...)</small><br>";
+                            // If it has a semicolon at the end, it's the end of the query
+                            if (substr(trim($line), -1, 1) == ';') {
+                                try {
+                                    \DB::unprepared($templine);
+                                    $success++;
+                                } catch (\Exception $stmt_e) {
+                                    $errors++;
+                                    if ($errors <= 5) {
+                                        echo "<small style='color:orange;'>Error in stmt: " . substr($stmt_e->getMessage(), 0, 100) . "...</small><br>";
+                                    }
+                                }
+                                $templine = '';
                             }
                         }
+                        fclose($handle);
+                        echo "<b style='color:green'>Done. Imported $success statements. Errors: $errors.</b><br>";
+                    } else {
+                        echo "Error opening file.<br>";
                     }
-
-                    echo "<b style='color:green'>Done. Imported $success statements. Errors: $errors.</b><br>";
                 } catch (\Exception $wipe_e) {
                     echo "<b style='color:red'>Critical Error: " . $wipe_e->getMessage() . "</b><br>";
                 }
