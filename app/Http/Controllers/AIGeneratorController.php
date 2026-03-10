@@ -43,7 +43,7 @@ class AIGeneratorController extends Controller
                     $url = str_replace('/v1', '', $url);
                     $url = str_replace('/v1beta', '', $url);
                     // Standard text generation endpoint for Gemini Pro
-                    $url .= "/v1beta/models/gemini-1.5-flash:generateContent?key={$key}";
+                    $url .= "/v1beta/models/gemini-pro:generateContent?key={$key}";
 
                     $payload = [
                         'contents' => [
