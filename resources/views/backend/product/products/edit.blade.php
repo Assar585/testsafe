@@ -22,69 +22,9 @@
             </div>
         </div>
 
-        <div class="d-sm-flex">
-            <!-- page side nav -->
-            <div class="page-side-nav c-scrollbar-light px-3 py-2">
-                <ul class="nav nav-tabs flex-sm-column border-0" role="tablist" aria-orientation="vertical">
-                    <!-- General -->
-                    <li class="nav-item">
-                        <a class="nav-link" id="general-tab" href="#general" data-toggle="tab" data-target="#general"
-                            type="button" role="tab" aria-controls="general" aria-selected="true">
-                            {{ translate('General') }}
-                        </a>
-                    </li>
-                    <!-- Files & Media -->
-                    <li class="nav-item">
-                        <a class="nav-link" id="files-and-media-tab" href="#files_and_media" data-toggle="tab"
-                            data-target="#files_and_media" type="button" role="tab" aria-controls="files_and_media"
-                            aria-selected="false">
-                            {{ translate("Files & Media") }}
-                        </a>
-                    </li>
-                    <!-- Price & Stock -->
-                    <li class="nav-item">
-                        <a class="nav-link" id="price-and-stocks-tab" href="#price_and_stocks" data-toggle="tab"
-                            data-target="#price_and_stocks" type="button" role="tab" aria-controls="price_and_stocks"
-                            aria-selected="false">
-                            {{ translate('Price & Stock') }}
-                        </a>
-                    </li>
-                    <!-- SEO -->
-                    <li class="nav-item">
-                        <a class="nav-link" id="seo-tab" href="#seo" data-toggle="tab" data-target="#seo" type="button"
-                            role="tab" aria-controls="seo" aria-selected="false">
-                            {{ translate('SEO') }}
-                        </a>
-                    </li>
-                    <!-- Shipping -->
-                    <li class="nav-item">
-                        <a class="nav-link" id="shipping-tab" href="#shipping" data-toggle="tab" data-target="#shipping"
-                            type="button" role="tab" aria-controls="shipping" aria-selected="false">
-                            {{ translate('Shipping') }}
-                        </a>
-                    </li>
-
-                    <!-- Warranty -->
-                    <li class="nav-item">
-                        <a class="nav-link" id="warranty-tab" href="#warranty" data-toggle="tab" data-target="#warranty"
-                            type="button" role="tab" aria-controls="warranty" aria-selected="false">
-                            {{ translate('Warranty') }}
-                        </a>
-                    </li>
-
-                    <!-- Frequently Bought Product -->
-                    <li class="nav-item">
-                        <a class="nav-link" id="frequenty-bought-product-tab" href="#frequenty-bought-product"
-                            data-toggle="tab" data-target="#frequenty-bought-product" type="button" role="tab"
-                            aria-controls="frequenty-bought-product" aria-selected="false">
-                            {{ translate('Frequently Bought') }}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- tab content -->
-            <div class="flex-grow-1 p-sm-3 p-lg-2rem mb-2rem mb-md-0">
+        <div>
+            <!-- Main Form Content -->
+            <div class="p-sm-3 p-lg-2rem mb-2rem mb-md-0">
                 <!-- Error Meassages -->
                 @if ($errors->any())
                     <div class="alert alert-danger">
@@ -118,9 +58,9 @@
                         @endforeach
                     </ul>
 
-                    <div class="tab-content">
+                    <div class="product-form-sections">
                         <!-- General -->
-                        <div class="tab-pane fade" id="general" role="tabpanel" aria-labelledby="general-tab">
+                        <div class="card mb-4" id="general">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- Product Information -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -245,7 +185,13 @@
 
                                     <!-- Description -->
                                     <div class="form-group">
-                                        <label class="fs-13">{{translate('Description')}}</label>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="fs-13 mb-0">{{translate('Description')}}</label>
+                                            <button type="button" class="btn btn-sm btn-soft-primary"
+                                                onclick="generateDescriptionAI()">
+                                                <i class="las la-magic"></i> {{translate('Generate description by AI')}}
+                                            </button>
+                                        </div>
                                         <div class="">
                                             <textarea class="aiz-text-editor"
                                                 name="description">{{ $product->getTranslation('description', $lang) }}</textarea>
@@ -451,8 +397,7 @@
                         </div>
 
                         <!-- Files & Media -->
-                        <div class="tab-pane fade" id="files_and_media" role="tabpanel"
-                            aria-labelledby="files-and-media-tab">
+                        <div class="card mb-4" id="files_and_media">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- Product Files & Media -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -598,16 +543,17 @@
                                         <button type="button"
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more" data-content='<div class="row mb-2">
-                                                                                    <div class="col">
-                                                                                        <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                        <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                    </div>
-                                                                                    <div class="col-auto d-flex justify-content-end">
-                                                                                            <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                <i class="las la-times"></i>
-                                                                                            </button>
-                                                                                    </div>
-                                                                                </div>' data-target=".video-provider-link">
+                                                                                                <div class="col">
+                                                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                </div>
+                                                                                                <div class="col-auto d-flex justify-content-end">
+                                                                                                        <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                            <i class="las la-times"></i>
+                                                                                                        </button>
+                                                                                                </div>
+                                                                                            </div>'
+                                            data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
                                         </button>
@@ -634,8 +580,7 @@
                             </div>
                         </div>
                         <!-- Price & Stock -->
-                        <div class="tab-pane fade" id="price_and_stocks" role="tabpanel"
-                            aria-labelledby="price-and-stocks-tab">
+                        <div class="card mb-4" id="price_and_stocks">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- tab Title -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -889,7 +834,7 @@
                         </div>
 
                         <!-- SEO -->
-                        <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
+                        <div class="card mb-4" id="seo">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- tab Title -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -943,7 +888,7 @@
                         </div>
 
                         <!-- Shipping -->
-                        <div class="tab-pane fade" id="shipping" role="tabpanel" aria-labelledby="shipping-tab">
+                        <div class="card mb-4" id="shipping">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- Shipping Configuration -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -1049,7 +994,7 @@
                         </div>
 
                         <!-- Warranty -->
-                        <div class="tab-pane fade" id="warranty" role="tabpanel" aria-labelledby="warranty-tab">
+                        <div class="card mb-4" id="warranty">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
                                     {{translate('Warranty')}}
@@ -1106,8 +1051,7 @@
                         </div>
 
                         <!-- Frequently Bought Product -->
-                        <div class="tab-pane fade" id="frequenty-bought-product" role="tabpanel"
-                            aria-labelledby="frequenty-bought-product-tab">
+                        <div class="card mb-4" id="frequenty-bought-product">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- tab Title -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700">{{translate('Frequently Bought')}}</h5>
@@ -1237,22 +1181,22 @@
                             </div>
                         </div>
 
-                        <!-- Update Button -->
-                        <div class="mt-4 text-right">
-                            @if ($product->draft)
-                                <button type="submit" name="button" value="unpublish" data-action="unpublish"
-                                    class="mx-2 btn btn-light w-230px btn-md rounded-2 fs-14 fw-700 shadow-secondary border-soft-secondary action-btn">{{ translate('Save & Unpublish') }}</button>
-                                <button type="submit" name="button" value="publish" data-action="publish"
-                                    class="mx-2 btn btn-success w-230px btn-md rounded-2 fs-14 fw-700 shadow-success action-btn">{{ translate('Save & Publish') }}</button>
-                                <button type="button" name="button" value="draft"
-                                    class="mx-2 btn btn-secondary w-230px btn-md rounded-2 fs-14 fw-700 shadow-secondary action-btn"
-                                    id="saveDraftBtn">{{ translate('Save as Draft') }}</button>
-                            @else
-                                <button type="submit" name="button"
-                                    class="mx-2 btn btn-success w-230px btn-md rounded-2 fs-14 fw-700 shadow-success action-btn">{{ translate('Update') }}</button>
-                            @endif
-                        </div>
+                    </div>
 
+                    <!-- Update Button -->
+                    <div class="mt-4 text-right">
+                        @if ($product->draft)
+                            <button type="submit" name="button" value="unpublish" data-action="unpublish"
+                                class="mx-2 btn btn-light w-230px btn-md rounded-2 fs-14 fw-700 shadow-secondary border-soft-secondary action-btn">{{ translate('Save & Unpublish') }}</button>
+                            <button type="submit" name="button" value="publish" data-action="publish"
+                                class="mx-2 btn btn-success w-230px btn-md rounded-2 fs-14 fw-700 shadow-success action-btn">{{ translate('Save & Publish') }}</button>
+                            <button type="button" name="button" value="draft"
+                                class="mx-2 btn btn-secondary w-230px btn-md rounded-2 fs-14 fw-700 shadow-secondary action-btn"
+                                id="saveDraftBtn">{{ translate('Save as Draft') }}</button>
+                        @else
+                            <button type="submit" name="button"
+                                class="mx-2 btn btn-success w-230px btn-md rounded-2 fs-14 fw-700 shadow-success action-btn">{{ translate('Update') }}</button>
+                        @endif
                     </div>
                 </form>
             </div>
@@ -1343,17 +1287,17 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                    <div class="form-group row">\
-                                                        <div class="col-md-3">\
-                                                            <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                                            <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                        </div>\
-                                                        <div class="col-md-8">\
-                                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                                                '+ obj + '\
-                                                            </select>\
-                                                        </div>\
-                                                    </div>');
+                                                                <div class="form-group row">\
+                                                                    <div class="col-md-3">\
+                                                                        <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                                                        <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                                                    </div>\
+                                                                    <div class="col-md-8">\
+                                                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                                                            '+ obj + '\
+                                                                        </select>\
+                                                                    </div>\
+                                                                </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
