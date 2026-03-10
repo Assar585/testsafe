@@ -8,6 +8,17 @@ if [ -f "/var/www/core_patch.php" ]; then
     echo "CoreComponent patch applied."
 fi
 
+# Ensure correct permissions for mounted volumes (Railway overrides Dockerfile permissions)
+echo "Setting permissions for storage and upload volumes..."
+mkdir -p /var/www/storage/framework/cache/data \
+         /var/www/storage/framework/app/cache \
+         /var/www/storage/framework/sessions \
+         /var/www/storage/framework/views \
+         /var/www/storage/logs
+
+chown -R www-data:www-data /var/www/storage /var/www/public/uploads || true
+chmod -R 775 /var/www/storage /var/www/public/uploads || true
+
 # Pre-warm Laravel caches for production on container boot
 echo "Building Laravel caches..."
 php /var/www/artisan package:discover
