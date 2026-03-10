@@ -146,40 +146,54 @@
 
                                         <!-- Product Category -->
                                         <div class="col-xxl-5 col-xl-6">
-                                            <div id="category-card"
-                                                class="card mb-1 @if($errors->has('category_ids') || $errors->has('category_id')) border border-danger @endif">
-                                                <div class="card-header">
-                                                    <h5 class="mb-0 h6">{{ translate('Product Category') }}</h5>
-                                                    <h6 class="float-right fs-13 mb-0">
-                                                        {{ translate('Select Main') }}
-                                                        <span class="position-relative main-category-info-icon">
-                                                            <i class="las la-question-circle fs-18 text-info"></i>
-                                                            <span
-                                                                class="main-category-info bg-soft-info p-2 position-absolute d-none border">{{ translate('This will be used for commission based calculations and homepage category wise product Show.') }}</span>
-                                                        </span>
-                                                    </h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="h-400px overflow-auto c-scrollbar-light">
-                                                        @php
-                                                            $old_categories = $product->categories()->pluck('category_id')->toArray();
-                                                        @endphp
-                                                        <ul class="hummingbird-treeview-converter list-unstyled"
-                                                            data-checkbox-name="category_ids[]"
-                                                            data-radio-name="category_id">
-                                                            @foreach ($categories as $category)
-                                                                <li id="{{ $category->id }}">
-                                                                    {{ $category->getTranslation('name') }}
-                                                                </li>
-                                                                @foreach ($category->childrenCategories as $childCategory)
-                                                                    @include('backend.product.products.child_category', ['child_category' => $childCategory])
-                                                                @endforeach
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{translate('Product Category')}} <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="hidden" name="category_ids[]" id="category_ids_hidden"
+                                                    value="{{ $product->category_id }}">
+                                                <select
+                                                    class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror"
+                                                    name="category_id" id="category_id" data-live-search="true" required
+                                                    onchange="$('#category_ids_hidden').val(this.value);">
+                                                    <option value="">{{ translate('Select Category') }}</option>
+                                                    @foreach ($categories as $category)
+                                                        <option value="{{ $category->id }}"
+                                                            @selected($product->category_id == $category->id)>
+                                                            {{ $category->getTranslation('name') }}
+                                                        </option>
+                                                        @foreach ($category->childrenCategories as $childCategory)
+                                                            <option value="{{ $childCategory->id }}"
+                                                                @selected($product->category_id == $childCategory->id)>
+                                                                &nbsp;&nbsp;&nbsp;-- {{ $childCategory->getTranslation('name') }}
+                                                            </option>
+                                                            @foreach ($childCategory->childrenCategories as $subChildCategory)
+                                                                <option value="{{ $subChildCategory->id }}"
+                                                                    @selected($product->category_id == $subChildCategory->id)>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
+                                                                    {{ $subChildCategory->getTranslation('name') }}
+                                                                </option>
                                                             @endforeach
-                                                        </ul>
-                                                    </div>
-                                                </div>
+                                                        @endforeach
+                                                    @endforeach
+                                                </select>
+                                                @error('category_ids')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
                                             </div>
-                                            <div id="category-tree-table-error"></div>
+                                            <!-- HS Code - Server-side rendered -->
+                                            <div class="form-group mb-2 mt-3">
+                                                <label
+                                                    class="col-from-label fs-13">{{translate('TN VED (HS Code)')}}</label>
+                                                <select class="form-control" name="hsn_code" id="hsn_code_select">
+                                                    @if($product->hsn_code)
+                                                        <option value="{{ $product->hsn_code }}" selected>
+                                                            {{ $product->hsn_code_name ?? $product->hsn_code }}
+                                                        </option>
+                                                    @endif
+                                                </select>
+                                                <small
+                                                    class="text-muted">{{ translate('Used for international shipping and customs.') }}</small>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -543,16 +557,16 @@
                                         <button type="button"
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more" data-content='<div class="row mb-2">
-                                                                                                <div class="col">
-                                                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                                </div>
-                                                                                                <div class="col-auto d-flex justify-content-end">
-                                                                                                        <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                            <i class="las la-times"></i>
-                                                                                                        </button>
-                                                                                                </div>
-                                                                                            </div>'
+                                                                                                        <div class="col">
+                                                                                                            <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                            <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                        </div>
+                                                                                                        <div class="col-auto d-flex justify-content-end">
+                                                                                                                <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                                    <i class="las la-times"></i>
+                                                                                                                </button>
+                                                                                                        </div>
+                                                                                                    </div>'
                                             data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
@@ -833,353 +847,373 @@
                             </div>
                         </div>
 
-                        <!-- SEO -->
-                        <div class="card mb-4" id="seo">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <!-- tab Title -->
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{translate('SEO Meta Tags')}}
-                                </h5>
-                                <div class="w-100">
-                                    <!-- Meta Title -->
-                                    <div class="form-group mb-2">
-                                        <label class="col-from-label">{{translate('Meta Title')}}</label>
-                                        <input type="text" class="form-control" name="meta_title"
-                                            value="{{ $product->meta_title }}" placeholder="{{translate('Meta Title')}}">
+                        <!-- Advanced Settings Toggle -->
+                        <div class="text-center mb-4">
+                            <button type="button" class="btn btn-soft-primary px-5 py-2 fw-700 shadow-sm"
+                                data-toggle="collapse" href="#advancedSettings" aria-expanded="false"
+                                aria-controls="advancedSettings">
+                                <i class="las la-cog mr-2"></i>{{ translate('Advanced Settings') }}
+                            </button>
+                        </div>
+
+                        <div class="collapse" id="advancedSettings">
+                            <!-- SEO -->
+                            <div class="card mb-4" id="seo">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <!-- tab Title -->
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{translate('SEO Meta Tags')}}
+                                    </h5>
+                                    <div class="w-100">
+                                        <!-- Meta Title -->
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label">{{translate('Meta Title')}}</label>
+                                            <input type="text" class="form-control" name="meta_title"
+                                                value="{{ $product->meta_title }}"
+                                                placeholder="{{translate('Meta Title')}}">
+                                        </div>
+                                        <!-- Description -->
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label">{{translate('Description')}}</label>
+                                            <textarea name="meta_description" rows="8"
+                                                class="form-control">{{ $product->meta_description }}</textarea>
+                                        </div>
+                                        <!-- meta keywords -->
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label">{{translate('Keywords')}}</label>
+                                            <textarea class="resize-off form-control" name="meta_keywords"
+                                                placeholder="{{ translate('Keyword, Keyword') }}">{{ $product->meta_keywords }}</textarea>
+                                            <small class="text-muted">{{ translate('Separate with coma') }}</small>
+                                        </div>
+                                        <!-- Meta Image -->
+                                        <div class="form-group mb-2">
+                                            <label class="col-form-label"
+                                                for="signinSrEmail">{{ translate('Meta Image') }}</label>
+                                            <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text bg-soft-secondary font-weight-medium">
+                                                        {{ translate('Browse')}}
+                                                    </div>
+                                                </div>
+                                                <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                <input type="hidden" name="meta_img" value="{{ $product->meta_img }}"
+                                                    class="selected-files">
+                                            </div>
+                                            <div class="file-preview box sm">
+                                            </div>
+                                        </div>
+                                        <!-- Slug -->
+                                        <div class="form-group mb-2">
+                                            <label class="col-form-label">{{translate('Slug')}}</label>
+                                            <input type="text" placeholder="{{translate('Slug')}}" id="slug" name="slug"
+                                                value="{{ $product->slug }}" class="form-control">
+                                        </div>
                                     </div>
-                                    <!-- Description -->
-                                    <div class="form-group mb-2">
-                                        <label class="col-from-label">{{translate('Description')}}</label>
-                                        <textarea name="meta_description" rows="8"
-                                            class="form-control">{{ $product->meta_description }}</textarea>
-                                    </div>
-                                    <!-- meta keywords -->
-                                    <div class="form-group mb-2">
-                                        <label class="col-from-label">{{translate('Keywords')}}</label>
-                                        <textarea class="resize-off form-control" name="meta_keywords"
-                                            placeholder="{{ translate('Keyword, Keyword') }}">{{ $product->meta_keywords }}</textarea>
-                                        <small class="text-muted">{{ translate('Separate with coma') }}</small>
-                                    </div>
-                                    <!-- Meta Image -->
-                                    <div class="form-group mb-2">
-                                        <label class="col-form-label"
-                                            for="signinSrEmail">{{ translate('Meta Image') }}</label>
-                                        <div class="input-group" data-toggle="aizuploader" data-type="image">
-                                            <div class="input-group-prepend">
-                                                <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                    {{ translate('Browse')}}
+                                </div>
+                            </div>
+
+                            <!-- Shipping -->
+                            <div class="card mb-4" id="shipping">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <!-- Shipping Configuration -->
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{translate('Shipping Configuration')}}
+                                    </h5>
+                                    <div class="w-100">
+                                        <!-- Cash On Delivery -->
+                                        @if (get_setting('cash_payment') == '1')
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-from-label">{{translate('Cash On Delivery')}}</label>
+                                                <div class="col-md-9">
+                                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                                        <input type="checkbox" name="cash_on_delivery" value="1"
+                                                            @if($product->cash_on_delivery == 1) checked @endif>
+                                                        <span></span>
+                                                    </label>
                                                 </div>
                                             </div>
-                                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                            <input type="hidden" name="meta_img" value="{{ $product->meta_img }}"
-                                                class="selected-files">
-                                        </div>
-                                        <div class="file-preview box sm">
-                                        </div>
+                                        @else
+                                            <p>
+                                                {{ translate('Cash On Delivery option is disabled. Activate this feature from here') }}
+                                                <a href="{{route('activation.index')}}"
+                                                    class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.index', 'shipping_configuration.edit', 'shipping_configuration.update'])}}">
+                                                    <span
+                                                        class="aiz-side-nav-text">{{translate('Cash Payment Activation')}}</span>
+                                                </a>
+                                            </p>
+                                        @endif
+
+                                        @if (get_setting('shipping_type') == 'product_wise_shipping')
+                                            <!-- Free Shipping -->
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-from-label">{{translate('Free Shipping')}}</label>
+                                                <div class="col-md-9">
+                                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                                        <input type="radio" name="shipping_type" value="free"
+                                                            @if($product->shipping_type == 'free') checked @endif>
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <!-- Flat Rate -->
+                                            <div class="form-group row">
+                                                <label class="col-md-3 col-from-label">{{translate('Flat Rate')}}</label>
+                                                <div class="col-md-9">
+                                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                                        <input type="radio" name="shipping_type" value="flat_rate"
+                                                            @if($product->shipping_type == 'flat_rate') checked @endif>
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <!-- Shipping cost -->
+                                            <div class="flat_rate_shipping_div" style="display: none">
+                                                <div class="form-group mb-2">
+                                                    <label class="col-from-label">{{translate('Shipping cost')}}</label>
+                                                    <input type="number" lang="en" min="0" value="{{ $product->shipping_cost }}"
+                                                        step="0.01" placeholder="{{ translate('Shipping cost') }}"
+                                                        name="flat_shipping_cost" class="form-control">
+                                                </div>
+                                            </div>
+                                            <!-- Is Product Quantity Mulitiply -->
+                                            <div class="form-group row">
+                                                <label
+                                                    class="col-md-3 col-from-label">{{translate('Is Product Quantity Mulitiply')}}</label>
+                                                <div class="col-md-9">
+                                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                                        <input type="checkbox" name="is_quantity_multiplied" value="1"
+                                                            @if($product->is_quantity_multiplied == 1) checked @endif>
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <p>
+                                                {{ translate('Product wise shipping cost is disable. Shipping cost is configured from here') }}
+                                                <a href="{{route('shipping_configuration.shipping_method')}}"
+                                                    class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.shipping_method'])}}">
+                                                    <span class="aiz-side-nav-text">{{translate('Shipping Method')}}</span>
+                                                </a>
+                                            </p>
+                                        @endif
                                     </div>
-                                    <!-- Slug -->
-                                    <div class="form-group mb-2">
-                                        <label class="col-form-label">{{translate('Slug')}}</label>
-                                        <input type="text" placeholder="{{translate('Slug')}}" id="slug" name="slug"
-                                            value="{{ $product->slug }}" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
-                        <!-- Shipping -->
-                        <div class="card mb-4" id="shipping">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <!-- Shipping Configuration -->
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{translate('Shipping Configuration')}}
-                                </h5>
-                                <div class="w-100">
-                                    <!-- Cash On Delivery -->
-                                    @if (get_setting('cash_payment') == '1')
-                                        <div class="form-group row">
-                                            <label class="col-md-3 col-from-label">{{translate('Cash On Delivery')}}</label>
-                                            <div class="col-md-9">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="checkbox" name="cash_on_delivery" value="1"
-                                                        @if($product->cash_on_delivery == 1) checked @endif>
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <p>
-                                            {{ translate('Cash On Delivery option is disabled. Activate this feature from here') }}
-                                            <a href="{{route('activation.index')}}"
-                                                class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.index', 'shipping_configuration.edit', 'shipping_configuration.update'])}}">
-                                                <span class="aiz-side-nav-text">{{translate('Cash Payment Activation')}}</span>
-                                            </a>
-                                        </p>
-                                    @endif
-
-                                    @if (get_setting('shipping_type') == 'product_wise_shipping')
-                                        <!-- Free Shipping -->
-                                        <div class="form-group row">
-                                            <label class="col-md-3 col-from-label">{{translate('Free Shipping')}}</label>
-                                            <div class="col-md-9">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="radio" name="shipping_type" value="free"
-                                                        @if($product->shipping_type == 'free') checked @endif>
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- Flat Rate -->
-                                        <div class="form-group row">
-                                            <label class="col-md-3 col-from-label">{{translate('Flat Rate')}}</label>
-                                            <div class="col-md-9">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="radio" name="shipping_type" value="flat_rate"
-                                                        @if($product->shipping_type == 'flat_rate') checked @endif>
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <!-- Shipping cost -->
-                                        <div class="flat_rate_shipping_div" style="display: none">
-                                            <div class="form-group mb-2">
-                                                <label class="col-from-label">{{translate('Shipping cost')}}</label>
-                                                <input type="number" lang="en" min="0" value="{{ $product->shipping_cost }}"
-                                                    step="0.01" placeholder="{{ translate('Shipping cost') }}"
-                                                    name="flat_shipping_cost" class="form-control">
-                                            </div>
-                                        </div>
-                                        <!-- Is Product Quantity Mulitiply -->
-                                        <div class="form-group row">
-                                            <label
-                                                class="col-md-3 col-from-label">{{translate('Is Product Quantity Mulitiply')}}</label>
-                                            <div class="col-md-9">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="checkbox" name="is_quantity_multiplied" value="1"
-                                                        @if($product->is_quantity_multiplied == 1) checked @endif>
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <p>
-                                            {{ translate('Product wise shipping cost is disable. Shipping cost is configured from here') }}
-                                            <a href="{{route('shipping_configuration.shipping_method')}}"
-                                                class="aiz-side-nav-link {{ areActiveRoutes(['shipping_configuration.shipping_method'])}}">
-                                                <span class="aiz-side-nav-text">{{translate('Shipping Method')}}</span>
-                                            </a>
-                                        </p>
-                                    @endif
-                                </div>
-
-                                <!-- Estimate Shipping Time -->
-                                <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{translate('Estimate Shipping Time')}}
-                                </h5>
-                                <div class="w-100">
-                                    <div class="form-group mb-2">
-                                        <label class="col-from-label">{{translate('Shipping Days')}}</label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" name="est_shipping_days"
-                                                value="{{ $product->est_shipping_days }}" min="1" step="1" integer-only
-                                                placeholder="{{translate('Shipping Days')}}">
-                                            <div class="input-group-prepend">
-                                                <span class="input-group-text"
-                                                    id="inputGroupPrepend">{{translate('Days')}}</span>
+                                    <!-- Estimate Shipping Time -->
+                                    <h5 class="mb-3 mt-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{translate('Estimate Shipping Time')}}
+                                    </h5>
+                                    <div class="w-100">
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label">{{translate('Shipping Days')}}</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" name="est_shipping_days"
+                                                    value="{{ $product->est_shipping_days }}" min="1" step="1" integer-only
+                                                    placeholder="{{translate('Shipping Days')}}">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text"
+                                                        id="inputGroupPrepend">{{translate('Days')}}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Warranty -->
-                        <div class="card mb-4" id="warranty">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{translate('Warranty')}}
-                                </h5>
-                                <div class="form-group row">
-                                    <label class="col-md-2 col-from-label">{{translate('Warranty')}}</label>
-                                    <div class="col-md-10">
-                                        <label class="aiz-switch aiz-switch-success mb-0">
-                                            <input type="checkbox" name="has_warranty" onchange="warrantySelection()"
-                                                @if($product->has_warranty == 1) checked @endif>
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="w-100 warranty_selection_div @if($product->has_warranty != 1) d-none @endif">
+                            <!-- Warranty -->
+                            <div class="card mb-4" id="warranty">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{translate('Warranty')}}
+                                    </h5>
                                     <div class="form-group row">
-                                        <div class="col-md-2"></div>
+                                        <label class="col-md-2 col-from-label">{{translate('Warranty')}}</label>
                                         <div class="col-md-10">
-                                            <select class="form-control aiz-selectpicker" name="warranty_id"
-                                                id="warranty_id" data-selected="{{ $product->warranty_id }}"
-                                                data-live-search="true" @if($product->has_warranty == 1) required @endif>
-                                                <option value="">{{ translate('Select Warranty') }}</option>
-                                                @foreach (\App\Models\Warranty::all() as $warranty)
-                                                    <option value="{{ $warranty->id }}"
-                                                        @selected(old('warranty_id') == $warranty->id)>
-                                                        {{ $warranty->getTranslation('text') }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                            <input type="hidden" name="warranty_note_id" id="warranty_note_id"
-                                                value="{{$product->warranty_note_id}}">
-
-                                            <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3"
-                                                style="border-bottom: 1px dashed #e4e5eb;">{{translate('Warranty Note')}}
-                                            </h5>
-                                            <div id="warranty_note">
-                                                @if($product->warrantyNote != null)
-                                                    <div class="border border-gray my-2 p-2">
-                                                        {{ $product->warrantyNote->getTranslation('description') ?? '' }}
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            <button type="button"
-                                                class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
-                                                onclick="noteModal('warranty')">
-                                                <i class="las la-plus"></i>
-                                                <span class="ml-2">{{ translate('Select Warranty Note') }}</span>
-                                            </button>
+                                            <label class="aiz-switch aiz-switch-success mb-0">
+                                                <input type="checkbox" name="has_warranty" onchange="warrantySelection()"
+                                                    @if($product->has_warranty == 1) checked @endif>
+                                                <span></span>
+                                            </label>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <div
+                                        class="w-100 warranty_selection_div @if($product->has_warranty != 1) d-none @endif">
+                                        <div class="form-group row">
+                                            <div class="col-md-2"></div>
+                                            <div class="col-md-10">
+                                                <select class="form-control aiz-selectpicker" name="warranty_id"
+                                                    id="warranty_id" data-selected="{{ $product->warranty_id }}"
+                                                    data-live-search="true" @if($product->has_warranty == 1) required @endif>
+                                                    <option value="">{{ translate('Select Warranty') }}</option>
+                                                    @foreach (\App\Models\Warranty::all() as $warranty)
+                                                        <option value="{{ $warranty->id }}"
+                                                            @selected(old('warranty_id') == $warranty->id)>
+                                                            {{ $warranty->getTranslation('text') }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
 
-                        <!-- Frequently Bought Product -->
-                        <div class="card mb-4" id="frequenty-bought-product">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <!-- tab Title -->
-                                <h5 class="mb-3 pb-3 fs-17 fw-700">{{translate('Frequently Bought')}}</h5>
-                                <div class="w-100">
-                                    <div class="d-flex mb-4">
-                                        <div class="radio mar-btm mr-5 d-flex align-items-center">
-                                            <input id="fq_bought_select_products" type="radio"
-                                                name="frequently_bought_selection_type" value="product"
-                                                onchange="fq_bought_product_selection_type()"
-                                                @if($product->frequently_bought_selection_type == 'product') checked @endif>
-                                            <label for="fq_bought_select_products"
-                                                class="fs-14 fw-700 mb-0 ml-2">{{translate('Select Product')}}</label>
-                                        </div>
-                                        <div class="radio mar-btm mr-3 d-flex align-items-center">
-                                            <input id="fq_bought_select_category" type="radio"
-                                                name="frequently_bought_selection_type" value="category"
-                                                onchange="fq_bought_product_selection_type()"
-                                                @if($product->frequently_bought_selection_type == 'category') checked @endif>
-                                            <label for="fq_bought_select_category"
-                                                class="fs-14 fw-700 mb-0 ml-2">{{translate('Select Category')}}</label>
-                                        </div>
-                                    </div>
+                                                <input type="hidden" name="warranty_note_id" id="warranty_note_id"
+                                                    value="{{$product->warranty_note_id}}">
 
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <div class="fq_bought_select_product_div d-none">
-                                                @php
-                                                    $fq_bought_products = $product->frequently_bought_products()->where('category_id', null)->get();
-                                                @endphp
-
-                                                <div id="selected-fq-bought-products">
-                                                    @if(count($fq_bought_products) > 0)
-                                                        <div class="table-responsive mb-4">
-                                                            <table class="table mb-0">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th class="opacity-50 pl-0">
-                                                                            {{ translate('Product Thumb') }}
-                                                                        </th>
-                                                                        <th class="opacity-50">{{ translate('Product Name') }}
-                                                                        </th>
-                                                                        <th class="opacity-50">{{ translate('Category') }}</th>
-                                                                        <th class="opacity-50 text-right pr-0">
-                                                                            {{ translate('Options') }}
-                                                                        </th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    @foreach($fq_bought_products as $fQBproduct)
-                                                                        <tr class="remove-parent">
-                                                                            <input type="hidden" name="fq_bought_product_ids[]"
-                                                                                value="{{ $fQBproduct->frequently_bought_product->id }}">
-                                                                            <td class="w-150px pl-0"
-                                                                                style="vertical-align: middle;">
-                                                                                <p class="d-block size-48px">
-                                                                                    <img src="{{ uploaded_asset($fQBproduct->frequently_bought_product->thumbnail_img) }}"
-                                                                                        alt="{{ translate('Image')}}"
-                                                                                        class="h-100 img-fit lazyload"
-                                                                                        onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
-                                                                                </p>
-                                                                            </td>
-                                                                            <td style="vertical-align: middle;">
-                                                                                <p class="d-block fs-13 fw-700 hov-text-primary mb-1 text-dark"
-                                                                                    title="{{ translate('Product Name') }}">
-                                                                                    {{ $fQBproduct->frequently_bought_product->getTranslation('name') }}
-                                                                                </p>
-                                                                            </td>
-                                                                            <td style="vertical-align: middle;">
-                                                                                {{ $fQBproduct->frequently_bought_product->main_category->name ?? translate('Category Not Found') }}
-                                                                            </td>
-                                                                            <td class="text-right pr-0"
-                                                                                style="vertical-align: middle;">
-                                                                                <button type="button"
-                                                                                    class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger"
-                                                                                    data-toggle="remove-parent"
-                                                                                    data-parent=".remove-parent">
-                                                                                    <i class="las la-trash"></i>
-                                                                                </button>
-                                                                            </td>
-                                                                        </tr>
-                                                                    @endforeach
-                                                                </tbody>
-                                                            </table>
+                                                <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3"
+                                                    style="border-bottom: 1px dashed #e4e5eb;">
+                                                    {{translate('Warranty Note')}}
+                                                </h5>
+                                                <div id="warranty_note">
+                                                    @if($product->warrantyNote != null)
+                                                        <div class="border border-gray my-2 p-2">
+                                                            {{ $product->warrantyNote->getTranslation('description') ?? '' }}
                                                         </div>
                                                     @endif
                                                 </div>
-
                                                 <button type="button"
-                                                    class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center"
-                                                    onclick="showFqBoughtProductModal()">
+                                                    class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                                    onclick="noteModal('warranty')">
                                                     <i class="las la-plus"></i>
-                                                    <span class="ml-2">{{ translate('Add More') }}</span>
+                                                    <span class="ml-2">{{ translate('Select Warranty Note') }}</span>
                                                 </button>
                                             </div>
-
-                                            {{-- Select Category for Frequently Bought Product --}}
-                                            <div class="fq_bought_select_category_div d-none">
-                                                @php
-                                                    $fq_bought_product_category_id = $product->frequently_bought_products()->where('category_id', '!=', null)->first();
-                                                    $fqCategory = $fq_bought_product_category_id != null ? $fq_bought_product_category_id->category_id : null;
-
-                                                @endphp
-                                                <div class="form-group row">
-                                                    <label class="col-md-2 col-from-label">{{translate('Category')}} <span
-                                                            class="text-danger">*</span></label>
-                                                    <div class="col-md-10">
-                                                        <select class="form-control aiz-selectpicker"
-                                                            data-placeholder="{{ translate('Select a Category')}}"
-                                                            name="fq_bought_product_category_id" data-live-search="true"
-                                                            data-selected="{{ $fqCategory }}" required>
-                                                            @foreach ($categories as $category)
-                                                                <option value="{{ $category->id }}">
-                                                                    {{ $category->getTranslation('name') }}
-                                                                </option>
-                                                                @foreach ($category->childrenCategories as $childCategory)
-                                                                    @include('categories.child_category', ['child_category' => $childCategory])
-                                                                @endforeach
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
+
+                            <!-- Frequently Bought Product -->
+                            <div class="card mb-4" id="frequenty-bought-product">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <!-- tab Title -->
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700">{{translate('Frequently Bought')}}</h5>
+                                    <div class="w-100">
+                                        <div class="d-flex mb-4">
+                                            <div class="radio mar-btm mr-5 d-flex align-items-center">
+                                                <input id="fq_bought_select_products" type="radio"
+                                                    name="frequently_bought_selection_type" value="product"
+                                                    onchange="fq_bought_product_selection_type()"
+                                                    @if($product->frequently_bought_selection_type == 'product') checked
+                                                    @endif>
+                                                <label for="fq_bought_select_products"
+                                                    class="fs-14 fw-700 mb-0 ml-2">{{translate('Select Product')}}</label>
+                                            </div>
+                                            <div class="radio mar-btm mr-3 d-flex align-items-center">
+                                                <input id="fq_bought_select_category" type="radio"
+                                                    name="frequently_bought_selection_type" value="category"
+                                                    onchange="fq_bought_product_selection_type()"
+                                                    @if($product->frequently_bought_selection_type == 'category') checked
+                                                    @endif>
+                                                <label for="fq_bought_select_category"
+                                                    class="fs-14 fw-700 mb-0 ml-2">{{translate('Select Category')}}</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="fq_bought_select_product_div d-none">
+                                                    @php
+                                                        $fq_bought_products = $product->frequently_bought_products()->where('category_id', null)->get();
+                                                    @endphp
+
+                                                    <div id="selected-fq-bought-products">
+                                                        @if(count($fq_bought_products) > 0)
+                                                            <div class="table-responsive mb-4">
+                                                                <table class="table mb-0">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th class="opacity-50 pl-0">
+                                                                                {{ translate('Product Thumb') }}
+                                                                            </th>
+                                                                            <th class="opacity-50">
+                                                                                {{ translate('Product Name') }}
+                                                                            </th>
+                                                                            <th class="opacity-50">{{ translate('Category') }}
+                                                                            </th>
+                                                                            <th class="opacity-50 text-right pr-0">
+                                                                                {{ translate('Options') }}
+                                                                            </th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        @foreach($fq_bought_products as $fQBproduct)
+                                                                            <tr class="remove-parent">
+                                                                                <input type="hidden" name="fq_bought_product_ids[]"
+                                                                                    value="{{ $fQBproduct->frequently_bought_product->id }}">
+                                                                                <td class="w-150px pl-0"
+                                                                                    style="vertical-align: middle;">
+                                                                                    <p class="d-block size-48px">
+                                                                                        <img src="{{ uploaded_asset($fQBproduct->frequently_bought_product->thumbnail_img) }}"
+                                                                                            alt="{{ translate('Image')}}"
+                                                                                            class="h-100 img-fit lazyload"
+                                                                                            onerror="this.onerror=null;this.src='{{ static_asset('assets/img/placeholder.jpg') }}';">
+                                                                                    </p>
+                                                                                </td>
+                                                                                <td style="vertical-align: middle;">
+                                                                                    <p class="d-block fs-13 fw-700 hov-text-primary mb-1 text-dark"
+                                                                                        title="{{ translate('Product Name') }}">
+                                                                                        {{ $fQBproduct->frequently_bought_product->getTranslation('name') }}
+                                                                                    </p>
+                                                                                </td>
+                                                                                <td style="vertical-align: middle;">
+                                                                                    {{ $fQBproduct->frequently_bought_product->main_category->name ?? translate('Category Not Found') }}
+                                                                                </td>
+                                                                                <td class="text-right pr-0"
+                                                                                    style="vertical-align: middle;">
+                                                                                    <button type="button"
+                                                                                        class="mt-1 btn btn-icon btn-circle btn-sm btn-soft-danger"
+                                                                                        data-toggle="remove-parent"
+                                                                                        data-parent=".remove-parent">
+                                                                                        <i class="las la-trash"></i>
+                                                                                    </button>
+                                                                                </td>
+                                                                            </tr>
+                                                                        @endforeach
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        @endif
+                                                    </div>
+
+                                                    <button type="button"
+                                                        class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                                        onclick="showFqBoughtProductModal()">
+                                                        <i class="las la-plus"></i>
+                                                        <span class="ml-2">{{ translate('Add More') }}</span>
+                                                    </button>
+                                                </div>
+
+                                                {{-- Select Category for Frequently Bought Product --}}
+                                                <div class="fq_bought_select_category_div d-none">
+                                                    @php
+                                                        $fq_bought_product_category_id = $product->frequently_bought_products()->where('category_id', '!=', null)->first();
+                                                        $fqCategory = $fq_bought_product_category_id != null ? $fq_bought_product_category_id->category_id : null;
+
+                                                    @endphp
+                                                    <div class="form-group row">
+                                                        <label class="col-md-2 col-from-label">{{translate('Category')}}
+                                                            <span class="text-danger">*</span></label>
+                                                        <div class="col-md-10">
+                                                            <select class="form-control aiz-selectpicker"
+                                                                data-placeholder="{{ translate('Select a Category')}}"
+                                                                name="fq_bought_product_category_id" data-live-search="true"
+                                                                data-selected="{{ $fqCategory }}" required>
+                                                                @foreach ($categories as $category)
+                                                                    <option value="{{ $category->id }}">
+                                                                        {{ $category->getTranslation('name') }}
+                                                                    </option>
+                                                                    @foreach ($category->childrenCategories as $childCategory)
+                                                                        @include('categories.child_category', ['child_category' => $childCategory])
+                                                                    @endforeach
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div> <!-- End Advanced Settings Collapse -->
 
                     </div>
 
@@ -1221,44 +1255,44 @@
     <script src="{{ static_asset('assets/js/hummingbird-treeview.js') }}"></script>
 
     <script type="text/javascript">
-        $(document).ready(function () {
+        $(document).ready(fu                    nction() {
             show_hide_shipping_div();
 
-            $("#treeview").hummingbird();
+                    $("#treeview").hummingbird();
             var main_id = '{{ $product->category_id != null ? $product->category_id : 0 }}';
             var selected_ids = '{{ implode(",", $old_categories) }}';
-            if (selected_ids != '') {
-                const myArray = selected_ids.split(",");
-                for (let i = 0; i < myArray.length; i++) {
-                    const element = myArray[i];
-                    $('#treeview input:checkbox#' + element).prop('checked', true);
-                    if (i < myArray.length - 1) {
-                        const $checkbox = $('#treeview input:checkbox#' + element);
+            if(selected_ids != '') {
+            const myArray = selected_ids.split(",");
+            for (let i = 0; i < myArray.length; i++) {
+                const element = myArray[i];
+                $('#treeview input:checkbox#' + element).prop('checked', true);
+                if (i < myArray.length - 1) {
+                    const $checkbox = $('#treeview input:checkbox#' + element);
 
-                        $checkbox.attr('onclick', 'cursor_not_allowed(event)');
-                        $checkbox.css('cursor', 'not-allowed');
-                        $checkbox.closest('label').css('cursor', 'not-allowed');
-                    } else {
-                        const $checkbox = $('#treeview input:checkbox#' + element);
-                        $checkbox.closest('ul').find('input[type="checkbox"]').removeAttr('onclick');
-                        $checkbox.closest('ul').find('input[type="checkbox"]').css('cursor', '');
-                        $checkbox.closest('ul').find('label').css('cursor', '');
-                    }
-                    $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
-                    $('#treeview input:checkbox#' + element).parents("li").children('.las').removeClass("la-plus").addClass('la-minus');
+                    $checkbox.attr('onclick', 'cursor_not_allowed(event)');
+                    $checkbox.css('cursor', 'not-allowed');
+                    $checkbox.closest('label').css('cursor', 'not-allowed');
+                } else {
+                    const $checkbox = $('#treeview input:checkbox#' + element);
+                    $checkbox.closest('ul').find('input[type="checkbox"]').removeAttr('onclick');
+                    $checkbox.closest('ul').find('input[type="checkbox"]').css('cursor', '');
+                    $checkbox.closest('ul').find('label').css('cursor', '');
                 }
+                $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
+                $('#treeview input:checkbox#' + element).parents("li").children('.las').removeClass("la-plus").addClass('la-minus');
             }
-            $radio = $('#treeview input:radio[value=' + main_id + ']');
-            $radio.prop('checked', true);
-            $prev_label = $radio.prev('label');
-            $prev_label.css('cursor', 'not-allowed');
-            $prev_label.find('input[type="checkbox"]').css('cursor', 'not-allowed');
-            $prev_label.find('input[type="checkbox"]').attr('onclick', 'cursor_not_allowed(event)');
-            $('#treeview input:radio[value=' + main_id + ']').next('ul').css("display", "block");
+        }
+        $radio = $('#treeview input:radio[value=' + main_id + ']');
+        $radio.prop('checked', true);
+        $prev_label = $radio.prev('label');
+        $prev_label.css('cursor', 'not-allowed');
+        $prev_label.find('input[type="checkbox"]').css('cursor', 'not-allowed');
+        $prev_label.find('input[type="checkbox"]').attr('onclick', 'cursor_not_allowed(event)');
+        $('#treeview input:radio[value=' + main_id + ']').next('ul').css("display", "block");
 
-            fq_bought_product_selection_type();
+        fq_bought_product_selection_type();
 
-        });
+                });
 
         $("[name=shipping_type]").on("change", function () {
             show_hide_shipping_div();
@@ -1287,17 +1321,17 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                                <div class="form-group row">\
-                                                                    <div class="col-md-3">\
-                                                                        <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                                                        <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                                    </div>\
-                                                                    <div class="col-md-8">\
-                                                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                                                            '+ obj + '\
-                                                                        </select>\
-                                                                    </div>\
-                                                                </div>');
+                                                                        <div class="form-group row">\
+                                                                            <div class="col-md-3">\
+                                                                                <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                                                                <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                                                            </div>\
+                                                                            <div class="col-md-8">\
+                                                                                <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                                                                    '+ obj + '\
+                                                                                </select>\
+                                                                            </div>\
+                                                                        </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
