@@ -78,7 +78,7 @@ RUN php artisan config:cache \
 
 # Copy startup script
 COPY docker/start.sh /start.sh
-RUN chmod +x /start.sh
+RUN sed -i 's/\r$//' /start.sh && chmod +x /start.sh
 
 # Expose port and start via script
 EXPOSE 8080
