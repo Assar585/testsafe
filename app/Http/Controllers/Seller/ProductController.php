@@ -614,45 +614,63 @@ class ProductController extends Controller
     public function hs_code_search(Request $request)
     {
         $q = strtolower(trim($request->get('q', '')));
-        $jsonPath = public_path('assets/data/hs_codes.json');
-
-        if (!file_exists($jsonPath)) {
-            $jsonPath = base_path('resources/data/hs_codes.json');
-            if (!file_exists($jsonPath)) {
-                return response()->json([]);
-            }
-        }
-
-        $jsonStr = file_get_contents($jsonPath);
-        $jsonStr = preg_replace('/^[\xEF\xBB\xBF\xFE\xFF\xFF\xFE]*/', '', $jsonStr);
-        $all = json_decode($jsonStr, true);
-
-        if (!$all || !is_array($all)) {
-            return response()->json([]);
-        }
+        \Log::info("Seller HS Code Search: Starting search for '$q'");
 
         $results = [];
+        $seen = [];
         $count = 0;
-        foreach ($all as $item) {
+
+        // Check for both possible JSON locations, prioritizing the larger database
+        $json_paths = [
+            public_path('assets/data/hs_codes_un.json'),
+            base_path('resources/data/hs_codes_un.json'),
+            public_path('assets/data/hs_codes.json'),
+            base_path('resources/data/hs_codes.json')
+        ];
+
+        foreach ($json_paths as $path) {
             if ($count >= 5)
                 break;
+            if (file_exists($path)) {
+                try {
+                    $content = file_get_contents($path);
+                    // Strip BOM if present
+                    $content = preg_replace('/^[\xEF\xBB\xBF\xFE\xFF\xFF\xFE]*/', '', $content);
+                    $data = json_decode($content, true);
 
-            $code = isset($item['code']) ? strval($item['code']) : '';
-            $desc = isset($item['desc']) ? strval($item['desc']) : '';
+                    if (empty($data) || !is_array($data)) {
+                        \Log::warning("Seller HS Code Search: Empty or invalid data in $path");
+                        continue;
+                    }
 
-            if (
-                empty($q) ||
-                strpos(strtolower($code), $q) !== false ||
-                strpos(strtolower($desc), $q) !== false
-            ) {
-                $results[] = [
-                    'id' => $code,
-                    'text' => $code . ' – ' . $desc
-                ];
-                $count++;
+                    foreach ($data as $item) {
+                        if ($count >= 5)
+                            break;
+
+                        $code = isset($item['code']) ? strval($item['code']) : '';
+                        $desc = isset($item['desc']) ? strval($item['desc']) : '';
+
+                        if (empty($code) || isset($seen[$code]))
+                            continue;
+
+                        if (
+                            empty($q) ||
+                            strpos(strtolower($code), $q) !== false ||
+                            strpos(strtolower($desc), $q) !== false
+                        ) {
+                            $results[] = [
+                                'id' => $code,
+                                'text' => $code . ' – ' . $desc
+                            ];
+                            $seen[$code] = true;
+                            $count++;
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Log::error("Seller HS Code Search Error in $path: " . $e->getMessage());
+                }
             }
         }
 
-        return response()->json($results);
     }
 }

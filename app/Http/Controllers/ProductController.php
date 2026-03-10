@@ -278,8 +278,12 @@ class ProductController extends Controller
 
     public function hs_code_search(Request $request)
     {
-        $q = $request->q;
+        $q = strtolower(trim($request->get('q', '')));
+        \Log::info("HS Code Search: Starting search for '$q'");
+
         $results = [];
+        $seen = [];
+        $count = 0;
 
         // Check for both possible JSON locations, prioritizing the larger database
         $json_paths = [
@@ -290,61 +294,55 @@ class ProductController extends Controller
         ];
 
         foreach ($json_paths as $path) {
+            if ($count >= 5)
+                break;
             if (file_exists($path)) {
                 try {
                     $content = file_get_contents($path);
-
-                    // Strip BOM if present (essential for some JSON readers)
+                    // Strip BOM if present
                     $content = preg_replace('/^[\xEF\xBB\xBF\xFE\xFF\xFF\xFE]*/', '', $content);
-
                     $data = json_decode($content, true);
 
-                    if (empty($data)) {
-                        \Log::warning("HS Code Search: Empty data in $path");
+                    if (empty($data) || !is_array($data)) {
+                        \Log::warning("HS Code Search: Empty or invalid data in $path");
                         continue;
                     }
 
-                    // Handle different JSON formats (array vs object with results)
-                    $items = isset($data['results']) ? $data['results'] : $data;
+                    \Log::info("HS Code Search: Searching in $path (" . count($data) . " items)");
 
-                    if (!is_array($items)) {
-                        \Log::warning("HS Code Search: Invalid format in $path (items is not an array)");
-                        continue;
-                    }
+                    foreach ($data as $item) {
+                        if ($count >= 5)
+                            break;
 
-                    foreach ($items as $item) {
-                        // Normalize standard and "un" formats
-                        $code = $item['code'] ?? $item['id'] ?? '';
-                        $desc = $item['desc'] ?? $item['text'] ?? '';
+                        $code = isset($item['code']) ? strval($item['code']) : '';
+                        $desc = isset($item['desc']) ? strval($item['desc']) : '';
 
-                        if (empty($code) || empty($desc))
+                        if (empty($code) || isset($seen[$code]))
                             continue;
 
-                        // Match query against code or description (case-insensitive)
                         if (
                             empty($q) ||
-                            stripos($code, $q) !== false ||
-                            stripos($desc, $q) !== false
+                            strpos(strtolower($code), $q) !== false ||
+                            strpos(strtolower($desc), $q) !== false
                         ) {
                             $results[] = [
                                 'id' => $code,
-                                'text' => $code . ' - ' . $desc
+                                'text' => $code . ' – ' . $desc
                             ];
+                            $seen[$code] = true;
+                            $count++;
                         }
-
-                        if (count($results) >= 5)
-                            break 2; // Limit to 5 results
                     }
-                    break; // Use the first file found that provides results
                 } catch (\Exception $e) {
                     \Log::error("HS Code Search Error in $path: " . $e->getMessage());
-                    continue;
                 }
             }
         }
 
         if (empty($results)) {
             \Log::info("HS Code Search: No results found for query '$q'");
+        } else {
+            \Log::info("HS Code Search: Found " . count($results) . " results");
         }
 
         return response()->json($results);
