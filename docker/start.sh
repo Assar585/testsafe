@@ -13,8 +13,10 @@ echo "Building Laravel caches..."
 php /var/www/artisan package:discover
 php /var/www/artisan config:cache
 php /var/www/artisan view:cache
+# Run the exact missing migration explicitly to bypass any earlier migration crashes
+php /var/www/artisan migrate --path=database/migrations/2026_03_03_000000_create_api_integrations_table.php --force || echo "Warning: Explicit API integration migration failed..."
+
 # Run migrations safely to avoid startup crash during schema mismatch.
-php /var/www/artisan migrate --force || echo "Warning: Migration failed, but continuing startup..."
 echo "Caches built and migrations attempted. Startup proceeding..."
 
 # Ensure correct permissions for mounted volumes and locally generated cache files
