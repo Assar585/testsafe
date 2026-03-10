@@ -313,24 +313,32 @@
                     <div class="card">
                         <div class="card-header">
                             <h5 class="mb-0 h6">{{ translate('Product Category') }}</h5>
-                            <h6 class="float-right fs-13 mb-0">
-                                {{ translate('Select Main') }}
-                                <span class="position-relative main-category-info-icon">
-                                    <i class="las la-question-circle fs-18 text-info"></i>
-                                    <span class="main-category-info bg-soft-info p-2 position-absolute d-none border">{{ translate('This will be used for commission based calculations and homepage category wise product Show.') }}</span>
-                                </span>
-                            </h6>
                         </div>
                         <div class="card-body ">
-                            <div class="h-170px overflow-auto c-scrollbar-light">
-                                <ul class="hummingbird-treeview-converter list-unstyled" data-checkbox-name="category_ids[]" data-radio-name="category_id">
+                            <div class="form-group mb-2">
+                                <label class="col-from-label fs-13">{{translate('Category')}} <span
+                                        class="text-danger">*</span></label>
+                                <select
+                                    class="form-control aiz-selectpicker"
+                                    name="category_id" id="category_id" data-live-search="true" required>
+                                    <option value="">{{ translate('Select Category') }}</option>
                                     @foreach ($categories as $category)
-                                    <li id="{{ $category->id }}">{{ $category->getTranslation('name') }}</li>
+                                        <option value="{{ $category->id }}">
+                                            {{ $category->getTranslation('name') }}
+                                        </option>
                                         @foreach ($category->childrenCategories as $childCategory)
-                                            @include('backend.product.products.child_category', ['child_category' => $childCategory])
+                                            <option value="{{ $childCategory->id }}">
+                                                &nbsp;&nbsp;&nbsp;-- {{ $childCategory->getTranslation('name') }}
+                                            </option>
+                                            @foreach ($subChildCategory = $childCategory->childrenCategories as $subChildCategory)
+                                                <option value="{{ $subChildCategory->id }}">
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
+                                                    {{ $subChildCategory->getTranslation('name') }}
+                                                </option>
+                                            @endforeach
                                         @endforeach
                                     @endforeach
-                                </ul>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -351,12 +359,10 @@
 @endsection
 
 @section('script')
-    <!-- Treeview js -->
-    <script src="{{ static_asset('assets/js/hummingbird-treeview.js') }}"></script>
+
     <script type="text/javascript">
 
         $(document).ready(function() {
-            $("#treeview").hummingbird();
         });
 
         function fq_bought_product_selection_type(){

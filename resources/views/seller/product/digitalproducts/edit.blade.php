@@ -374,27 +374,32 @@
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0 h6">{{ translate('Product Category') }}</h5>
-                        <h6 class="float-right fs-13 mb-0">
-                            {{ translate('Select Main') }}
-                            <span class="position-relative main-category-info-icon">
-                                <i class="las la-question-circle fs-18 text-info"></i>
-                                <span class="main-category-info bg-soft-info p-2 position-absolute d-none border">{{ translate('This will be used for commission based calculations and homepage category wise product Show.') }}</span>
-                            </span>
-                        </h6>
                     </div>
                     <div class="card-body ">
-                        <div class="h-190px overflow-auto c-scrollbar-light">
-                            @php
-                                $old_categories = $product->categories()->pluck('category_id')->toArray();
-                            @endphp
-                            <ul class="hummingbird-treeview-converter list-unstyled" data-checkbox-name="category_ids[]" data-radio-name="category_id">
+                        <div class="form-group mb-2">
+                            <label class="col-from-label fs-13">{{translate('Category')}} <span
+                                    class="text-danger">*</span></label>
+                            <select
+                                class="form-control aiz-selectpicker"
+                                name="category_id" id="category_id" data-live-search="true" required>
+                                <option value="">{{ translate('Select Category') }}</option>
                                 @foreach ($categories as $category)
-                                <li id="{{ $category->id }}">{{ $category->getTranslation('name') }}</li>
+                                    <option value="{{ $category->id }}" @if($category->id == $product->category_id) selected @endif>
+                                        {{ $category->getTranslation('name') }}
+                                    </option>
                                     @foreach ($category->childrenCategories as $childCategory)
-                                        @include('backend.product.products.child_category', ['child_category' => $childCategory])
+                                        <option value="{{ $childCategory->id }}" @if($childCategory->id == $product->category_id) selected @endif>
+                                            &nbsp;&nbsp;&nbsp;-- {{ $childCategory->getTranslation('name') }}
+                                        </option>
+                                        @foreach ($childCategory->childrenCategories as $subChildCategory)
+                                            <option value="{{ $subChildCategory->id }}" @if($subChildCategory->id == $product->category_id) selected @endif>
+                                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
+                                                {{ $subChildCategory->getTranslation('name') }}
+                                            </option>
+                                        @endforeach
                                     @endforeach
                                 @endforeach
-                            </ul>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -415,42 +420,10 @@
 @endsection
 
 @section('script')
-<!-- Treeview js -->
-<script src="{{ static_asset('assets/js/hummingbird-treeview.js') }}"></script>
+
 <script type="text/javascript">
 
     $(document).ready(function() {
-        $("#treeview").hummingbird();
-        var main_id = '{{ $product->category_id != null ? $product->category_id : 0 }}';
-        var selected_ids = '{{ implode(",",$old_categories) }}';
-        if (selected_ids != '') {
-            const myArray = selected_ids.split(",");
-            for (let i = 0; i < myArray.length; i++) {
-                const element = myArray[i];
-                $('#treeview input:checkbox#'+element).prop('checked',true);
-                 if(i < myArray.length - 1){
-                    const $checkbox = $('#treeview input:checkbox#'+element);
-
-                    $checkbox.attr('onclick', 'cursor_not_allowed(event)');
-                    $checkbox.css('cursor', 'not-allowed');
-                    $checkbox.closest('label').css('cursor', 'not-allowed');
-                } else {
-                    const $checkbox = $('#treeview input:checkbox#'+element);
-                    $checkbox.closest('ul').find('input[type="checkbox"]').removeAttr('onclick');
-                    $checkbox.closest('ul').find('input[type="checkbox"]').css('cursor', '');
-                    $checkbox.closest('ul').find('label').css('cursor', '');
-                }
-                $('#treeview input:checkbox#'+element).parents( "ul" ).css( "display", "block" );
-                $('#treeview input:checkbox#'+element).parents( "li" ).children('.las').removeClass( "la-plus" ).addClass('la-minus');
-            }
-        }
-        $radio = $('#treeview input:radio[value='+main_id+']');
-        $radio.prop('checked',true);
-        $prev_label = $radio.prev('label');
-        $prev_label.css('cursor', 'not-allowed');
-        $prev_label.find('input[type="checkbox"]').css('cursor', 'not-allowed');
-        $prev_label.find('input[type="checkbox"]').attr('onclick', 'cursor_not_allowed(event)');
-        $('#treeview input:radio[value=' + main_id + ']').next('ul').css("display", "block");
         fq_bought_product_selection_type();
     });
 
