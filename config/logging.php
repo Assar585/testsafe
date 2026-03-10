@@ -61,7 +61,7 @@ return [
         ],
 
         'papertrail' => [
-            'driver'  => 'monolog',
+            'driver' => 'monolog',
             'level' => 'debug',
             'handler' => SyslogUdpHandler::class,
             'handler_with' => [
@@ -88,10 +88,12 @@ return [
             'level' => 'debug',
         ],
         'seller_login' => [
-            'driver' => 'single',
-            'path' => storage_path('logs/seller_login.log'),
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'with' => [
+                'stream' => 'php://stderr',
+            ],
             'level' => 'info',
-            'days' => 180,
         ],
     ],
 
