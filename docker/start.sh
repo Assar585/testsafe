@@ -13,9 +13,9 @@ echo "Building Laravel caches..."
 php /var/www/artisan package:discover
 php /var/www/artisan config:cache
 php /var/www/artisan view:cache
-# Manual migration suppressed to avoid startup crash during schema mismatch.
-# php /var/www/artisan migrate --force
-echo "Caches built. Startup proceeding..."
+# Run migrations safely to avoid startup crash during schema mismatch.
+php /var/www/artisan migrate --force || echo "Warning: Migration failed, but continuing startup..."
+echo "Caches built and migrations attempted. Startup proceeding..."
 # Start Nginx
 service nginx start
 
