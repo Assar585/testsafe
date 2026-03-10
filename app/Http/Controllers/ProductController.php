@@ -279,79 +279,82 @@ class ProductController extends Controller
     public function hs_code_search(Request $request)
     {
         $q = strtolower(trim($request->get('q', '')));
-        \Log::info("HS Code Search: Starting search for '$q'");
+        \Log::info("HS Code Search START [Admin]", ['q' => $q]);
 
         $results = [];
         $seen = [];
-        $count = 0;
+        $limit = 20;
 
-        // Check for both possible JSON locations, prioritizing the larger database
-        $json_paths = [
+        $jsonPaths = [
             public_path('assets/data/hs_codes_un.json'),
             base_path('resources/data/hs_codes_un.json'),
             public_path('assets/data/hs_codes.json'),
-            base_path('resources/data/hs_codes.json')
+            base_path('resources/data/hs_codes.json'),
+            '/app/public/assets/data/hs_codes_un.json', // Railway-specific absolute path
+            '/app/public/assets/data/hs_codes.json',
         ];
 
-        foreach ($json_paths as $path) {
-            if ($count >= 5)
+        foreach ($jsonPaths as $path) {
+            if (count($results) >= $limit)
                 break;
+
             if (file_exists($path)) {
                 try {
-                    $content = file_get_contents($path);
-                    // Strip BOM if present
-                    $content = preg_replace('/^[\xEF\xBB\xBF\xFE\xFF\xFF\xFE]*/', '', $content);
-                    $data = json_decode($content, true);
-
-                    if (empty($data) || !is_array($data)) {
-                        \Log::warning("HS Code Search: Empty or invalid data in $path");
+                    $jsonContent = file_get_contents($path);
+                    if ($jsonContent === false) {
+                        \Log::error("HS Code Search: Failed to read file: $path");
                         continue;
                     }
 
-                    // Handle different JSON formats (array vs object with results key)
-                    $items = isset($data['results']) ? $data['results'] : $data;
-                    if (!is_array($items))
-                        continue;
+                    // Remove BOM and non-printable characters at the start
+                    $jsonContent = preg_replace('/^[\xEF\xBB\xBF\xFE\xFF\xFF\xFE]*/', '', $jsonContent);
 
-                    \Log::info("HS Code Search: Searching in $path (" . count($items) . " items)");
+                    $data = json_decode($jsonContent, true);
+                    if ($data === null) {
+                        \Log::error("HS Code Search: JSON Decode Failed for $path. Error: " . json_last_error_msg());
+                        continue;
+                    }
+
+                    $items = isset($data['results']) ? $data['results'] : $data;
+                    if (!is_array($items)) {
+                        \Log::warning("HS Code Search: Data is not an array in $path");
+                        continue;
+                    }
+
+                    \Log::info("HS Code Search: Searching in " . basename($path) . " (" . count($items) . " items)");
 
                     foreach ($items as $item) {
-                        if ($count >= 5)
+                        if (count($results) >= $limit)
                             break;
 
-                        // Normalize standard format (code/desc) and UN format (id/text)
-                        $code = $item['code'] ?? $item['id'] ?? '';
-                        $desc = $item['desc'] ?? $item['text'] ?? '';
+                        $id = $item['id'] ?? $item['code'] ?? '';
+                        $text = $item['text'] ?? $item['desc'] ?? '';
 
-                        if (empty($code) || isset($seen[$code]))
+                        if (empty($id) || isset($seen[$id]))
                             continue;
 
-                        if (
-                            empty($q) ||
-                            strpos(strtolower($code), $q) !== false ||
-                            strpos(strtolower($desc), $q) !== false
-                        ) {
+                        $id_lower = strtolower((string) $id);
+                        $text_lower = strtolower((string) $text);
+
+                        if (empty($q) || strpos($id_lower, $q) !== false || strpos($text_lower, $q) !== false) {
                             $results[] = [
-                                'id' => $code,
-                                'text' => $code . ' – ' . $desc
+                                'id' => $id,
+                                'text' => $id . ' - ' . $text
                             ];
-                            $seen[$code] = true;
-                            $count++;
+                            $seen[$id] = true;
                         }
                     }
                 } catch (\Exception $e) {
-                    \Log::error("HS Code Search Error in $path: " . $e->getMessage());
+                    \Log::error("HS Code Search EXCEPTION in $path: " . $e->getMessage());
                 }
+            } else {
+                \Log::debug("HS Code Search: File not found: $path");
             }
         }
 
-        if (empty($results)) {
-            \Log::info("HS Code Search: No results found for query '$q'");
-        } else {
-            \Log::info("HS Code Search: Found " . count($results) . " results");
-        }
+        \Log::info("HS Code Search END", ['results_count' => count($results)]);
 
-        return response()->json($results);
+        return response()->json($results, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
 
