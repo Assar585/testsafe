@@ -278,43 +278,55 @@ class ProductController extends Controller
 
     public function hs_code_search(Request $request)
     {
-        $q = strtolower(trim($request->get('q', '')));
-        $jsonPath = public_path('assets/data/hs_codes.json');
-
-        if (!file_exists($jsonPath)) {
-            $jsonPath = base_path('resources/data/hs_codes.json');
-            if (!file_exists($jsonPath)) {
-                return response()->json([]);
-            }
-        }
-
-        $jsonStr = file_get_contents($jsonPath);
-        $jsonStr = preg_replace('/^[\xEF\xBB\xBF\xFE\xFF\xFF\xFE]*/', '', $jsonStr);
-        $all = json_decode($jsonStr, true);
-
-        if (!$all || !is_array($all)) {
-            return response()->json([]);
-        }
-
+        $q = $request->q;
         $results = [];
-        $count = 0;
-        foreach ($all as $item) {
-            if ($count >= 5)
-                break;
 
-            $code = isset($item['code']) ? strval($item['code']) : '';
-            $desc = isset($item['desc']) ? strval($item['desc']) : '';
+        // Check for both possible JSON locations, prioritizing the larger database
+        $json_paths = [
+            public_path('assets/data/hs_codes_un.json'),
+            base_path('resources/data/hs_codes_un.json'),
+            public_path('assets/data/hs_codes.json'),
+            base_path('resources/data/hs_codes.json')
+        ];
 
-            if (
-                empty($q) ||
-                strpos(strtolower($code), $q) !== false ||
-                strpos(strtolower($desc), $q) !== false
-            ) {
-                $results[] = [
-                    'id' => $code,
-                    'text' => $code . ' – ' . $desc
-                ];
-                $count++;
+        foreach ($json_paths as $path) {
+            if (file_exists($path)) {
+                $content = file_get_contents($path);
+                $data = json_decode($content, true);
+
+                if (empty($data))
+                    continue;
+
+                // Handle different JSON formats (array vs object with results)
+                $items = isset($data['results']) ? $data['results'] : $data;
+
+                if (!is_array($items))
+                    continue;
+
+                foreach ($items as $item) {
+                    // Normalize standard and "un" formats
+                    $code = $item['code'] ?? $item['id'] ?? '';
+                    $desc = $item['desc'] ?? $item['text'] ?? '';
+
+                    if (empty($code) || empty($desc))
+                        continue;
+
+                    // Match query against code or description (case-insensitive)
+                    if (
+                        empty($q) ||
+                        stripos($code, $q) !== false ||
+                        stripos($desc, $q) !== false
+                    ) {
+                        $results[] = [
+                            'id' => $code,
+                            'text' => $code . ' - ' . $desc
+                        ];
+                    }
+
+                    if (count($results) >= 5)
+                        break 2; // Limit to 5 results
+                }
+                break; // Use the first file found that provides results
             }
         }
 
