@@ -39,11 +39,34 @@ class AIGeneratorController extends Controller
 
             switch ($activeAi->service_name) {
                 case 'gemini':
-                    $url = rtrim($activeAi->api_url, '/');
-                    $url = str_replace('/v1', '', $url);
-                    $url = str_replace('/v1beta', '', $url);
-                    // Standard text generation endpoint for Gemini Pro
-                    $url .= "/v1beta/models/gemini-1.5-pro:generateContent?key={$key}";
+                    // IMPORTANT: strip suffixes in longest-first order to avoid '/v1' corrupting '/v1beta'
+                    $baseUrl = rtrim($activeAi->api_url, '/');
+                    $baseUrl = str_replace('/v1beta', '', $baseUrl);
+                    $baseUrl = str_replace('/v1', '', $baseUrl);
+                    // $baseUrl is now just https://generativelanguage.googleapis.com
+
+                    // Step 1: Discover the first model that supports generateContent
+                    $modelsResponse = Http::timeout(10)->get("{$baseUrl}/v1beta/models?key={$key}");
+                    $modelId = null;
+
+                    if ($modelsResponse->successful()) {
+                        $models = $modelsResponse->json()['models'] ?? [];
+                        foreach ($models as $model) {
+                            $supported = $model['supportedGenerationMethods'] ?? [];
+                            if (in_array('generateContent', $supported)) {
+                                // Extract only the model name part (e.g. "gemini-2.0-flash")
+                                $modelId = basename($model['name']);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!$modelId) {
+                        throw new \Exception('Could not find a Gemini model that supports generateContent for this API key. Response: ' . $modelsResponse->body());
+                    }
+
+                    // Step 2: Run the actual generateContent request
+                    $url = "{$baseUrl}/v1beta/models/{$modelId}:generateContent?key={$key}";
 
                     $payload = [
                         'contents' => [
@@ -55,7 +78,7 @@ class AIGeneratorController extends Controller
                         ]
                     ];
 
-                    $response = Http::timeout(20)->post($url, $payload);
+                    $response = Http::timeout(30)->post($url, $payload);
 
                     if ($response->successful()) {
                         $data = $response->json();
@@ -63,7 +86,7 @@ class AIGeneratorController extends Controller
                             $generatedText = $data['candidates'][0]['content']['parts'][0]['text'];
                         }
                     } else {
-                        throw new \Exception('Gemini API Error: ' . $response->body());
+                        throw new \Exception('Gemini API Error (model=' . $modelId . '): ' . $response->body());
                     }
                     break;
 
