@@ -63,25 +63,86 @@ class ApiIntegrationController extends Controller
     }
 
     /**
-     * Test the connection to an API endpoint.
+     * Test the connection to an API endpoint dynamically.
      */
     public function test_connection(ApiIntegration $apiIntegration)
     {
         if (empty($apiIntegration->api_url)) {
             return response()->json(['success' => false, 'message' => translate('No API URL configured.')]);
         }
+
         try {
             $key = $apiIntegration->api_key ? Crypt::decryptString($apiIntegration->api_key) : null;
-            $response = Http::timeout(10)->withHeaders(
-                $key ? ['Authorization' => 'Bearer ' . $key] : []
-            )->get($apiIntegration->api_url);
+            $url = rtrim($apiIntegration->api_url, '/');
+            $headers = [];
+            $method = 'get';
+
+            // Dynamic routing based on the service name
+            switch ($apiIntegration->service_name) {
+                case 'openai':
+                    $url .= '/models';
+                    if ($key)
+                        $headers['Authorization'] = 'Bearer ' . $key;
+                    break;
+
+                case 'gemini':
+                    // Gemini uses query parameter for API key, not headers
+                    $url = str_replace('/v1', '', $url); // Strip trailing /v1 if accidentally included
+                    $url = str_replace('/v1beta', '', $url);
+                    $url .= '/v1beta/models' . ($key ? "?key={$key}" : '');
+                    break;
+
+                case 'claude':
+                case 'anthropic':
+                    $url .= '/v1/models';
+                    if ($key) {
+                        $headers['x-api-key'] = $key;
+                        $headers['anthropic-version'] = '2023-06-01'; // Required by Anthropic
+                    }
+                    break;
+
+                case 'stripe':
+                    $url .= '/charges';
+                    // Stripe uses Basic Auth with key as username
+                    if ($key)
+                        $headers['Authorization'] = 'Basic ' . base64_encode($key . ':');
+                    break;
+
+                default:
+                    // Generic fallback: Assume Bearer token on base URL
+                    if ($key)
+                        $headers['Authorization'] = 'Bearer ' . $key;
+                    break;
+            }
+
+            $response = Http::timeout(10)->withHeaders($headers);
+
+            if ($method === 'get') {
+                $response = $response->get($url);
+            } else {
+                $response = $response->post($url);
+            }
 
             if ($response->successful()) {
-                return response()->json(['success' => true, 'message' => translate('Connection successful! Status: ') . $response->status()]);
+                return response()->json([
+                    'success' => true,
+                    'message' => translate('Connection successful! Status: ') . $response->status()
+                ]);
             }
-            return response()->json(['success' => false, 'message' => translate('Connection failed. Status: ') . $response->status()]);
+
+            // Helpful message for 401/403/404s
+            $errorMsg = translate('Connection failed. Status: ') . $response->status();
+            if ($response->status() === 401 || $response->status() === 403) {
+                $errorMsg .= ' - ' . translate('Invalid API Key or Secret/Token.');
+            }
+            if ($response->status() === 404) {
+                $errorMsg .= ' - ' . translate('Endpoint not found. Check the API URL.');
+            }
+
+            return response()->json(['success' => false, 'message' => $errorMsg]);
+
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => translate('Connection error: ') . $e->getMessage()]);
         }
     }
 
