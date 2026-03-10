@@ -618,7 +618,7 @@ class ProductController extends Controller
 
         $results = [];
         $seen = [];
-        $limit = 20;
+        $limit = 5;
 
         $jsonPaths = [
             public_path('assets/data/hs_codes_un.json'),
