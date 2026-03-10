@@ -643,12 +643,18 @@ class ProductController extends Controller
                         continue;
                     }
 
-                    foreach ($data as $item) {
+                    // Handle different JSON formats (array vs object with results key)
+                    $items = isset($data['results']) ? $data['results'] : $data;
+                    if (!is_array($items))
+                        continue;
+
+                    foreach ($items as $item) {
                         if ($count >= 5)
                             break;
 
-                        $code = isset($item['code']) ? strval($item['code']) : '';
-                        $desc = isset($item['desc']) ? strval($item['desc']) : '';
+                        // Normalize standard format (code/desc) and UN format (id/text)
+                        $code = $item['code'] ?? $item['id'] ?? '';
+                        $desc = $item['desc'] ?? $item['text'] ?? '';
 
                         if (empty($code) || isset($seen[$code]))
                             continue;
@@ -672,5 +678,6 @@ class ProductController extends Controller
             }
         }
 
+        return response()->json($results);
     }
 }

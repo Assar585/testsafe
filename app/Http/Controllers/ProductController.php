@@ -308,14 +308,20 @@ class ProductController extends Controller
                         continue;
                     }
 
-                    \Log::info("HS Code Search: Searching in $path (" . count($data) . " items)");
+                    // Handle different JSON formats (array vs object with results key)
+                    $items = isset($data['results']) ? $data['results'] : $data;
+                    if (!is_array($items))
+                        continue;
 
-                    foreach ($data as $item) {
+                    \Log::info("HS Code Search: Searching in $path (" . count($items) . " items)");
+
+                    foreach ($items as $item) {
                         if ($count >= 5)
                             break;
 
-                        $code = isset($item['code']) ? strval($item['code']) : '';
-                        $desc = isset($item['desc']) ? strval($item['desc']) : '';
+                        // Normalize standard format (code/desc) and UN format (id/text)
+                        $code = $item['code'] ?? $item['id'] ?? '';
+                        $desc = $item['desc'] ?? $item['text'] ?? '';
 
                         if (empty($code) || isset($seen[$code]))
                             continue;
