@@ -10,8 +10,8 @@
 /storage/framework/sessions
 /storage/framework/views
 /storage/logs
-# /public/uploads
-# /public/storage
+/public/uploads
+/public/storage
 /*.sql
 /*.sql.gz
 /*.zip
@@ -21,10 +21,19 @@
 /FlutterEcommerceAPI.postman_collection.json
 /build_logs*.txt
 /documentation
-/sqlupdates
-/nbproject
-/.idea
-/.vscode
+/sqlupdates*
+!fonts/
+!css/
+!js/
+!img/
+!*.png
+!*.svg
+!*.jpg
+!*.jpeg
+!*.gif
+!*.webp
+!*.txt
+/public/assets/documentation
 *.pdf
 *.ttf
 /public/assets/documentation

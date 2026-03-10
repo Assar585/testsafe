@@ -1,6 +1,13 @@
 *
 !fonts/
-!css/aiz-core.css
-!js/aiz-core.js
+!css/
+!js/
+!img/
 !*.png
 !*.svg
+!*.jpg
+!*.jpeg
+!*.gif
+!*.webp
+!*.txt
+!.gitignore
