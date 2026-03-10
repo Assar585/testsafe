@@ -256,16 +256,16 @@
 
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="add-more"
                                         data-content='<div class="row">
-                                                                                                                <div class="col-md-11">
-                                                                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                                                </div>
-                                                                                                                <div class="col-1 d-flex justify-content-end">
-                                                                                                                        <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                                            <i class="las la-times"></i>
-                                                                                                                        </button>
-                                                                                                                </div>
-                                                                                                            </div>'
+                                                                                                                    <div class="col-md-11">
+                                                                                                                        <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                                        <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                                    </div>
+                                                                                                                    <div class="col-1 d-flex justify-content-end">
+                                                                                                                            <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                                                <i class="las la-times"></i>
+                                                                                                                            </button>
+                                                                                                                    </div>
+                                                                                                                </div>'
                                         data-target=".video-provider-link">
                                         {{ translate('Add Another') }}
                                     </button>
@@ -996,18 +996,18 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                                                <div class="form-group row">\
-                                                                                    <div class="col-md-3">\
-                                                                                        <input type="hidden" name="choice_no[]" value="' + i + '">\
-                                                                                        <input type="text" class="form-control" name="choice[]" va                                    lue="' + name +
+                                                                                    <div class="form-group row">\
+                                                                                        <div class="col-md-3">\
+                                                                                            <input type="hidden" name="choice_no[]" value="' + i + '">\
+                                                                                            <input type="text" class="form-control" name="choice[]" va                                    lue="' + name +
                         '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                                                    </div>\
-                                                                                    <div class="col-md-8">\
-                                                                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
-                                                                                            ' + obj + '\
-                                                                                        </select>\
-                                                                                    </div>\
-                                                                                </div>');
+                                                                                        </div>\
+                                                                                        <div class="col-md-8">\
+                                                                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
+                                                                                                ' + obj + '\
+                                                                                            </select>\
+                                                                                        </div>\
+                                                                                    </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1277,7 +1277,7 @@
 
 
 
-        // AI Generation Handler (Placeholder)
+        // AI Generation Handler
         function generateDescriptionAI() {
             if (!$('#product_name').val() || !$('#category_id').val()) {
                 AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
@@ -1287,24 +1287,35 @@
             let originalBtnHtml = $('button[onclick="generateDescriptionAI()"]').html();
             $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
 
-            setTimeout(function () {
-                let productName = $('#product_name').val();
-                let mockDescription = "<p><strong>" + productName + "</strong> " + "{{ translate('is a premium quality product designed for everyday excellence. Built with care and precision, it meets all your standards.') }}" + "</p>";
-                $('#product_description').val(mockDescription).siblings('.note-editor').find('.note-editable').html(mockDescription);
+            $.post('{{ route('seller.ai.generate') }}', {
+                _token: '{{ csrf_token() }}',
+                product_name: $('#product_name').val(),
+                category_id: $('#category_id').val()
+            }, function (data) {
+                if (data.success) {
+                    $('#product_description').val(data.description).siblings('.note-editor').find('.note-editable').html(data.description);
+                    $('input[name="meta_title"]').val(data.meta_title);
+                    $('textarea[name="meta_description"]').val(data.meta_description);
 
-                // Auto-Generate SEO Tags without user intervention
-                $('input[name="meta_title"]').val(productName + " - Premium");
-                $('textarea[name="meta_description"]').val("Buy " + productName + " at the best price. Premium quality guaranteed.");
-                let tags = $('#product_tags').val();
-                $('textarea[name="meta_keywords"]').val(tags);
+                    let tags = $('#product_tags').val();
+                    let metaKeywords = $('textarea[name="meta_keywords"]');
+                    metaKeywords.val(tags).trigger('change');
 
+                    AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
+                    validateField($('input[name="meta_title"]'));
+                    validateField($('textarea[name="meta_description"]'));
+                } else {
+                    AIZ.plugins.notify('danger', data.message || '{{ translate("Failed to generate description.") }}');
+                }
+            }).fail(function (xhr) {
+                let errorMessage = '{{ translate("An error occurred during AI generation.") }}';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                AIZ.plugins.notify('danger', errorMessage);
+            }).always(function () {
                 $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
-                AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
-
-                // Trigger validation visual update for these fields
-                validateField($('input[name="meta_title"]'));
-                validateField($('textarea[name="meta_description"]'));
-            }, 1500);
+            });
         }
 
         // Auto-populate tags from Product Name
@@ -1459,7 +1470,7 @@
                     var savedOpt = new Option("{{ old('hsn_code') }}", "{{ old('hsn_code') }}", true, true);
                     $('#hsn_code_select').append(savedOpt).trigger('change');
                 @endif
-                        }
+                            }
         });
     </script>
 @endsection

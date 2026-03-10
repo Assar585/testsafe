@@ -199,6 +199,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
         Route::post('/save-as-draft', 'store_as_draft')->name('products.store_as_draft');
         Route::get('/stock/show/{id}', 'stockShow')->name('stock.show');
         Route::get('/products/check-sku-availability', 'check_sku_availability')->name('products.check-sku-availability');
+
+        // AI Route
+        Route::post('/ai/generate', [\App\Http\Controllers\AIGeneratorController::class, 'generate_description'])->name('admin.ai.generate');
         Route::get('/hs-code-search', 'hs_code_search')->name('products.hs_code_search');
     });
 

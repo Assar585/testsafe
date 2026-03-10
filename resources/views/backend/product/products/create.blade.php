@@ -512,16 +512,16 @@
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more"
                                             data-content='<div class="row mb-2">
-                                                                                                                                            <div class="col">
-                                                                                                                                                <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                                                                                <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                                                                            </div>
-                                                                                                                                            <div class="col-auto d-flex justify-content-end">
-                                                                                                                                                    <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                                                                        <i class="las la-times"></i>
-                                                                                                                                                    </button>
-                                                                                                                                            </div>
-                                                                                                                                        </div>'
+                                                                                                                                                <div class="col">
+                                                                                                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                                                                </div>
+                                                                                                                                                <div class="col-auto d-flex justify-content-end">
+                                                                                                                                                        <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                                                                            <i class="las la-times"></i>
+                                                                                                                                                        </button>
+                                                                                                                                                </div>
+                                                                                                                                            </div>'
                                             data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
@@ -1089,639 +1089,649 @@
 @section('script')
 
     <!-- Select2 JS -->
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-        <!-- Treeview js -->
-        <script src="{{ static_asset('assets/js/hummingbird-treeview.js') }}"></script>
+    <!-- Treeview js -->
+    <script src="{{ static_asset('assets/js/hummingbird-treeview.js') }}"></script>
 
-        <script type="text/javascript">
+    <script type="text/javascript">
 
-            $(document).ready(function () {
-                $("#treeview").hummingbird();
+        $(document).ready(function () {
+            $("#treeview").hummingbird();
 
-                var main_id = '{{ old("category_id") }}';
-                var selected_ids = [];
-                @if(old("category_ids"))
-                    selected_ids = @json(old("category_ids"));
+            var main_id = '{{ old("category_id") }}';
+            var selected_ids = [];
+            @if(old("category_ids"))
+                selected_ids = @json(old("category_ids"));
+            @endif
+                                                                                            for (let i = 0; i < selected_ids.length; i++) {
+                const element = selected_ids[i];
+                $('#treeview input:checkbox#' + element).prop('checked', true);
+                $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
+                $('#treeview input:checkbox#' + element).parents("li").children('.las').removeClass("la-plus").addClass('la-minus');
+            }
+
+            if (main_id) {
+                $('#treeview input:radio[value=' + main_id + ']').prop('checked', true).trigger('change');
+                $('#treeview input:radio[value=' + main_id + ']').next('ul').css("display", "block");
+            }
+
+            $('#treeview input:checkbox').on("click", function () {
+                let $this = $(this);
+                if ($this.prop('checked') && ($('#treeview input:radio:checked').length == 0)) {
+                    let val = $this.val();
+                    $('#treeview input:radio[value=' + val + ']').prop('checked', true);
+                }
+            });
+        });
+
+        $('form').bind('submit', function (e) {
+            if ($(".action-btn").attr('attempted') == 'true') {
+                //stop submitting the form because we have already clicked submit.
+                e.preventDefault();
+            }
+            else {
+                $(".action-btn").attr("attempted", 'true');
+            }
+        });
+
+        $("[name=shipping_type]").on("change", function () {
+            $(".flat_rate_shipping_div").hide();
+
+            if ($(this).val() == 'flat_rate') {
+                $(".flat_rate_shipping_div").show();
+            }
+        });
+
+        function add_more_customer_choice_option(i, name) {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "POST",
+                url: '{{ route('products.add-more-choice-option') }}',
+                data: {
+                    attribute_id: i
+                },
+                success: function (data) {
+                    var obj = JSON.parse(data);
+                    $('#customer_choice_options').append('\
+                                                                                                    <div class="form-group row">\
+                                                                                                        <div class="col-md-3">\
+                                                                                                            <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                                                                                            <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                                                                                        </div>\
+                                                                                                        <div class="col-md-9">\
+                                                                                                            <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                                                                                                '+ obj + '\
+                                                                                                            </select>\
+                                                                                                        </div>\
+                                                                                                    </div>');
+                    AIZ.plugins.bootstrapSelect('refresh');
+                }
+            });
+
+
+        }
+
+        $('input[name="colors_active"]').on('change', function () {
+            if (!$('input[name="colors_active"]').is(':checked')) {
+                $('#colors').prop('disabled', true);
+                AIZ.plugins.bootstrapSelect('refresh');
+            }
+            else {
+                $('#colors').prop('disabled', false);
+                AIZ.plugins.bootstrapSelect('refresh');
+            }
+            update_sku();
+        });
+
+        $(document).on("change", ".attribute_choice", function () {
+            update_sku();
+        });
+
+        $('#colors').on('change', function () {
+            update_sku();
+        });
+
+        $('input[name="unit_price"]').on('keyup', function () {
+            update_sku();
+        });
+
+        $('input[name="name"]').on('keyup', function () {
+            update_sku();
+        });
+
+        function delete_row(em) {
+            $(em).closest('.form-group row').remove();
+            update_sku();
+        }
+
+        function delete_variant(em) {
+            $(em).closest('.variant').remove();
+        }
+
+        function update_sku() {
+            $.ajax({
+                type: "POST",
+                url: '{{ route('products.sku_combination') }}',
+                data: $('#aizSubmitForm').serialize(),
+                success: function (data) {
+                    $('#sku_combination').html(data);
+                    AIZ.uploader.previewGenerate();
+                    AIZ.plugins.sectionFooTable('#sku_combination');
+                    if (data.trim().length > 1) {
+                        $('#show-hide-div').hide();
+                        $('input[name="current_stock"]').removeAttr('integer-only');
+
+                        // Check availability for all generated variant SKUs
+                        $('#sku_combination input[name="sku_combinations[]"]').each(function () {
+                            checkSKUAvailability(this);
+                        });
+                    }
+                    else {
+                        $('#show-hide-div').show();
+                        $('input[name="current_stock"]').attr('integer-only', 'true');
+                    }
+                }
+            });
+        }
+
+        $('#choice_attributes').on('change', function () {
+            $('#customer_choice_options').html(null);
+            $.each($("#choice_attributes option:selected"), function () {
+                add_more_customer_choice_option($(this).val(), $.trim($(this).text()));
+            });
+
+            update_sku();
+        });
+
+        function fq_bought_product_selection_type() {
+            var productSelectionType = $("input[name='frequently_bought_selection_type']:checked").val();
+            if (productSelectionType == 'product') {
+                $('.fq_bought_select_product_div').removeClass('d-none');
+                $('.fq_bought_select_category_div').addClass('d-none');
+            }
+            else if (productSelectionType == 'category') {
+                $('.fq_bought_select_category_div').removeClass('d-none');
+                $('.fq_bought_select_product_div').addClass('d-none');
+            }
+        }
+
+        function showFqBoughtProductModal() {
+            $('#fq-bought-product-select-modal').modal('show', { backdrop: 'static' });
+        }
+
+        function filterFqBoughtProduct() {
+            var searchKey = $('input[name=search_keyword]').val();
+            var fqBroughCategory = $('select[name=fq_brough_category]').val();
+            $.post('{{ route('product.search') }}', { _token: AIZ.data.csrf, product_id: null, search_key: searchKey, category: fqBroughCategory, product_type: "physical" }, function (data) {
+                $('#product-list').html(data);
+                AIZ.plugins.sectionFooTable('#product-list');
+            });
+        }
+
+        function addFqBoughtProduct() {
+            var selectedProducts = [];
+            $("input:checkbox[name=fq_bought_product_id]:checked").each(function () {
+                selectedProducts.push($(this).val());
+            });
+
+            var fqBoughtProductIds = [];
+            $("input[name='fq_bought_product_ids[]']").each(function () {
+                fqBoughtProductIds.push($(this).val());
+            });
+
+            var productIds = selectedProducts.concat(fqBoughtProductIds.filter((item) => selectedProducts.indexOf(item) < 0))
+
+            $.post('{{ route('get-selected-products') }}', { _token: AIZ.data.csrf, product_ids: productIds }, function (data) {
+                $('#fq-bought-product-select-modal').modal('hide');
+                $('#selected-fq-bought-products').html(data);
+                AIZ.plugins.sectionFooTable('#selected-fq-bought-products');
+            });
+        }
+
+        // Warranty
+        function warrantySelection() {
+            if ($('input[name="has_warranty"]').is(':checked')) {
+                $('.warranty_selection_div').removeClass('d-none');
+                $('#warranty_id').attr('required', true);
+            }
+            else {
+                $('.warranty_selection_div').addClass('d-none');
+                $('#warranty_id').removeAttr('required');
+            }
+        }
+
+        // HS Code Select2 AJAX autocomplete
+        $(document).ready(function () {
+            if ($('#hsn_code_select').length) {
+                $('#hsn_code_select').select2({
+                    placeholder: '{{ translate("Search by code or product name...") }}',
+                    allowClear: true,
+                    minimumInputLength: 0,
+                    ajax: {
+                        url: '{{ route("products.hs_code_search") }}',
+                        dataType: 'json',
+                        delay: 300,
+                        data: function (params) {
+                            return { q: params.term || '' };
+                        },
+                        processResults: function (data) {
+                            return { results: data };
+                        },
+                        cache: true
+                    }
+                });
+                // Restore saved value
+                @php $savedHsn = old('hsn_code') @endphp
+                @if(old('hsn_code'))
+                    var savedOpt = new Option("{{ old('hsn_code') }}", "{{ old('hsn_code') }}", true, true);
+                    $('#hsn_code_select').append(savedOpt).trigger('change');
                 @endif
-                                                                                        for (let i = 0; i < selected_ids.length; i++) {
-                    const element = selected_ids[i];
-                    $('#treeview input:checkbox#' + element).prop('checked', true);
-                    $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
-                    $('#treeview input:checkbox#' + element).parents("li").children('.las').removeClass("la-plus").addClass('la-minus');
-                }
-
-                if (main_id) {
-                    $('#treeview input:radio[value=' + main_id + ']').prop('checked', true).trigger('change');
-                    $('#treeview input:radio[value=' + main_id + ']').next('ul').css("display", "block");
-                }
-
-                $('#treeview input:checkbox').on("click", function () {
-                    let $this = $(this);
-                    if ($this.prop('checked') && ($('#treeview input:radio:checked').length == 0)) {
-                        let val = $this.val();
-                        $('#treeview input:radio[value=' + val + ']').prop('checked', true);
-                    }
-                });
-            });
-
-            $('form').bind('submit', function (e) {
-                if ($(".action-btn").attr('attempted') == 'true') {
-                    //stop submitting the form because we have already clicked submit.
-                    e.preventDefault();
-                }
-                else {
-                    $(".action-btn").attr("attempted", 'true');
-                }
-            });
-
-            $("[name=shipping_type]").on("change", function () {
-                $(".flat_rate_shipping_div").hide();
-
-                if ($(this).val() == 'flat_rate') {
-                    $(".flat_rate_shipping_div").show();
-                }
-            });
-
-            function add_more_customer_choice_option(i, name) {
-                $.ajax({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    },
-                    type: "POST",
-                    url: '{{ route('products.add-more-choice-option') }}',
-                    data: {
-                        attribute_id: i
-                    },
-                    success: function (data) {
-                        var obj = JSON.parse(data);
-                        $('#customer_choice_options').append('\
-                                                                                                <div class="form-group row">\
-                                                                                                    <div class="col-md-3">\
-                                                                                                        <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                                                                                        <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                                                                    </div>\
-                                                                                                    <div class="col-md-9">\
-                                                                                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                                                                                            '+ obj + '\
-                                                                                                        </select>\
-                                                                                                    </div>\
-                                                                                                </div>');
-                        AIZ.plugins.bootstrapSelect('refresh');
-                    }
-                });
-
-
-            }
-
-            $('input[name="colors_active"]').on('change', function () {
-                if (!$('input[name="colors_active"]').is(':checked')) {
-                    $('#colors').prop('disabled', true);
-                    AIZ.plugins.bootstrapSelect('refresh');
-                }
-                else {
-                    $('#colors').prop('disabled', false);
-                    AIZ.plugins.bootstrapSelect('refresh');
-                }
-                update_sku();
-            });
-
-            $(document).on("change", ".attribute_choice", function () {
-                update_sku();
-            });
-
-            $('#colors').on('change', function () {
-                update_sku();
-            });
-
-            $('input[name="unit_price"]').on('keyup', function () {
-                update_sku();
-            });
-
-            $('input[name="name"]').on('keyup', function () {
-                update_sku();
-            });
-
-            function delete_row(em) {
-                $(em).closest('.form-group row').remove();
-                update_sku();
-            }
-
-            function delete_variant(em) {
-                $(em).closest('.variant').remove();
-            }
-
-            function update_sku() {
-                $.ajax({
-                    type: "POST",
-                    url: '{{ route('products.sku_combination') }}',
-                    data: $('#aizSubmitForm').serialize(),
-                    success: function (data) {
-                        $('#sku_combination').html(data);
-                        AIZ.uploader.previewGenerate();
-                        AIZ.plugins.sectionFooTable('#sku_combination');
-                        if (data.trim().length > 1) {
-                            $('#show-hide-div').hide();
-                            $('input[name="current_stock"]').removeAttr('integer-only');
-
-                            // Check availability for all generated variant SKUs
-                            $('#sku_combination input[name="sku_combinations[]"]').each(function () {
-                                checkSKUAvailability(this);
-                            });
-                        }
-                        else {
-                            $('#show-hide-div').show();
-                            $('input[name="current_stock"]').attr('integer-only', 'true');
-                        }
-                    }
-                });
-            }
-
-            $('#choice_attributes').on('change', function () {
-                $('#customer_choice_options').html(null);
-                $.each($("#choice_attributes option:selected"), function () {
-                    add_more_customer_choice_option($(this).val(), $.trim($(this).text()));
-                });
-
-                update_sku();
-            });
-
-            function fq_bought_product_selection_type() {
-                var productSelectionType = $("input[name='frequently_bought_selection_type']:checked").val();
-                if (productSelectionType == 'product') {
-                    $('.fq_bought_select_product_div').removeClass('d-none');
-                    $('.fq_bought_select_category_div').addClass('d-none');
-                }
-                else if (productSelectionType == 'category') {
-                    $('.fq_bought_select_category_div').removeClass('d-none');
-                    $('.fq_bought_select_product_div').addClass('d-none');
-                }
-            }
-
-            function showFqBoughtProductModal() {
-                $('#fq-bought-product-select-modal').modal('show', { backdrop: 'static' });
-            }
-
-            function filterFqBoughtProduct() {
-                var searchKey = $('input[name=search_keyword]').val();
-                var fqBroughCategory = $('select[name=fq_brough_category]').val();
-                $.post('{{ route('product.search') }}', { _token: AIZ.data.csrf, product_id: null, search_key: searchKey, category: fqBroughCategory, product_type: "physical" }, function (data) {
-                    $('#product-list').html(data);
-                    AIZ.plugins.sectionFooTable('#product-list');
-                });
-            }
-
-            function addFqBoughtProduct() {
-                var selectedProducts = [];
-                $("input:checkbox[name=fq_bought_product_id]:checked").each(function () {
-                    selectedProducts.push($(this).val());
-                });
-
-                var fqBoughtProductIds = [];
-                $("input[name='fq_bought_product_ids[]']").each(function () {
-                    fqBoughtProductIds.push($(this).val());
-                });
-
-                var productIds = selectedProducts.concat(fqBoughtProductIds.filter((item) => selectedProducts.indexOf(item) < 0))
-
-                $.post('{{ route('get-selected-products') }}', { _token: AIZ.data.csrf, product_ids: productIds }, function (data) {
-                    $('#fq-bought-product-select-modal').modal('hide');
-                    $('#selected-fq-bought-products').html(data);
-                    AIZ.plugins.sectionFooTable('#selected-fq-bought-products');
-                });
-            }
-
-            // Warranty
-            function warrantySelection() {
-                if ($('input[name="has_warranty"]').is(':checked')) {
-                    $('.warranty_selection_div').removeClass('d-none');
-                    $('#warranty_id').attr('required', true);
-                }
-                else {
-                    $('.warranty_selection_div').addClass('d-none');
-                    $('#warranty_id').removeAttr('required');
-                }
-            }
-
-            // HS Code Select2 AJAX autocomplete
-            $(document).ready(function () {
-                if ($('#hsn_code_select').length) {
-                    $('#hsn_code_select').select2({
-                        placeholder: '{{ translate("Search by code or product name...") }}',
-                        allowClear: true,
-                        minimumInputLength: 0,
-                        ajax: {
-                            url: '{{ route("products.hs_code_search") }}',
-                            dataType: 'json',
-                            delay: 300,
-                            data: function (params) {
-                                return { q: params.term || '' };
-                            },
-                            processResults: function (data) {
-                                return { results: data };
-                            },
-                            cache: true
-                        }
-                    });
-                    // Restore saved value
-                    @php $savedHsn = old('hsn_code') @endphp
-                    @if(old('hsn_code'))
-                        var savedOpt = new Option("{{ old('hsn_code') }}", "{{ old('hsn_code') }}", true, true);
-                        $('#hsn_code_select').append(savedOpt).trigger('change');
-                    @endif
-                            }
-            });
-
-            // Refundable
-            function isRefundable() {
-                const refundType = "{{ get_setting('refund_type') }}";
-                const $refundable = $('input[name="refundable"]');
-                const $mainCategoryRadio = $('input[name="category_id"]:checked');
-                const $note = $('#refundable-note');
-
-                $refundable.off('change.isRefundableLock');
-
-                if (!refundType) {
-                    $refundable.prop('checked', false);
-                    $refundable.prop('disabled', true);
-                    $('.refund-block').addClass('d-none');
-                    $note.text('{{ translate("Refund system is not configured.") }}')
-                        .removeClass('d-none');
-                    return;
-                }
-
-                if (refundType !== 'category_based_refund') {
-                    $refundable.prop('disabled', false);
-                    $note.addClass('d-none');
-                    $('.refund-block').toggleClass('d-none', !$refundable.is(':checked'));
-                    return;
-                }
-
-                if (!$mainCategoryRadio.length) {
-                    $refundable.prop('checked', false);
-                    $refundable.prop('disabled', true);
-                    $('.refund-block').addClass('d-none');
-                    $note.text('{{ translate("Your refund type is category based. At first select the main category.") }}')
-                        .removeClass('d-none');
-                    return;
-                }
-
-                const categoryId = $mainCategoryRadio.val();
-                $.ajax({
-                    type: 'POST',
-                    url: '{{ route("admin.products.check_refundable_category") }}',
-                    data: {
-                        _token: '{{ csrf_token() }}',
-                        category_id: categoryId
-                    },
-                    success: function (response) {
-                        if (response.status === 'success' && response.is_refundable) {
-                            $refundable.prop('disabled', false);
-                            $note.text('{{ translate("This product allows refunds.") }}')
-                                .removeClass('d-none');
-                            $refundable.on('change.isRefundableLock', function () {
-                                if (!$refundable.is(':checked')) {
-                                    $('.refund-block').addClass('d-none');
-                                } else {
-                                    $('.refund-block').removeClass('d-none');
                                 }
-                            });
-                        } else {
-                            $refundable.prop('checked', false);
-                            $refundable.prop('disabled', true);
-                            $('.refund-block').addClass('d-none');
-                            $note.text('{{ translate("Selected main category has no refund. Select a refundable category.") }}')
-                                .removeClass('d-none');
-                        }
-                    },
-                    error: function () {
+        });
+
+        // Refundable
+        function isRefundable() {
+            const refundType = "{{ get_setting('refund_type') }}";
+            const $refundable = $('input[name="refundable"]');
+            const $mainCategoryRadio = $('input[name="category_id"]:checked');
+            const $note = $('#refundable-note');
+
+            $refundable.off('change.isRefundableLock');
+
+            if (!refundType) {
+                $refundable.prop('checked', false);
+                $refundable.prop('disabled', true);
+                $('.refund-block').addClass('d-none');
+                $note.text('{{ translate("Refund system is not configured.") }}')
+                    .removeClass('d-none');
+                return;
+            }
+
+            if (refundType !== 'category_based_refund') {
+                $refundable.prop('disabled', false);
+                $note.addClass('d-none');
+                $('.refund-block').toggleClass('d-none', !$refundable.is(':checked'));
+                return;
+            }
+
+            if (!$mainCategoryRadio.length) {
+                $refundable.prop('checked', false);
+                $refundable.prop('disabled', true);
+                $('.refund-block').addClass('d-none');
+                $note.text('{{ translate("Your refund type is category based. At first select the main category.") }}')
+                    .removeClass('d-none');
+                return;
+            }
+
+            const categoryId = $mainCategoryRadio.val();
+            $.ajax({
+                type: 'POST',
+                url: '{{ route("admin.products.check_refundable_category") }}',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    category_id: categoryId
+                },
+                success: function (response) {
+                    if (response.status === 'success' && response.is_refundable) {
+                        $refundable.prop('disabled', false);
+                        $note.text('{{ translate("This product allows refunds.") }}')
+                            .removeClass('d-none');
+                        $refundable.on('change.isRefundableLock', function () {
+                            if (!$refundable.is(':checked')) {
+                                $('.refund-block').addClass('d-none');
+                            } else {
+                                $('.refund-block').removeClass('d-none');
+                            }
+                        });
+                    } else {
                         $refundable.prop('checked', false);
                         $refundable.prop('disabled', true);
                         $('.refund-block').addClass('d-none');
-                        $note.text('{{ translate("Could not verify category refund status.") }}')
+                        $note.text('{{ translate("Selected main category has no refund. Select a refundable category.") }}')
                             .removeClass('d-none');
                     }
-                });
+                },
+                error: function () {
+                    $refundable.prop('checked', false);
+                    $refundable.prop('disabled', true);
+                    $('.refund-block').addClass('d-none');
+                    $note.text('{{ translate("Could not verify category refund status.") }}')
+                        .removeClass('d-none');
+                }
+            });
+        }
+
+        function noteModal(noteType) {
+            $.post('{{ route('get_notes') }}', { _token: '{{ @csrf_token() }}', note_type: noteType }, function (data) {
+                $('#note_modal #note_modal_content').html(data);
+                $('#note_modal').modal('show', { backdrop: 'static' });
+            });
+        }
+
+        function addNote(noteId, noteType) {
+            var noteDescription = $('#note_description_' + noteId).val();
+            $('#' + noteType + '_note_id').val(noteId);
+            $('#' + noteType + '_note').html(noteDescription);
+            $('#' + noteType + '_note').addClass('border border-gray my-2 p-2');
+            $('#note_modal').modal('hide');
+        }
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            var hash = document.location.hash;
+            if (hash) {
+                $('.nav-tabs a[href="' + hash + '"]').tab('show');
+            } else {
+                $('.nav-tabs a[href="#general"]').tab('show');
             }
 
-            function noteModal(noteType) {
-                $.post('{{ route('get_notes') }}', { _token: '{{ @csrf_token() }}', note_type: noteType }, function (data) {
-                    $('#note_modal #note_modal_content').html(data);
-                    $('#note_modal').modal('show', { backdrop: 'static' });
-                });
-            }
+            // Change hash for page-reload
+            $('.nav-tabs a').on('shown.bs.tab', function (e) {
+                window.location.hash = e.target.hash;
+            });
+        });
 
-            function addNote(noteId, noteType) {
-                var noteDescription = $('#note_description_' + noteId).val();
-                $('#' + noteType + '_note_id').val(noteId);
-                $('#' + noteType + '_note').html(noteDescription);
-                $('#' + noteType + '_note').addClass('border border-gray my-2 p-2');
-                $('#note_modal').modal('hide');
-            }
+    </script>
 
-        </script>
-        <script>
-            $(document).ready(function () {
-                var hash = document.location.hash;
-                if (hash) {
-                    $('.nav-tabs a[href="' + hash + '"]').tab('show');
-                } else {
-                    $('.nav-tabs a[href="#general"]').tab('show');
+    @include('partials.product.product_temp_data')
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            warrantySelection();
+            isRefundable();
+
+            $(document).on('change', 'input[name="category_id"]', function () {
+                isRefundable();
+            });
+
+            $('input[name="refundable"]').on('change', function () {
+                if (!$('input[name="refundable"]').prop('disabled')) {
+                    $('.refund-block').toggleClass('d-none', !$(this).is(':checked'));
+                }
+            });
+        });
+
+        function showProductSelectModal() {
+            $('#products_select_modal').modal('show', { backdrop: 'static' });
+            $('#products_select_modal #modal-title-text').text("{{ translate('Copy Products') }}");
+            $('#products_select_modal .action-btn').text("{{ translate('Copy') }}").attr('onclick', 'duplicateProduct()');
+        }
+
+        function filterProductByCategory() {
+            var searchKey = $('input[name=search_product_keyword]').val();
+            var selectedCategory = $('select[name=selected_Products_category]').val();
+            $.post('{{ route('products.search') }}', { _token: AIZ.data.csrf, product_id: null, search_key: searchKey, category: selectedCategory, product_type: "physical", single_select: 1 }, function (data) {
+                $('#products-list').html(data);
+                AIZ.plugins.sectionFooTable('#products-list');
+            });
+        }
+
+        var duplicateProductUrl = "{{ route('products.duplicate', ':id') }}";
+
+        // innitially assign pid null
+        let draftProductId = null;
+
+        $(document).ready(function () {
+            function saveDraft() {
+                let form = $('#aizSubmitForm')[0];
+                let formData = new FormData(form);
+
+                // Update Draft
+                if (draftProductId) {
+                    formData.append('id', draftProductId);
+                }
+                let draftBtn = $('#saveDraftBtn');
+                let draftBtnText = draftBtn.length ? draftBtn.text() : '';
+                if (draftBtn.length) {
+                    draftBtn.prop('disabled', true).html('<i class="las la-spinner la-spin mr-2"></i> ' + AIZ.local.saving_as_draft);
                 }
 
-                // Change hash for page-reload
-                $('.nav-tabs a').on('shown.bs.tab', function (e) {
-                    window.location.hash = e.target.hash;
-                });
-            });
+                $.ajax({
+                    url: "{{ route('products.store_as_draft') }}",
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.success) {
+                            draftProductId = response.product_id;
 
-        </script>
+                            // Update form action for future edits
+                            $('#aizSubmitForm').attr('action', "{{ url('admin/products/update') }}/" + draftProductId);
 
-        @include('partials.product.product_temp_data')
-
-        <script type="text/javascript">
-            $(document).ready(function () {
-                warrantySelection();
-                isRefundable();
-
-                $(document).on('change', 'input[name="category_id"]', function () {
-                    isRefundable();
-                });
-
-                $('input[name="refundable"]').on('change', function () {
-                    if (!$('input[name="refundable"]').prop('disabled')) {
-                        $('.refund-block').toggleClass('d-none', !$(this).is(':checked'));
-                    }
-                });
-            });
-
-            function showProductSelectModal() {
-                $('#products_select_modal').modal('show', { backdrop: 'static' });
-                $('#products_select_modal #modal-title-text').text("{{ translate('Copy Products') }}");
-                $('#products_select_modal .action-btn').text("{{ translate('Copy') }}").attr('onclick', 'duplicateProduct()');
-            }
-
-            function filterProductByCategory() {
-                var searchKey = $('input[name=search_product_keyword]').val();
-                var selectedCategory = $('select[name=selected_Products_category]').val();
-                $.post('{{ route('products.search') }}', { _token: AIZ.data.csrf, product_id: null, search_key: searchKey, category: selectedCategory, product_type: "physical", single_select: 1 }, function (data) {
-                    $('#products-list').html(data);
-                    AIZ.plugins.sectionFooTable('#products-list');
-                });
-            }
-
-            var duplicateProductUrl = "{{ route('products.duplicate', ':id') }}";
-
-            // innitially assign pid null
-            let draftProductId = null;
-
-            $(document).ready(function () {
-                function saveDraft() {
-                    let form = $('#aizSubmitForm')[0];
-                    let formData = new FormData(form);
-
-                    // Update Draft
-                    if (draftProductId) {
-                        formData.append('id', draftProductId);
-                    }
-                    let draftBtn = $('#saveDraftBtn');
-                    let draftBtnText = draftBtn.length ? draftBtn.text() : '';
-                    if (draftBtn.length) {
-                        draftBtn.prop('disabled', true).html('<i class="las la-spinner la-spin mr-2"></i> ' + AIZ.local.saving_as_draft);
-                    }
-
-                    $.ajax({
-                        url: "{{ route('products.store_as_draft') }}",
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.success) {
-                                draftProductId = response.product_id;
-
-                                // Update form action for future edits
-                                $('#aizSubmitForm').attr('action', "{{ url('admin/products/update') }}/" + draftProductId);
-
-                                if ($('#aizSubmitForm input[name="_method"]').length === 0) {
-                                    $('#aizSubmitForm').append('<input type="hidden" name="_method" value="POST">');
-                                }
-
-                                if (draftBtn.length) {
-                                    draftBtn.prop('disabled', false).html('<i class="las la-check-circle mr-2"></i>' + draftBtnText);
-                                }
-                                AIZ.plugins.notify('success', `${response.message}`);
-                                savedClearTempdata();
-                            } else {
-                                if (draftBtn.length) {
-                                    draftBtn.prop('disabled', false).html('<i class="las la-exclamation-circle text-danger mr-2"></i>' + draftBtnText);
-                                }
+                            if ($('#aizSubmitForm input[name="_method"]').length === 0) {
+                                $('#aizSubmitForm').append('<input type="hidden" name="_method" value="POST">');
                             }
-                        },
-                        error: function (xhr) {
-                            if (xhr.status === 422) {
-                                let errors = xhr.responseJSON.errors;
-                                Object.values(errors).forEach(function (fieldErrors) {
-                                    // fieldErrors.forEach(function(error) {
-                                    //     AIZ.plugins.notify('danger', error);
-                                    // });
-                                    if (draftBtn.length) {
-                                        draftBtn.prop('disabled', false).html('<i class="las la-exclamation-circle text-danger mr-2"></i>' + draftBtnText);
-                                    }
-                                });
-                            } else {
-                                if (draftBtn.length) {
-                                    draftBtn.prop('disabled', false).html('<i class="las la-exclamation-circle text-danger mr-2"></i>' + draftBtnText);
-                                }
-                                //AIZ.plugins.notify('danger', AIZ.local.error_occured_while_processing);
+
+                            if (draftBtn.length) {
+                                draftBtn.prop('disabled', false).html('<i class="las la-check-circle mr-2"></i>' + draftBtnText);
+                            }
+                            AIZ.plugins.notify('success', `${response.message}`);
+                            savedClearTempdata();
+                        } else {
+                            if (draftBtn.length) {
+                                draftBtn.prop('disabled', false).html('<i class="las la-exclamation-circle text-danger mr-2"></i>' + draftBtnText);
                             }
                         }
-                    });
-                }
-
-                // Auto-save on tab click
-                $('a[data-toggle="tab"]').on('show.bs.tab', function () {
-                    var productName = $('input[name="name"]').val();
-                    if (productName && productName.trim() !== '') {
-                        saveDraft();
+                    },
+                    error: function (xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            Object.values(errors).forEach(function (fieldErrors) {
+                                // fieldErrors.forEach(function(error) {
+                                //     AIZ.plugins.notify('danger', error);
+                                // });
+                                if (draftBtn.length) {
+                                    draftBtn.prop('disabled', false).html('<i class="las la-exclamation-circle text-danger mr-2"></i>' + draftBtnText);
+                                }
+                            });
+                        } else {
+                            if (draftBtn.length) {
+                                draftBtn.prop('disabled', false).html('<i class="las la-exclamation-circle text-danger mr-2"></i>' + draftBtnText);
+                            }
+                            //AIZ.plugins.notify('danger', AIZ.local.error_occured_while_processing);
+                        }
                     }
                 });
+            }
 
-                $('#saveDraftBtn').on('click', function (e) {
-                    e.preventDefault();
+            // Auto-save on tab click
+            $('a[data-toggle="tab"]').on('show.bs.tab', function () {
+                var productName = $('input[name="name"]').val();
+                if (productName && productName.trim() !== '') {
                     saveDraft();
-                });
-
+                }
             });
 
+            $('#saveDraftBtn').on('click', function (e) {
+                e.preventDefault();
+                saveDraft();
+            });
+
+        });
 
 
 
 
-            // AI Generation Handler (Placeholder)
-            function generateDescriptionAI() {
-                if (!$('#product_name').val() || !$('#category_id').val()) {
-                    AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
-                    return;
-                }
 
-                let originalBtnHtml = $('button[onclick="generateDescriptionAI()"]').html();
-                $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
+        // AI Generation Handler
+        function generateDescriptionAI() {
+            if (!$('#product_name').val() || !$('#category_id').val()) {
+                AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
+                return;
+            }
 
-                setTimeout(function () {
-                    let productName = $('#product_name').val();
-                    let mockDescription = "<p><strong>" + productName + "</strong> " + "{{ translate('is a premium quality product designed for everyday excellence. Built with care and precision, it meets all your standards.') }}" + "</p>";
-                    $('#product_description').val(mockDescription).siblings('.note-editor').find('.note-editable').html(mockDescription);
+            let originalBtnHtml = $('button[onclick="generateDescriptionAI()"]').html();
+            $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
 
-                    // Auto-Generate SEO Tags without user intervention
-                    $('input[name="meta_title"]').val(productName + " - Premium");
-                    $('textarea[name="meta_description"]').val("Buy " + productName + " at the best price. Premium quality guaranteed.");
+            $.post('{{ route('admin.ai.generate') }}', {
+                _token: '{{ csrf_token() }}',
+                product_name: $('#product_name').val(),
+                category_id: $('#category_id').val()
+            }, function (data) {
+                if (data.success) {
+                    $('#product_description').val(data.description).siblings('.note-editor').find('.note-editable').html(data.description);
+                    $('input[name="meta_title"]').val(data.meta_title);
+                    $('textarea[name="meta_description"]').val(data.meta_description);
+
                     let tags = $('#product_tags').val();
                     let metaKeywords = $('textarea[name="meta_keywords"]');
                     metaKeywords.val(tags).trigger('change');
 
-                    $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
                     AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
-
-                    // Trigger validation visual update for these fields
                     validateField($('input[name="meta_title"]'));
                     validateField($('textarea[name="meta_description"]'));
-                }, 1500);
-            }
-
-            // Auto-populate tags from Product Name
-            // Auto-populate tags from Product Name
-            $('#product_name').on('change', function () {
-                let name = $(this).val();
-                if (name) {
-                    let tagsInput = $('#product_tags');
-                    let currentTags = tagsInput.val();
-                    if (!currentTags.includes(name)) {
-                        let newTags = currentTags ? currentTags + ',' + name : name;
-                        // Trigger enter key or change for the tags input plugin to catch it
-                        tagsInput.val(newTags).trigger('change');
-
-                        // Also update Meta Keywords if empty
-                        let metaKeywords = $('textarea[name="meta_keywords"]');
-                        if (!metaKeywords.val()) {
-                            metaKeywords.val(newTags).trigger('change');
-                        }
-                    }
-                }
-            });
-
-            // Generate SKU
-            function generateSKU() {
-                let name = $('#product_name').val();
-                let prefix = "PRD-";
-                if (name && name.trim().length >= 3) {
-                    // Get first 3 letters or initials
-                    let words = name.trim().split(/\s+/);
-                    if (words.length >= 3) {
-                        prefix = (words[0][0] + words[1][0] + words[2][0]).toUpperCase() + "-";
-                    } else {
-                        prefix = name.trim().substring(0, 3).toUpperCase() + "-";
-                    }
-                }
-
-                let randomNum = Math.floor(100000 + Math.random() * 900000);
-                $('#sku_input').val(prefix + randomNum);
-                validateField($('#sku_input'));
-                AIZ.plugins.notify('success', '{{ translate("Generated meaningful SKU successfully.") }}');
-
-                if (typeof update_sku === 'function') {
-                    update_sku();
-                }
-            }
-
-            function checkSKUAvailability(el) {
-                let sku = $(el).val();
-                if (!sku || sku.length < 2) {
-                    $(el).removeClass('is-invalid is-valid');
-                    $(el).next('.invalid-feedback').remove();
-                    return;
-                }
-
-                let product_id = $('input[name="id"]').val() || null;
-
-                $.get('{{ route('products.check-sku-availability') }}', { sku: sku, product_id: product_id }, function (data) {
-                    if (data.exists) {
-                        $(el).addClass('is-invalid').removeClass('is-valid');
-                        if (!$(el).next('.invalid-feedback').length) {
-                            $(el).after('<div class="invalid-feedback">{{ translate("This SKU already exists in your catalog.") }}</div>');
-                        }
-                    } else {
-                        $(el).addClass('is-valid').removeClass('is-invalid');
-                        $(el).next('.invalid-feedback').remove();
-                    }
-                });
-            }
-
-            $(document).on('change', '#sku_input', function () {
-                checkSKUAvailability(this);
-            });
-
-            $(document).on('change', 'input[name="sku_combinations[]"]', function () {
-                checkSKUAvailability(this);
-            });
-
-            // Validation Highlighting Logic (Green/Red)
-            function validateField(el) {
-                if ($(el).val() && $(el).val().length > 0) {
-                    $(el).addClass('is-valid').removeClass('is-invalid');
                 } else {
-                    $(el).addClass('is-invalid').removeClass('is-valid');
+                    AIZ.plugins.notify('danger', data.message || '{{ translate("Failed to generate description.") }}');
+                }
+            }).fail(function (xhr) {
+                let errorMessage = '{{ translate("An error occurred during AI generation.") }}';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                AIZ.plugins.notify('danger', errorMessage);
+            }).always(function () {
+                $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
+            });
+        }
+
+        // Auto-populate tags from Product Name
+        // Auto-populate tags from Product Name
+        $('#product_name').on('change', function () {
+            let name = $(this).val();
+            if (name) {
+                let tagsInput = $('#product_tags');
+                let currentTags = tagsInput.val();
+                if (!currentTags.includes(name)) {
+                    let newTags = currentTags ? currentTags + ',' + name : name;
+                    // Trigger enter key or change for the tags input plugin to catch it
+                    tagsInput.val(newTags).trigger('change');
+
+                    // Also update Meta Keywords if empty
+                    let metaKeywords = $('textarea[name="meta_keywords"]');
+                    if (!metaKeywords.val()) {
+                        metaKeywords.val(newTags).trigger('change');
+                    }
+                }
+            }
+        });
+
+        // Generate SKU
+        function generateSKU() {
+            let name = $('#product_name').val();
+            let prefix = "PRD-";
+            if (name && name.trim().length >= 3) {
+                // Get first 3 letters or initials
+                let words = name.trim().split(/\s+/);
+                if (words.length >= 3) {
+                    prefix = (words[0][0] + words[1][0] + words[2][0]).toUpperCase() + "-";
+                } else {
+                    prefix = name.trim().substring(0, 3).toUpperCase() + "-";
                 }
             }
 
-            $(document).ready(function () {
-                // Apply instantly on load to highlight empty required fields in red, filled in green
-                $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').each(function () {
-                    validateField(this);
-                });
+            let randomNum = Math.floor(100000 + Math.random() * 900000);
+            $('#sku_input').val(prefix + randomNum);
+            validateField($('#sku_input'));
+            AIZ.plugins.notify('success', '{{ translate("Generated meaningful SKU successfully.") }}');
 
-                $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').on('change blur input', function () {
-                    validateField(this);
-                });
+            if (typeof update_sku === 'function') {
+                update_sku();
+            }
+        }
 
-                // For Aiz Selectpicker (Bootstrap Select) required fields
-                $('.aiz-selectpicker[required]').each(function () {
-                    if ($(this).val()) {
-                        $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
-                    } else {
-                        $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
+        function checkSKUAvailability(el) {
+            let sku = $(el).val();
+            if (!sku || sku.length < 2) {
+                $(el).removeClass('is-invalid is-valid');
+                $(el).next('.invalid-feedback').remove();
+                return;
+            }
+
+            let product_id = $('input[name="id"]').val() || null;
+
+            $.get('{{ route('products.check-sku-availability') }}', { sku: sku, product_id: product_id }, function (data) {
+                if (data.exists) {
+                    $(el).addClass('is-invalid').removeClass('is-valid');
+                    if (!$(el).next('.invalid-feedback').length) {
+                        $(el).after('<div class="invalid-feedback">{{ translate("This SKU already exists in your catalog.") }}</div>');
                     }
-                });
+                } else {
+                    $(el).addClass('is-valid').removeClass('is-invalid');
+                    $(el).next('.invalid-feedback').remove();
+                }
+            });
+        }
 
-                $('.aiz-selectpicker[required]').on('changed.bs.select', function () {
-                    if ($(this).val()) {
-                        $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
-                    } else {
-                        $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
-                    }
-                });
+        $(document).on('change', '#sku_input', function () {
+            checkSKUAvailability(this);
+        });
+
+        $(document).on('change', 'input[name="sku_combinations[]"]', function () {
+            checkSKUAvailability(this);
+        });
+
+        // Validation Highlighting Logic (Green/Red)
+        function validateField(el) {
+            if ($(el).val() && $(el).val().length > 0) {
+                $(el).addClass('is-valid').removeClass('is-invalid');
+            } else {
+                $(el).addClass('is-invalid').removeClass('is-valid');
+            }
+        }
+
+        $(document).ready(function () {
+            // Apply instantly on load to highlight empty required fields in red, filled in green
+            $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').each(function () {
+                validateField(this);
             });
 
-            // Uploader Modal Tooltips Sequential Display
-            $(document).on('shown.bs.modal', '#aizUploaderModal', function () {
-                let uploadTip = $('a[href="#aiz-upload-new"]').parent();
-                let selectTip = $('a[href="#aiz-select-file"]').parent();
+            $('input[required], select[required], textarea[required]').not('.aiz-selectpicker').on('change blur input', function () {
+                validateField(this);
+            });
 
-                // Ensure manual trigger behavior doesn't clash
-                uploadTip.tooltip({ trigger: 'manual' }).tooltip('show');
+            // For Aiz Selectpicker (Bootstrap Select) required fields
+            $('.aiz-selectpicker[required]').each(function () {
+                if ($(this).val()) {
+                    $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
+                } else {
+                    $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
+                }
+            });
+
+            $('.aiz-selectpicker[required]').on('changed.bs.select', function () {
+                if ($(this).val()) {
+                    $(this).next('.dropdown-toggle').addClass('border-success').removeClass('border-danger');
+                } else {
+                    $(this).next('.dropdown-toggle').addClass('border-danger').removeClass('border-success');
+                }
+            });
+        });
+
+        // Uploader Modal Tooltips Sequential Display
+        $(document).on('shown.bs.modal', '#aizUploaderModal', function () {
+            let uploadTip = $('a[href="#aiz-upload-new"]').parent();
+            let selectTip = $('a[href="#aiz-select-file"]').parent();
+
+            // Ensure manual trigger behavior doesn't clash
+            uploadTip.tooltip({ trigger: 'manual' }).tooltip('show');
+
+            setTimeout(function () {
+                uploadTip.tooltip('hide');
+                selectTip.tooltip({ trigger: 'manual' }).tooltip('show');
 
                 setTimeout(function () {
-                    uploadTip.tooltip('hide');
-                    selectTip.tooltip({ trigger: 'manual' }).tooltip('show');
-
-                    setTimeout(function () {
-                        selectTip.tooltip('hide');
-                    }, 4000);
+                    selectTip.tooltip('hide');
                 }, 4000);
-            });
+            }, 4000);
+        });
 
-        </script>
+    </script>
 
 
 
