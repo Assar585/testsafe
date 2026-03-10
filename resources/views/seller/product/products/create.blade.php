@@ -1,6 +1,8 @@
 @extends('seller.layouts.app')
 
 @section('panel_content')
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <div class="page-content mx-0">
         <div class="aiz-titlebar mt-2 mb-4">
             <div class="row align-items-center">
@@ -254,16 +256,16 @@
 
                                     <button type="button" class="btn btn-secondary btn-sm" data-toggle="add-more"
                                         data-content='<div class="row">
-                                                                                                            <div class="col-md-11">
-                                                                                                                <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                                                <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                                            </div>
-                                                                                                            <div class="col-1 d-flex justify-content-end">
-                                                                                                                    <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                                        <i class="las la-times"></i>
-                                                                                                                    </button>
-                                                                                                            </div>
-                                                                                                        </div>'
+                                                                                                                <div class="col-md-11">
+                                                                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                                </div>
+                                                                                                                <div class="col-1 d-flex justify-content-end">
+                                                                                                                        <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                                            <i class="las la-times"></i>
+                                                                                                                        </button>
+                                                                                                                </div>
+                                                                                                            </div>'
                                         data-target=".video-provider-link">
                                         {{ translate('Add Another') }}
                                     </button>
@@ -994,18 +996,18 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                                            <div class="form-group row">\
-                                                                                <div class="col-md-3">\
-                                                                                    <input type="hidden" name="choice_no[]" value="' + i + '">\
-                                                                                    <input type="text" class="form-control" name="choice[]" va                                    lue="' + name +
+                                                                                <div class="form-group row">\
+                                                                                    <div class="col-md-3">\
+                                                                                        <input type="hidden" name="choice_no[]" value="' + i + '">\
+                                                                                        <input type="text" class="form-control" name="choice[]" va                                    lue="' + name +
                         '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                                                </div>\
-                                                                                <div class="col-md-8">\
-                                                                                    <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
-                                                                                        ' + obj + '\
-                                                                                    </select>\
-                                                                                </div>\
-                                                                            </div>');
+                                                                                    </div>\
+                                                                                    <div class="col-md-8">\
+                                                                                        <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_' + i + '[]" multiple>\
+                                                                                            ' + obj + '\
+                                                                                        </select>\
+                                                                                    </div>\
+                                                                                </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
@@ -1217,6 +1219,8 @@
 
 
     </script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function () {
             var hash = document.location.hash;
@@ -1455,7 +1459,7 @@
                     var savedOpt = new Option("{{ old('hsn_code') }}", "{{ old('hsn_code') }}", true, true);
                     $('#hsn_code_select').append(savedOpt).trigger('change');
                 @endif
-                    }
+                        }
         });
     </script>
 @endsection
