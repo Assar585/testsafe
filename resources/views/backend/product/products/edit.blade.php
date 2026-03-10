@@ -557,16 +557,16 @@
                                         <button type="button"
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center ml-3 mt-3"
                                             data-toggle="add-more" data-content='<div class="row mb-2">
-                                                                                                        <div class="col">
-                                                                                                            <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                                            <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                                        </div>
-                                                                                                        <div class="col-auto d-flex justify-content-end">
-                                                                                                                <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                                                    <i class="las la-times"></i>
-                                                                                                                </button>
-                                                                                                        </div>
-                                                                                                    </div>'
+                                                                                                            <div class="col">
+                                                                                                                <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
+                                                                                                                <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
+                                                                                                            </div>
+                                                                                                            <div class="col-auto d-flex justify-content-end">
+                                                                                                                    <button type="button" class="my-1 pt-2 btn btn-icon btn-circle btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
+                                                                                                                        <i class="las la-times"></i>
+                                                                                                                    </button>
+                                                                                                            </div>
+                                                                                                        </div>'
                                             data-target=".video-provider-link">
                                             <i class="las la-plus mr-2"></i>
                                             {{ translate('Add Another') }}
@@ -1258,41 +1258,11 @@
         $(document).ready(fu                    nction() {
             show_hide_shipping_div();
 
-                    $("#treeview").hummingbird();
-            var main_id = '{{ $product->category_id != null ? $product->category_id : 0 }}';
-            var selected_ids = '{{ implode(",", $old_categories) }}';
-            if(selected_ids != '') {
-            const myArray = selected_ids.split(",");
-            for (let i = 0; i < myArray.length; i++) {
-                const element = myArray[i];
-                $('#treeview input:checkbox#' + element).prop('checked', true);
-                if (i < myArray.length - 1) {
-                    const $checkbox = $('#treeview input:checkbox#' + element);
 
-                    $checkbox.attr('onclick', 'cursor_not_allowed(event)');
-                    $checkbox.css('cursor', 'not-allowed');
-                    $checkbox.closest('label').css('cursor', 'not-allowed');
-                } else {
-                    const $checkbox = $('#treeview input:checkbox#' + element);
-                    $checkbox.closest('ul').find('input[type="checkbox"]').removeAttr('onclick');
-                    $checkbox.closest('ul').find('input[type="checkbox"]').css('cursor', '');
-                    $checkbox.closest('ul').find('label').css('cursor', '');
-                }
-                $('#treeview input:checkbox#' + element).parents("ul").css("display", "block");
-                $('#treeview input:checkbox#' + element).parents("li").children('.las').removeClass("la-plus").addClass('la-minus');
-            }
-        }
-        $radio = $('#treeview input:radio[value=' + main_id + ']');
-        $radio.prop('checked', true);
-        $prev_label = $radio.prev('label');
-        $prev_label.css('cursor', 'not-allowed');
-        $prev_label.find('input[type="checkbox"]').css('cursor', 'not-allowed');
-        $prev_label.find('input[type="checkbox"]').attr('onclick', 'cursor_not_allowed(event)');
-        $('#treeview input:radio[value=' + main_id + ']').next('ul').css("display", "block");
 
-        fq_bought_product_selection_type();
+            fq_bought_product_selection_type();
 
-                });
+        });
 
         $("[name=shipping_type]").on("change", function () {
             show_hide_shipping_div();
@@ -1321,17 +1291,17 @@
                 success: function (data) {
                     var obj = JSON.parse(data);
                     $('#customer_choice_options').append('\
-                                                                        <div class="form-group row">\
-                                                                            <div class="col-md-3">\
-                                                                                <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                                                                <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
-                                                                            </div>\
-                                                                            <div class="col-md-8">\
-                                                                                <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
-                                                                                    '+ obj + '\
-                                                                                </select>\
-                                                                            </div>\
-                                                                        </div>');
+                                                                            <div class="form-group row">\
+                                                                                <div class="col-md-3">\
+                                                                                    <input type="hidden" name="choice_no[]" value="'+ i + '">\
+                                                                                    <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                                                                </div>\
+                                                                                <div class="col-md-8">\
+                                                                                    <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
+                                                                                        '+ obj + '\
+                                                                                    </select>\
+                                                                                </div>\
+                                                                            </div>');
                     AIZ.plugins.bootstrapSelect('refresh');
                 }
             });
