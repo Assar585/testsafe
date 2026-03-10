@@ -36,7 +36,7 @@ class ApiIntegrationController extends Controller
         $integration->label = $request->label ?? $request->service_name;
         $integration->api_url = $request->api_url;
         $integration->extra_data = $request->extra_data;
-        $integration->is_active = $request->has('is_active') ? 1 : $integration->is_active;
+        $integration->is_active = $request->has('is_active') ? 1 : ($integration->is_active ?? 0);
 
         // Only update key if a new non-empty/non-masked value was submitted
         if ($request->filled('api_key') && $request->api_key !== '••••••••') {
