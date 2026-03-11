@@ -51,10 +51,7 @@ RUN echo "DEBUG: RUNNING COMPOSER UPDATE WITHOUT STABILITY FLAG" \
 # Copy existing application directory contents
 COPY . /var/www
 
-# Now generate optimized autoloader after code is present
-RUN composer dump-autoload --optimize --no-dev
-
-# Create necessary directories and set permissions
+# Create necessary directories and set permissions BEFORE dump-autoload
 RUN mkdir -p /var/www/storage/framework/cache/data \
     && mkdir -p /var/www/storage/framework/app/cache \
     && mkdir -p /var/www/storage/framework/sessions \
@@ -63,6 +60,9 @@ RUN mkdir -p /var/www/storage/framework/cache/data \
     && mkdir -p /var/www/bootstrap/cache \
     && chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
+
+# Now generate optimized autoloader after code and directories are present
+RUN composer dump-autoload --optimize --no-dev
 
 # Switch to root to ensure we can run start.sh with proper permissions if needed
 USER root
