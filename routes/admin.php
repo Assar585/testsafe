@@ -208,9 +208,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-ba
     // Digital Product
     Route::resource('digitalproducts', DigitalProductController::class);
     Route::controller(DigitalProductController::class)->group(function () {
-        Route::get('/digitalproducts/edit/{id}', 'edit')->name('digitalproducts.edit');
-        Route::get('/digitalproducts/destroy/{id}', 'destroy')->name('digitalproducts.destroy');
-        Route::get('/digitalproducts/download/{id}', 'download')->name('digitalproducts.download');
+        Route::get('/digitalproducts/admin-edit/{id}', 'edit')->name('digitalproducts.edit.admin');
+        Route::get('/digitalproducts/destroy/{id}', 'destroy')->name('digitalproducts.destroy.admin');
+        Route::get('/digitalproducts/download/{id}', 'download')->name('digitalproducts.download.admin');
     });
 
     Route::controller(ProductBulkUploadController::class)->group(function () {
