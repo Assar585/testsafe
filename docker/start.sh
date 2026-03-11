@@ -11,16 +11,13 @@ fi
 # Pre-warm Laravel caches for production on container boot
 echo "Building Laravel caches..."
 php /var/www/artisan package:discover
-php /var/www/artisan config:clear
 php /var/www/artisan config:cache
 php /var/www/artisan view:cache
-php /var/www/artisan storage:link || echo "Storage link already exists or failed..."
-
 # Run the exact missing migration explicitly to bypass any earlier migration crashes
 php /var/www/artisan migrate --path=database/migrations/2026_03_03_000000_create_api_integrations_table.php --force || echo "Warning: Explicit API integration migration failed..."
 
 # Run migrations safely to avoid startup crash during schema mismatch.
-echo "Caches built, storage linked, and migrations attempted. Startup proceeding..."
+echo "Caches built and migrations attempted. Startup proceeding..."
 
 # Ensure correct permissions for mounted volumes and locally generated cache files
 echo "Setting permissions for storage, cache, and upload volumes..."
