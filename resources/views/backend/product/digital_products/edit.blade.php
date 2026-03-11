@@ -400,9 +400,11 @@
                         <div class="form-group mb-2">
                             <label class="col-from-label fs-13">{{translate('Category')}} <span
                                     class="text-danger">*</span></label>
+                            <input type="hidden" name="category_ids[]" id="category_ids_hidden" value="{{ $product->category_id }}">
                             <select
                                 class="form-control aiz-selectpicker"
-                                name="category_id" id="category_id" data-live-search="true" required>
+                                name="category_id" id="category_id" data-live-search="true" required
+                                onchange="$('#category_ids_hidden').val(this.value);">
                                 <option value="">{{ translate('Select Category') }}</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}" @if($category->id == $product->category_id) selected @endif>

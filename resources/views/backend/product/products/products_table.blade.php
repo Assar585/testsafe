@@ -91,7 +91,7 @@
                          {{ $shop->name ?? translate('Inhouse') }}
                     </a>
                     <span class="fs-12 fw-200 text-secondary d-block pt-1">{{ translate('Main Category') }}</span>
-                    <p class="fs-12 fs-md-14 fw-700 m-0">{{translate($product->main_category->name ?? '')}}</p> 
+                    <p class="fs-12 fs-md-14 fw-700 m-0">{{translate(optional($product->main_category)->name ?? translate('Uncategorized'))}}</p> 
                 </td>
                 <td class="hide-sm" data-label="Ratings">
                     <!--Ratting-->

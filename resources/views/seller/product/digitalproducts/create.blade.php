@@ -59,7 +59,8 @@
                                     <div class="input-group" data-toggle="aizuploader" data-multiple="false">
                                         <div class="input-group-prepend">
                                             <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse')}}</div>
+                                                {{ translate('Browse')}}
+                                            </div>
                                         </div>
                                         <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                         <input type="hidden" name="file_name" class="selected-files">
@@ -92,7 +93,8 @@
                                         data-multiple="true">
                                         <div class="input-group-prepend">
                                             <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse')}}</div>
+                                                {{ translate('Browse')}}
+                                            </div>
                                         </div>
                                         <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                         <input type="hidden" name="photos" class="selected-files">
@@ -112,7 +114,8 @@
                                         data-multiple="false">
                                         <div class="input-group-prepend">
                                             <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse')}}</div>
+                                                {{ translate('Browse')}}
+                                            </div>
                                         </div>
                                         <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                         <input type="hidden" name="thumbnail_img" class="selected-files">
@@ -159,7 +162,8 @@
                                         data-multiple="false">
                                         <div class="input-group-prepend">
                                             <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse')}}</div>
+                                                {{ translate('Browse')}}
+                                            </div>
                                         </div>
                                         <div class="form-control file-amount">{{ translate('Choose File') }}</div>
                                         <input type="hidden" name="meta_img" class="selected-files">
@@ -310,7 +314,8 @@
                                                         name="fq_bought_product_category_id" data-live-search="true">
                                                         @foreach ($categories as $category)
                                                             <option value="{{ $category->id }}">
-                                                                {{ $category->getTranslation('name') }}</option>
+                                                                {{ $category->getTranslation('name') }}
+                                                            </option>
                                                             @foreach ($category->childrenCategories as $childCategory)
                                                                 @include('categories.child_category', ['child_category' => $childCategory])
                                                             @endforeach
@@ -336,8 +341,10 @@
                             <div class="form-group mb-2">
                                 <label class="col-from-label fs-13">{{translate('Category')}} <span
                                         class="text-danger">*</span></label>
+                                <input type="hidden" name="category_ids[]" id="category_ids_hidden"
+                                    value="{{ old('category_id') }}">
                                 <select class="form-control aiz-selectpicker" name="category_id" id="category_id"
-                                    data-live-search="true" required>
+                                    data-live-search="true" required onchange="$('#category_ids_hidden').val(this.value);">
                                     <option value="">{{ translate('Select Category') }}</option>
                                     @foreach ($categories as $category)
                                         <option value="{{ $category->id }}">
