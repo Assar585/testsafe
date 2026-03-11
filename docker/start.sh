@@ -16,6 +16,10 @@ php /var/www/artisan config:cache
 php /var/www/artisan view:cache
 php /var/www/artisan storage:link || echo "Storage link already exists or failed..."
 
+# Fix branding
+echo "Fixing branding..."
+php /var/www/fix_branding.php || echo "Branding fix failed..."
+
 # Run migrations
 echo "Running migrations..."
 php /var/www/artisan migrate --force || echo "Warning: Migration failed..."
