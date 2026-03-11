@@ -244,7 +244,7 @@
                                 @if($product->digital)
                                 @can('add_digital_product')
                                 <a
-                                    class="d-flex align-items-center px-20px py-10px hov-bg-light hov-text-blue" href="{{route('digitalproducts.download', encrypt($product->id))}}">
+                                    class="d-flex align-items-center px-20px py-10px hov-bg-light hov-text-blue" href="{{route('digitalproducts.download.admin', encrypt($product->id))}}">
                                     <span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="10.2" height="12" viewBox="0 0 10.2 12">
                                             <path d="M 4.6 7.8 L 4.6 1.8 L 5.6 1.8 L 5.6 7.8 L 8.4 7.8 L 5.1 11.1 L 1.8 7.8 L 4.6 7.8 Z M 1.8 10.8 L 8.4 10.8 L 8.4 12 L 1.8 12 L 1.8 10.8 Z"

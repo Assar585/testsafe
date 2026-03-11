@@ -224,21 +224,12 @@ class ProductController extends Controller
         $type = $request->seller_type;
         $ptoduct_type = $request->product_type;
 
-        try {
-            $view = view(
-                'backend.product.products.products_table',
-                compact('products', 'type', 'col_name', 'query', 'sort_search', 'ptoduct_type')
-            )->render();
+        $view = view(
+            'backend.product.products.products_table',
+            compact('products', 'type', 'col_name', 'query', 'sort_search', 'ptoduct_type')
+        )->render();
 
-            return response()->json(['html' => $view]);
-        } catch (\Exception $e) {
-            \Log::error('All Products Error: ' . $e->getMessage(), [
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return response()->json(['html' => '<div class="text-center text-danger">Error: ' . $e->getMessage() . ' in ' . basename($e->getFile()) . ' at line ' . $e->getLine() . '</div>']);
-        }
+        return response()->json(['html' => $view]);
     }
 
 
