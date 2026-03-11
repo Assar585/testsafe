@@ -398,24 +398,28 @@
                     </div>
                     <div class="card-body ">
                         <div class="form-group mb-2">
-                            <label class="col-from-label fs-13">{{translate('Category')}} <span
+                            <label class="col-from-label fs-13">{{translate('Product Category')}} <span
                                     class="text-danger">*</span></label>
-                            <input type="hidden" name="category_ids[]" id="category_ids_hidden" value="{{ $product->category_id }}">
+                            <input type="hidden" name="category_ids[]" id="category_ids_hidden"
+                                value="{{ $product->category_id }}">
                             <select
-                                class="form-control aiz-selectpicker"
+                                class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror"
                                 name="category_id" id="category_id" data-live-search="true" required
                                 onchange="$('#category_ids_hidden').val(this.value);">
                                 <option value="">{{ translate('Select Category') }}</option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" @if($category->id == $product->category_id) selected @endif>
+                                    <option value="{{ $category->id }}"
+                                        @selected($product->category_id == $category->id)>
                                         {{ $category->getTranslation('name') }}
                                     </option>
                                     @foreach ($category->childrenCategories as $childCategory)
-                                        <option value="{{ $childCategory->id }}" @if($childCategory->id == $product->category_id) selected @endif>
+                                        <option value="{{ $childCategory->id }}"
+                                            @selected($product->category_id == $childCategory->id)>
                                             &nbsp;&nbsp;&nbsp;-- {{ $childCategory->getTranslation('name') }}
                                         </option>
                                         @foreach ($childCategory->childrenCategories as $subChildCategory)
-                                            <option value="{{ $subChildCategory->id }}" @if($subChildCategory->id == $product->category_id) selected @endif>
+                                            <option value="{{ $subChildCategory->id }}"
+                                                @selected($product->category_id == $subChildCategory->id)>
                                                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
                                                 {{ $subChildCategory->getTranslation('name') }}
                                             </option>

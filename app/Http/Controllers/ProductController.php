@@ -593,7 +593,7 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
         if ($product->digital == 1) {
-            return redirect('admin/digitalproducts/' . $id . '/edit');
+            return redirect()->route('digitalproducts.edit', $id);
         }
 
         if (addon_is_activated('gst_system')) {
@@ -642,7 +642,7 @@ class ProductController extends Controller
 
         $product = Product::findOrFail($id);
         if ($product->digital == 1) {
-            return redirect('digitalproducts/' . $id . '/edit');
+            return redirect()->route('seller.digitalproducts.edit', $id);
         }
         $lang = $request->lang;
         $tags = json_decode($product->tags);
