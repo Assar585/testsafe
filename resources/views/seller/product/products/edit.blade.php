@@ -9,6 +9,12 @@
         <div class="col-md-6">
             <h1 class="h3">{{ translate('Update your product') }}</h1>
         </div>
+        <div class="col-md-6 text-right">
+            <a href="{{ route('seller.products.index') }}" class="btn btn-link text-reset">
+                <i class="las la-angle-left"></i>
+                <span>{{translate('Back to product list')}}</span>
+            </a>
+        </div>
     </div>
 </div>
 
@@ -26,7 +32,7 @@
 <form class="" action="{{route('seller.products.update', $product->id)}}" method="POST" enctype="multipart/form-data"
     id="choice_form">
     <div class="row gutters-5">
-        <div class="col-lg-8">
+        <div class="col-12">
             <input name="_method" type="hidden" value="POST">
             <input type="hidden" name="lang" value="{{ $lang }}">
             <input type="hidden" name="id" value="{{ $product->id }}">
@@ -49,60 +55,112 @@
                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
                         {{translate('Product Information')}}
                     </h5>
-                    <div class="w-100">
-                    <div class="form-group mb-3">
-                        <label class="col-from-label fs-13">{{translate('Product Name')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
-                        <input type="text" class="form-control" name="name" id="product_name"
-                            placeholder="{{translate('Product Name')}}" value="{{$product->getTranslation('name',$lang)}}"
-                            required>
-                    </div>
-                    <div class="form-group mb-3" id="brand">
-                        <label class="col-from-label fs-13">{{translate('Brand')}}</label>
-                        <select class="form-control aiz-selectpicker" name="brand_id" id="brand_id" data-live-search="true">
-                            <option value="">{{ translate('Select Brand') }}</option>
-                            @foreach (\App\Models\Brand::all() as $brand)
-                            <option value="{{ $brand->id }}" @if($product->brand_id == $brand->id) selected
-                                @endif>{{ $brand->getTranslation('name') }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label class="col-from-label fs-13">{{translate('Unit')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
-                        <input type="text" class="form-control" name="unit"
-                            placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}"
-                            value="{{$product->getTranslation('unit', $lang)}}" required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label class="col-from-label fs-13">{{translate('Weight')}} <small>({{ translate('In Kg') }})</small></label>
-                        <input type="number" class="form-control" name="weight" value="{{ $product->weight }}" step="0.01" placeholder="0.00">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label class="col-from-label fs-13">{{translate('Minimum Purchase Qty')}}</label>
-                        <input type="number" lang="en" class="form-control" name="min_qty"
-                            value="@if($product->min_qty <= 1){{1}}@else{{$product->min_qty}}@endif" min="1"
-                            required>
-                    </div>
-                    <div class="form-group mb-3">
-                        <label class="col-from-label fs-13">{{translate('Tags')}}</label>
-                        <input type="text" class="form-control aiz-tag-input" name="tags[]" id="tags"
-                            value="{{ $product->tags }}" placeholder="{{ translate('Type to add a tag') }}"
-                            data-role="tagsinput">
-                    </div>
+                    <div class="row">
+                        <div class="col-xxl-7 col-xl-6">
+                            <div class="form-group mb-3">
+                                <label class="col-from-label fs-13">{{translate('Product Name')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
+                                <input type="text" class="form-control" name="name" id="product_name"
+                                    placeholder="{{translate('Product Name')}}" value="{{$product->getTranslation('name',$lang)}}"
+                                    required>
+                            </div>
+                            <div class="form-group mb-3" id="brand">
+                                <label class="col-from-label fs-13">{{translate('Brand')}}</label>
+                                <select class="form-control aiz-selectpicker" name="brand_id" id="brand_id" data-live-search="true">
+                                    <option value="">{{ translate('Select Brand') }}</option>
+                                    @foreach (\App\Models\Brand::all() as $brand)
+                                    <option value="{{ $brand->id }}" @if($product->brand_id == $brand->id) selected
+                                        @endif>{{ $brand->getTranslation('name') }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="col-from-label fs-13">{{translate('Unit')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
+                                <input type="text" class="form-control" name="unit"
+                                    placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}"
+                                    value="{{$product->getTranslation('unit', $lang)}}" required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="col-from-label fs-13">{{translate('Weight')}} <small>({{ translate('In Kg') }})</small></label>
+                                <input type="number" class="form-control" name="weight" value="{{ $product->weight }}" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="col-from-label fs-13">{{translate('Minimum Purchase Qty')}}</label>
+                                <input type="number" lang="en" class="form-control" name="min_qty"
+                                    value="@if($product->min_qty <= 1){{1}}@else{{$product->min_qty}}@endif" min="1"
+                                    required>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="col-from-label fs-13">{{translate('Tags')}}</label>
+                                <input type="text" class="form-control aiz-tag-input" name="tags[]" id="tags"
+                                    value="{{ $product->tags }}" placeholder="{{ translate('Type to add a tag') }}"
+                                    data-role="tagsinput">
+                            </div>
 
-                    @if (addon_is_activated('pos_system'))
-                    <div class="form-group mb-3">
-                        <label class="col-from-label fs-13">{{translate('Barcode')}}</label>
-                        <input type="text" class="form-control" name="barcode"
-                            placeholder="{{ translate('Barcode') }}" value="{{ $product->barcode }}">
-                    </div>
-                    @endif
+                            @if (addon_is_activated('pos_system'))
+                            <div class="form-group mb-3">
+                                <label class="col-from-label fs-13">{{translate('Barcode')}}</label>
+                                <input type="text" class="form-control" name="barcode"
+                                    placeholder="{{ translate('Barcode') }}" value="{{ $product->barcode }}">
+                            </div>
+                            @endif
+                        </div>
+                        <div class="col-xxl-5 col-xl-6">
+                            <div class="form-group mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-0">
+                                    <label class="col-from-label fs-13 mb-0">{{ translate('Product Category') }}</label>
+                                    <h6 class="fs-12 mb-0">
+                                        {{ translate('Select Main') }}
+                                        <span class="position-relative main-category-info-icon">
+                                            <i class="las la-question-circle fs-14 text-info"></i>
+                                            <span class="main-category-info bg-soft-info p-2 position-absolute d-none border" style="z-index: 10;">{{ translate('This will be used for commission based calculations and homepage category wise product Show') }}</span>
+                                        </span>
+                                    </h6>
+                                </div>
+                                <div class="h-300px overflow-auto c-scrollbar-light border p-3">
+                                    @php
+                                        $old_categories = $product->categories()->pluck('category_id')->toArray();
+                                    @endphp
+                                    <ul id="treeview" class="hummingbird-treeview-converter list-unstyled" data-checkbox-name="category_ids[]" data-radio-name="category_id">
+                                        @foreach ($categories as $category)
+                                        <li id="{{ $category->id }}">{{ $category->getTranslation('name') }}</li>
+                                            @foreach ($category->childrenCategories as $childCategory)
+                                                @include('backend.product.products.child_category', ['child_category' => $childCategory])
+                                            @endforeach
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="col-from-label fs-13">{{ translate('TN VED (HS Code)') }}</label>
+                                <select class="form-control hsn-code-select-ajax" name="hsn_code" id="hsn_code_select">
+                                    <option value="{{ $product->hsn_code }}" selected>{{ $product->hsn_code }}</option>
+                                </select>
+                                <small class="text-muted">{{ translate('Search by code or product name') }}</small>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
             <div class="card">
                 <div class="bg-white p-3 p-sm-2rem">
                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                        {{translate('Product Images')}}
+                        {{translate('Product Description')}}
+                    </h5>
+                    <div class="w-100">
+                        <div class="form-group mb-3">
+                            <label class="col-from-label fs-13">{{translate('Description')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
+                            <textarea class="aiz-text-editor"
+                                name="description">{{$product->getTranslation('description',$lang)}}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="bg-white p-3 p-sm-2rem">
+                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                        {{translate('Files & Media')}}
                     </h5>
                     <div class="w-100">
                         <div class="form-group mb-3">
@@ -120,7 +178,7 @@
                             </div>
                             <small class="text-muted">{{translate('These images are visible in product details page gallery. Minimum dimensions required: 900px width X 900px height.')}}</small>
                         </div>
-                        <div class="form-group mb-0">
+                        <div class="form-group mb-3">
                             <label class="col-from-label fs-13">{{translate('Thumbnail Image')}}</label>
                             <div class="input-group" data-toggle="aizuploader" data-type="image">
                                 <div class="input-group-prepend">
@@ -135,16 +193,6 @@
                             </div>
                             <small class="text-muted">{{translate("This image is visible in all product box. Minimum dimensions required: 195px width X 195px height. Keep some blank space around main object of your image as we had to crop some edge in different devices to make it responsive.")}}</small>
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="bg-white p-3 p-sm-2rem">
-                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                        {{ translate('Product Videos') }}
-                    </h5>
-                    <div class="w-100">
-                        <!-- Short Video  -->
                         <div class="form-group mb-3">
                             <label class="col-from-label fs-13">{{ translate('Videos') }}</label>
                             <div class="input-group" data-toggle="aizuploader" data-type="video"
@@ -159,11 +207,7 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
-                            <small
-                                class="text-muted">{{ translate('Try to upload videos under 30 seconds for better performance.') }}</small>
                         </div>
-
-                        <!-- short_video_thumbnail Video  -->
                         <div class="form-group mb-3">
                             <label class="col-from-label fs-13">{{ translate('Video Thumbnails') }}</label>
                             <div class="input-group" data-toggle="aizuploader" data-type="image"
@@ -178,23 +222,15 @@
                             </div>
                             <div class="file-preview box sm">
                             </div>
-                            <small class="text-muted">
-                                {{ translate('Add thumbnails in the same order as your videos. If you upload only one image, it will be used for all videos.') }}
-                            </small>
                         </div>
-
-                        <!-- Video Link -->
                         <div class="form-group mb-3">
                             <label class="col-from-label fs-13">{{ translate('Youtube video / shorts link') }}</label>
                             <div class="video-provider-link">
-                                {{-- @if (!$product->video_link) --}}
                                 @if (empty($product->video_link))
                                     <div class="row mb-2">
                                         <div class="col-md-11">
                                             <input type="text" class="form-control" name="video_link[]"
                                                 value="" placeholder="{{ translate('Video Link') }}">
-                                            <small
-                                                class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
                                         </div>
                                         <div class="col-1 d-flex justify-content-end">
                                             <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger"
@@ -212,10 +248,7 @@
                                                 <input type="text" class="form-control" name="video_link[]"
                                                     value="{{ $video_link }}"
                                                     placeholder="{{ translate('Video Link') }}">
-                                                <small
-                                                    class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
                                             </div>
-
                                         </div>
                                     @else
                                         <div class="row mb-2">
@@ -223,8 +256,6 @@
                                                 <input type="text" class="form-control" name="video_link[]"
                                                     value="{{ $video_link }}"
                                                     placeholder="{{ translate('Video Link') }}">
-                                                <small
-                                                    class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
                                             </div>
                                             <div class="col-1 d-flex justify-content-end">
                                                 <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger"
@@ -232,30 +263,29 @@
                                                     <i class="las la-times"></i>
                                                 </button>
                                             </div>
-
                                         </div>
                                     @endif
                                 @endforeach
-                                {{-- @endif --}}
                             </div>
-
-
                             <div class="mt-3 text-right">
                                 <button type="button" class="btn btn-secondary btn-sm" data-toggle="add-more"
-                                    data-content='<div class="row mb-2">
-                                                        <div class="col-md-11">
-                                                            <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video / shorts url') }}">
-                                                            <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                        </div>
-                                                        <div class="col-1 d-flex justify-content-end">
-                                                                <button type="button" class="mt-1 btn btn-icon  btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                    <i class="las la-times"></i>
-                                                                </button>
-                                                        </div>
-                                                    </div>'
+                                    data-content='<div class="row mb-2"><div class="col-md-11"><input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video / shorts url') }}"></div><div class="col-1 d-flex justify-content-end"><button type="button" class="mt-1 btn btn-icon btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row"><i class="las la-times"></i></button></div></div>'
                                     data-target=".video-provider-link">
                                     {{ translate('Add Another') }} 
                                 </button>
+                            </div>
+                        </div>
+                        <div class="form-group mb-0">
+                            <label class="col-from-label fs-13">{{translate('PDF Specification')}}</label>
+                            <div class="input-group" data-toggle="aizuploader">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}
+                                    </div>
+                                </div>
+                                <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                <input type="hidden" name="pdf" value="{{ $product->pdf }}" class="selected-files">
+                            </div>
+                            <div class="file-preview box sm">
                             </div>
                         </div>
                     </div>
@@ -264,7 +294,7 @@
             <div class="card">
                 <div class="bg-white p-3 p-sm-2rem">
                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                        {{translate('Product Variation')}}
+                        {{translate('Price & Variation')}}
                     </h5>
                     <div class="w-100">
                         <div class="form-group mb-3 row">
@@ -330,15 +360,7 @@
                             </div>
                             @endforeach
                         </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="bg-white p-3 p-sm-2rem">
-                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                        {{translate('Product price + stock')}}
-                    </h5>
-                    <div class="w-100">
+
                         <div class="form-group mb-3">
                             <label class="col-from-label fs-13">{{translate('Unit price')}}</label>
                             <input type="text" placeholder="{{translate('Unit price')}}" name="unit_price" class="form-control"
@@ -415,48 +437,20 @@
                     </div>
                 </div>
             </div>
-            <div class="card">
-                <div class="bg-white p-3 p-sm-2rem">
-                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                        {{translate('Product Description')}}
-                    </h5>
-                    <div class="w-100">
-                        <div class="form-group mb-3">
-                            <label class="col-from-label fs-13">{{translate('Description')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
-                            <textarea class="aiz-text-editor"
-                                name="description">{{$product->getTranslation('description',$lang)}}</textarea>
-                        </div>
-                    </div>
-                </div>
+
+            <div class="btn-block text-center mt-4 mb-3">
+                <button type="button" class="btn btn-soft-secondary w-200px" data-toggle="collapse" data-target="#advanced_settings">
+                    {{ translate('Advanced Settings') }}
+                    <i class="las la-angle-down ml-2"></i>
+                </button>
             </div>
 
-            <div class="card">
-                <div class="bg-white p-3 p-sm-2rem">
-                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                        {{translate('PDF Specification')}}
-                    </h5>
-                    <div class="w-100">
-                        <div class="form-group mb-3">
-                            <label class="col-from-label fs-13">{{translate('PDF Specification')}}</label>
-                            <div class="input-group" data-toggle="aizuploader">
-                                <div class="input-group-prepend">
-                                    <div class="input-group-text bg-soft-secondary font-weight-medium">{{ translate('Browse')}}
-                                    </div>
-                                </div>
-                                <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                <input type="hidden" name="pdf" value="{{ $product->pdf }}" class="selected-files">
-                            </div>
-                            <div class="file-preview box sm">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="card">
-                <div class="bg-white p-3 p-sm-2rem">
-                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                        {{translate('SEO Meta Tags')}}
-                    </h5>
+            <div id="advanced_settings" class="collapse">
+                <div class="card">
+                    <div class="bg-white p-3 p-sm-2rem">
+                        <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                            {{translate('SEO Meta Tags')}}
+                        </h5>
                     <div class="w-100">
                         <div class="form-group mb-3">
                             <label class="col-from-label fs-13">{{translate('Meta Title')}}</label>
@@ -720,35 +714,7 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card">
-                <div class="bg-white p-3 p-sm-2rem">
-                    <div class="d-flex justify-content-between align-items-center mb-3 pb-3" style="border-bottom: 1px dashed #e4e5eb;">
-                        <h5 class="mb-0 fs-17 fw-700">{{ translate('Product Category') }}</h5>
-                        <h6 class="fs-13 mb-0">
-                            {{ translate('Select Main') }}
-                            <span class="position-relative main-category-info-icon">
-                                <i class="las la-question-circle fs-18 text-info"></i>
-                                <span class="main-category-info bg-soft-info p-2 position-absolute d-none border">{{ translate('This will be used for commission based calculations and homepage category wise product Show') }}</span>
-                            </span>
-                        </h6>
-                    </div>
-                    <div class="w-100">
-                        <div class="h-300px overflow-auto c-scrollbar-light">
-                            @php
-                                $old_categories = $product->categories()->pluck('category_id')->toArray();
-                            @endphp
-                            <ul class="hummingbird-treeview-converter list-unstyled" data-checkbox-name="category_ids[]" data-radio-name="category_id">
-                                @foreach ($categories as $category)
-                                <li id="{{ $category->id }}">{{ $category->getTranslation('name') }}</li>
-                                    @foreach ($category->childrenCategories as $childCategory)
-                                        @include('backend.product.products.child_category', ['child_category' => $childCategory])
-                                    @endforeach
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
             <div class="card">
                 <div class="bg-white p-3 p-sm-2rem">
@@ -923,6 +889,7 @@
                     </div>
                 </div>
             </div>
+        </div>
 
             <div class="card">
                 <div class="bg-white p-3 p-sm-2rem">

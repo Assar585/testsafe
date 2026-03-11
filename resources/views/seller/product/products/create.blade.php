@@ -3,11 +3,11 @@
 @section('panel_content')
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <div class="page-content mx-0">
-        <div class="aiz-titlebar mt-2 mb-4">
+    <div class="page-content">
+        <div class="aiz-titlebar text-left mt-2 pb-2 px-3 px-md-2rem border-bottom border-gray">
             <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1 class="h3">{{ translate('Add Your Product') }}</h1>
+                <div class="col">
+                    <h1 class="h3">{{ translate('Add New Product') }}</h1>
                 </div>
                 <div class="col text-right">
                     <a class="btn btn-xs btn-soft-primary" href="javascript:void(0);" onclick="clearTempdata()">
@@ -17,894 +17,454 @@
             </div>
         </div>
 
-        <!-- Error Meassages -->
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <div>
+            <!-- Main Form Content -->
+            <div class="p-sm-3 p-lg-2rem mb-2rem mb-md-0">
+                <!-- Error Meassages -->
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-        <!-- Data type -->
-        <input type="hidden" id="data_type" value="physical">
+                <!-- Data type -->
+                <input type="hidden" id="data_type" value="physical">
 
-        <form class="" action="{{ route('seller.products.store') }}" method="POST" enctype="multipart/form-data"
-            id="choice_form">
-            <div class="row gutters-5">
-                <div class="col-lg-8">
+                <form action="{{ route('seller.products.store') }}" method="POST" enctype="multipart/form-data"
+                    id="choice_form">
                     @csrf
                     <input type="hidden" name="added_by" value="seller">
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- Product Information -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Product Information') }}
-                            </h5>
-                            <div class="w-100">
-                                <div class="row">
-                                    <div class="col-xxl-7 col-xl-6">
-                                        <!-- Product Name -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('Product Name') }} <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" name="name" id="product_name"
-                                                placeholder="{{ translate('Product Name') }}" onchange="update_sku()"
-                                                required>
-                                        </div>
-                                        <!-- Brand -->
-                                        <div class="form-group mb-2" id="brand">
-                                            <label class="col-from-label fs-13">{{ translate('Brand') }}</label>
-                                            <select class="form-control aiz-selectpicker" name="brand_id" id="brand_id"
-                                                data-live-search="true">
-                                                <option value="">{{ translate('Select Brand') }}</option>
-                                                @foreach (\App\Models\Brand::all() as $brand)
-                                                    <option value="{{ $brand->id }}">{{ $brand->getTranslation('name') }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <!-- Unit -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('Unit') }} <span
-                                                    class="text-danger">*</span></label>
-                                            <select
-                                                class="form-control aiz-selectpicker @error('unit') is-invalid @enderror"
-                                                name="unit" data-live-search="true">
-                                                <option value="{{ translate('Piece') }}" @selected(old('unit', translate('Piece')) == translate('Piece'))>{{ translate('Piece') }}
-                                                </option>
-                                                <option value="{{ translate('Service') }}"
-                                                    @selected(old('unit') == translate('Service'))>{{ translate('Service') }}
-                                                </option>
-                                                <option value="{{ translate('KG') }}"
-                                                    @selected(old('unit') == translate('KG'))>
-                                                    {{ translate('KG') }}
-                                                </option>
-                                                <option value="{{ translate('Ton') }}"
-                                                    @selected(old('unit') == translate('Ton'))>
-                                                    {{ translate('Ton') }}
-                                                </option>
-                                                <option value="{{ translate('Gram') }}"
-                                                    @selected(old('unit') == translate('Gram'))>
-                                                    {{ translate('Gram') }}
-                                                </option>
-                                                <option value="{{ translate('Liter') }}"
-                                                    @selected(old('unit') == translate('Liter'))>
-                                                    {{ translate('Liter') }}
-                                                </option>
-                                                <option value="{{ translate('Milliliter') }}"
-                                                    @selected(old('unit') == translate('Milliliter'))>
-                                                    {{ translate('Milliliter') }}
-                                                </option>
-                                                <option value="{{ translate('Meter') }}"
-                                                    @selected(old('unit') == translate('Meter'))>
-                                                    {{ translate('Meter') }}
-                                                </option>
-                                                <option value="{{ translate('Sq. Meter') }}"
-                                                    @selected(old('unit') == translate('Sq. Meter'))>
-                                                    {{ translate('Sq. Meter') }}
-                                                </option>
-                                                <option value="{{ translate('Cubic Meter') }}"
-                                                    @selected(old('unit') == translate('Cubic Meter'))>
-                                                    {{ translate('Cubic Meter') }}
-                                                </option>
-                                            </select>
-                                        </div>
-                                        <!-- Weight -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('Weight') }}
-                                                <small>({{ translate('In Kg') }})</small></label>
-                                            <input type="number" class="form-control" name="weight" step="0.01" value="0.00"
-                                                placeholder="0.00">
-                                            <small
-                                                class="text-muted">{{ translate('Used to calculate shipping cost.') }}</small>
-                                        </div>
-                                        <!-- Minimum Purchase Qty -->
-                                        <div class="form-group mb-2 d-none">
-                                            <label class="col-from-label fs-13">{{ translate('Minimum Purchase Qty') }}
-                                                <span class="text-danger">*</span></label>
-                                            <input type="number" lang="en" class="form-control" name="min_qty" value="1"
-                                                min="1" required>
-                                        </div>
-                                        <!-- Tags -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('Tags') }}</label>
-                                            <input type="text" class="form-control aiz-tag-input" name="tags[]"
-                                                id="product_tags"
-                                                placeholder="{{ translate('Type and hit enter to add a tag') }}">
-                                            <small
-                                                class="text-muted">{{translate('This is used for search. Input those words by which cutomer can find this product. Automatically seeds with Product Name.')}}</small>
-                                        </div>
-                                        @if (addon_is_activated('pos_system'))
-                                            <!-- Barcode -->
+
+                    <div class="product-form-sections">
+                        <!-- General -->
+                        <div class="card mb-4" id="general">
+                            <div class="bg-white p-3 p-sm-2rem">
+                                <!-- Product Information -->
+                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                    {{ translate('Product Information') }}
+                                </h5>
+                                <div class="w-100">
+                                    <div class="row">
+                                        <div class="col-xxl-7 col-xl-6">
+                                            <!-- Product Name -->
                                             <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{ translate('Barcode') }}</label>
-                                                <input type="text" class="form-control" name="barcode"
-                                                    placeholder="{{ translate('Barcode') }}">
+                                                <label class="col-from-label fs-13">{{ translate('Product Name') }} <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="name" id="product_name"
+                                                    placeholder="{{ translate('Product Name') }}" onchange="update_sku()"
+                                                    required>
                                             </div>
-                                        @endif
+                                            <!-- Brand -->
+                                            <div class="form-group mb-2" id="brand">
+                                                <label class="col-from-label fs-13">{{ translate('Brand') }}</label>
+                                                <select class="form-control aiz-selectpicker" name="brand_id" id="brand_id"
+                                                    data-live-search="true">
+                                                    <option value="">{{ translate('Select Brand') }}</option>
+                                                    @foreach (\App\Models\Brand::all() as $brand)
+                                                        <option value="{{ $brand->id }}">{{ $brand->getTranslation('name') }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                <small
+                                                    class="text-muted">{{translate("You can choose a brand if you'd like to display your product by brand.")}}</small>
+                                            </div>
+                                            <!-- Unit -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('Unit') }} <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="unit"
+                                                    placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}" required>
+                                            </div>
+                                            <!-- Weight -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('Weight') }}
+                                                    <small>({{ translate('In Kg') }})</small></label>
+                                                <input type="number" class="form-control" name="weight" step="0.01" value="0.00"
+                                                    placeholder="0.00">
+                                            </div>
+                                            <!-- Minimum Purchase Qty -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('Minimum Purchase Qty') }}
+                                                    <span class="text-danger">*</span></label>
+                                                <input type="number" lang="en" class="form-control" name="min_qty" value="1"
+                                                    min="1" required>
+                                            </div>
+                                            <!-- Tags -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('Tags') }}</label>
+                                                <input type="text" class="form-control aiz-tag-input" name="tags[]"
+                                                    id="product_tags"
+                                                    placeholder="{{ translate('Type and hit enter to add a tag') }}">
+                                                <small
+                                                    class="text-muted">{{translate('This is used for search. Input those words by which cutomer can find this product. Automatically seeds with Product Name.')}}</small>
+                                            </div>
+                                            @if (addon_is_activated('pos_system'))
+                                                <!-- Barcode -->
+                                                <div class="form-group mb-2">
+                                                    <label class="col-from-label fs-13">{{ translate('Barcode') }}</label>
+                                                    <input type="text" class="form-control" name="barcode"
+                                                        placeholder="{{ translate('Barcode') }}">
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="col-xxl-5 col-xl-6">
+                                            <!-- Product Category -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('Product Category') }} <span
+                                                        class="text-danger">*</span></label>
+                                                <select
+                                                    class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror"
+                                                    name="category_id" id="category_id" data-live-search="true" required
+                                                    onchange="$('#category_ids_hidden').val(this.value);">
+                                                    <option value="">{{ translate('Select Category') }}</option>
+                                                    @foreach ($categories as $category)
+                                                        <option value="{{ $category->id }}"
+                                                            @selected(old('category_id') == $category->id)>
+                                                            {{ $category->getTranslation('name') }}
+                                                        </option>
+                                                        @foreach ($category->childrenCategories as $childCategory)
+                                                            <option value="{{ $childCategory->id }}"
+                                                                @selected(old('category_id') == $childCategory->id)>&nbsp;&nbsp;&nbsp;--
+                                                                {{ $childCategory->getTranslation('name') }}
+                                                            </option>
+                                                            @foreach ($childCategory->childrenCategories as $subChildCategory)
+                                                                <option value="{{ $subChildCategory->id }}"
+                                                                    @selected(old('category_id') == $subChildCategory->id)>
+                                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
+                                                                    {{ $subChildCategory->getTranslation('name') }}
+                                                                </option>
+                                                            @endforeach
+                                                        @endforeach
+                                                    @endforeach
+                                                </select>
+                                                <input type="hidden" name="category_ids[]" id="category_ids_hidden"
+                                                    value="{{ old('category_id') }}">
+                                            </div>
+                                            <!-- HS Code - Server-side rendered -->
+                                            <div class="form-group mb-2 mt-3">
+                                                <label
+                                                    class="col-from-label fs-13">{{translate('TN VED (HS Code)')}}</label>
+                                                <select class="form-control" name="hsn_code" id="hsn_code_select">
+                                                    <option></option>
+                                                </select>
+                                                <small
+                                                    class="text-muted">{{ translate('Used for international shipping and customs.') }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Description -->
+                                    <div class="form-group">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <label class="fs-13 mb-0">{{translate('Description')}}</label>
+                                            <button type="button" class="btn btn-sm btn-soft-primary"
+                                                onclick="generateDescriptionAI()">
+                                                <i class="las la-magic"></i> {{translate('Generate description by AI')}}
+                                            </button>
+                                        </div>
+                                        <div class="">
+                                            <textarea class="aiz-text-editor" name="description" id="product_description"></textarea>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- Product Images -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Product Images') }}
-                            </h5>
-                            <div class="w-100">
-                                <!-- Gallery Images -->
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Gallery Images') }}</label>
-                                    <div class="input-group" data-toggle="aizuploader" data-type="image"
-                                        data-multiple="true">
-                                        <div class="input-group-prepend">
-                                            <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse') }}
+                        <!-- Files & Media -->
+                        <div class="card mb-4" id="files_media">
+                            <div class="bg-white p-3 p-sm-2rem">
+                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                    {{ translate('Files & Media') }}
+                                </h5>
+                                <div class="w-100">
+                                    <!-- Gallery Images -->
+                                    <div class="form-group mb-2">
+                                        <label class="col-from-label fs-13">{{ translate('Gallery Images') }}</label>
+                                        <div class="input-group" data-toggle="aizuploader" data-type="image"
+                                            data-multiple="true">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-soft-secondary font-weight-medium">
+                                                    {{ translate('Browse') }}
+                                                </div>
                                             </div>
+                                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                            <input type="hidden" name="photos" class="selected-files">
                                         </div>
-                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                        <input type="hidden" name="photos" class="selected-files">
+                                        <div class="file-preview box sm">
+                                        </div>
+                                        <small
+                                            class="text-muted">{{translate('These images are visible in product details page gallery. Minimum dimensions required: 900px width X 900px height.')}}</small>
                                     </div>
-                                    <div class="file-preview box sm">
-                                    </div>
-                                    <small
-                                        class="text-muted">{{translate('These images are visible in product details page gallery. Minimum dimensions required: 900px width X 900px height.')}}</small>
-                                </div>
-                                <!-- Thumbnail Image -->
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Thumbnail Image') }}</label>
-                                    <div class="input-group" data-toggle="aizuploader" data-type="image">
-                                        <div class="input-group-prepend">
-                                            <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse') }}
+                                    <!-- Thumbnail Image -->
+                                    <div class="form-group mb-2">
+                                        <label class="col-from-label fs-13">{{ translate('Thumbnail Image') }}</label>
+                                        <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-soft-secondary font-weight-medium">
+                                                    {{ translate('Browse') }}
+                                                </div>
                                             </div>
+                                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                            <input type="hidden" name="thumbnail_img" class="selected-files">
                                         </div>
-                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                        <input type="hidden" name="thumbnail_img" class="selected-files">
+                                        <div class="file-preview box sm">
+                                        </div>
+                                        <small
+                                            class="text-muted">{{translate("This image is visible in all product box. Minimum dimensions required: 195px width X 195px height.")}}</small>
                                     </div>
-                                    <div class="file-preview box sm">
-                                    </div>
-                                    <small
-                                        class="text-muted">{{translate("This image is visible in all product box. Minimum dimensions required: 195px width X 195px height. Keep some blank space around main object of your image as we had to crop some edge in different devices to make it responsive.")}}</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- Product Videos -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Product Videos') }}
-                            </h5>
-                            <div class="w-100">
-                                <!-- Videos -->
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Videos') }}</label>
-                                    <div class="input-group" data-toggle="aizuploader" data-type="video"
-                                        data-multiple="true">
-                                        <div class="input-group-prepend">
-                                            <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse') }}
+
+                                    <hr class="my-4">
+
+                                    <!-- Videos -->
+                                    <div class="form-group mb-2">
+                                        <label class="col-from-label fs-13">{{ translate('Videos') }}</label>
+                                        <div class="input-group" data-toggle="aizuploader" data-type="video"
+                                            data-multiple="true">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-soft-secondary font-weight-medium">
+                                                    {{ translate('Browse') }}
+                                                </div>
                                             </div>
+                                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                            <input type="hidden" name="short_video" class="selected-files">
                                         </div>
-                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                        <input type="hidden" name="short_video" class="selected-files">
+                                        <div class="file-preview box sm">
+                                        </div>
+                                        <small
+                                            class="text-muted">{{ translate('Try to upload videos under 30 seconds for better performance.') }}</small>
                                     </div>
-                                    <div class="file-preview box sm">
-                                    </div>
-                                    <small
-                                        class="text-muted">{{ translate('Try to upload videos under 30 seconds for better performance.') }}</small>
-                                </div>
-                                <!-- Video Thumbnails -->
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Video Thumbnails') }}</label>
-                                    <div class="input-group" data-toggle="aizuploader" data-type="image"
-                                        data-multiple="true">
-                                        <div class="input-group-prepend">
-                                            <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse') }}
+                                    <!-- Video Thumbnails -->
+                                    <div class="form-group mb-2">
+                                        <label class="col-from-label fs-13">{{ translate('Video Thumbnails') }}</label>
+                                        <div class="input-group" data-toggle="aizuploader" data-type="image"
+                                            data-multiple="true">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-soft-secondary font-weight-medium">
+                                                    {{ translate('Browse') }}
+                                                </div>
                                             </div>
+                                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                            <input type="hidden" name="short_video_thumbnail" class="selected-files">
                                         </div>
-                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                        <input type="hidden" name="short_video_thumbnail" class="selected-files">
+                                        <div class="file-preview box sm">
+                                        </div>
+                                        <small class="text-muted">
+                                            {{ translate('Add thumbnails in the same order as your videos.') }}
+                                        </small>
                                     </div>
-                                    <div class="file-preview box sm">
-                                    </div>
-                                    <small class="text-muted">
-                                        {{ translate('Add thumbnails in the same order as your videos. If you upload only one image, it will be used for all videos.') }}
-                                    </small>
-                                </div>
-                                <!-- Youtube Link -->
-                                <div class="form-group mb-2">
-                                    <label
-                                        class="col-from-label fs-13">{{ translate('Youtube video / shorts link') }}</label>
-                                    <div class="video-provider-link">
-                                        @if (empty($product->video_link))
+                                    <!-- Youtube Link -->
+                                    <div class="form-group mb-2">
+                                        <label
+                                            class="col-from-label fs-13">{{ translate('Youtube video / shorts link') }}</label>
+                                        <div class="video-provider-link">
                                             <div class="row gutters-5">
                                                 <div class="col">
                                                     <input type="text" class="form-control" name="video_link[]" value=""
                                                         placeholder="{{ translate('Youtube video / shorts url') }}">
-                                                    <small
-                                                        class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                </div>
-                                            </div>
-                                        @endif
-                                    </div>
-                                    <div class="text-right mt-2">
-                                        <button type="button" class="btn btn-secondary btn-sm" data-toggle="add-more"
-                                            data-content='<div class="row gutters-5 mt-2">
-                                                                                <div class="col">
-                                                                                    <input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}">
-                                                                                    <small class="text-muted">{{ translate("Use proper link without extra parameter. Don't use short share link/embeded iframe code.") }}</small>
-                                                                                </div>
-                                                                                <div class="col-auto">
-                                                                                    <button type="button" class="btn btn-icon btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row">
-                                                                                        <i class="las la-times"></i>
-                                                                                    </button>
-                                                                                </div>
-                                                                            </div>' data-target=".video-provider-link">
-                                            {{ translate('Add Another') }}
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- Product Variation -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Product Variation') }}
-                            </h5>
-                            <div class="w-100">
-                                <!-- Colors -->
-                                <div class="form-group row gutters-5 align-items-center">
-                                    <div class="col-md-3">
-                                        <input type="text" class="form-control" value="{{ translate('Colors') }}" disabled>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <select class="form-control aiz-selectpicker" data-live-search="true"
-                                            name="colors[]" data-selected-text-format="count" id="colors" multiple disabled>
-                                            @foreach (\App\Models\Color::orderBy('name', 'asc')->get() as $key => $color)
-                                                <option value="{{ $color->code }}"
-                                                    data-content="<span><span class='size-15px d-inline-block mr-2 rounded border' style='background:{{ $color->code }}'></span><span>{{ $color->name }}</span></span>">
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-md-1">
-                                        <label class="aiz-switch aiz-switch-success mb-0 d-block">
-                                            <input value="1" type="checkbox" name="colors_active">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <!-- Attributes -->
-                                <div class="form-group row gutters-5">
-                                    <div class="col-md-3">
-                                        <input type="text" class="form-control" value="{{ translate('Attributes') }}"
-                                            disabled>
-                                    </div>
-                                    <div class="col-md-9">
-                                        <select name="choice_attributes[]" id="choice_attributes"
-                                            class="form-control aiz-selectpicker" data-live-search="true"
-                                            data-selected-text-format="count" multiple
-                                            data-placeholder="{{ translate('Choose Attributes') }}">
-                                            @foreach (\App\Models\Attribute::all() as $key => $attribute)
-                                                <option value="{{ $attribute->id }}">{{ $attribute->getTranslation('name') }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="mb-3">
-                                    <small
-                                        class="text-muted">{{ translate('Choose the attributes of this product and then input values of each attribute') }}</small>
-                                </div>
-                                <div class="customer_choice_options" id="customer_choice_options">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- Product price + stock -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Product price + stock') }}
-                            </h5>
-                            <div class="w-100">
-                                <div class="row gutters-5">
-                                    <div class="col-md-6">
-                                        <!-- Unit price -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('Unit price') }} <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="number" lang="en" min="0" value="0" step="0.01"
-                                                placeholder="{{ translate('Unit price') }}" name="unit_price"
-                                                class="form-control" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- Discount Date Range -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('Discount Date Range') }}
-                                            </label>
-                                            <input type="text" class="form-control aiz-date-range" name="date_range"
-                                                placeholder="{{ translate('Select Date') }}" data-time-picker="true"
-                                                data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- Discount -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('Discount') }} <span
-                                                    class="text-danger">*</span></label>
-                                            <div class="input-group">
-                                                <input type="number" lang="en" min="0" value="0" step="0.01"
-                                                    placeholder="{{ translate('Discount') }}" name="discount"
-                                                    class="form-control" required>
-                                                <div class="input-group-append">
-                                                    <select class="form-control aiz-selectpicker" name="discount_type">
-                                                        <option value="amount">{{ translate('Flat') }}</option>
-                                                        <option value="percent">{{ translate('Percent') }}</option>
-                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <!-- SKU -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('SKU') }}</label>
-                                            <div class="input-group">
-                                                <input type="text" placeholder="{{ translate('SKU') }}" name="sku"
-                                                    id="sku_input" class="form-control">
-                                                <div class="input-group-append">
-                                                    <button type="button" class="btn btn-soft-primary"
-                                                        onclick="generateSKU()">
-                                                        {{ translate('Auto Generate') }}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6" id="show-hide-div">
-                                        <!-- Quantity -->
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{ translate('Quantity') }} <span
-                                                    class="text-danger">*</span></label>
-                                            <input type="number" lang="en" min="0" value="0" step="1"
-                                                placeholder="{{ translate('Quantity') }}" name="current_stock"
-                                                class="form-control" required>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                @if(get_setting('product_external_link_for_seller') == 1)
-                                    <div class="row gutters-5">
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{ translate('External link') }}</label>
-                                                <input type="text" placeholder="{{ translate('External link') }}"
-                                                    name="external_link" class="form-control">
-                                                <small
-                                                    class="text-muted">{{ translate('Leave it blank if you do not use external site link') }}</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group mb-2">
-                                                <label
-                                                    class="col-from-label fs-13">{{ translate('External link button text') }}</label>
-                                                <input type="text" placeholder="{{ translate('External link button text') }}"
-                                                    name="external_link_btn" class="form-control">
-                                                <small
-                                                    class="text-muted">{{ translate('Leave it blank if you do not use external site link') }}</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endif
-                                <div class="sku_combination" id="sku_combination">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- Product Description -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Product Description') }}
-                            </h5>
-                            <div class="w-100">
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Description') }}</label>
-                                    <div class="mb-2">
-                                        <button type="button" class="btn btn-sm btn-soft-primary"
-                                            onclick="generateDescriptionAI()">
-                                            <i class="las la-magic"></i> {{ translate('Generate by AI') }}
-                                        </button>
-                                    </div>
-                                    <textarea class="aiz-text-editor" name="description"
-                                        id="product_description"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- PDF Specification -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('PDF Specification') }}
-                            </h5>
-                            <div class="w-100">
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('PDF Specification') }}</label>
-                                    <div class="input-group" data-toggle="aizuploader" data-type="document">
-                                        <div class="input-group-prepend">
-                                            <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse') }}
-                                            </div>
-                                        </div>
-                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                        <input type="hidden" name="pdf" class="selected-files">
-                                    </div>
-                                    <div class="file-preview box sm">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- SEO Meta Tags -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('SEO Meta Tags') }}
-                            </h5>
-                            <div class="w-100">
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Meta Title') }}</label>
-                                    <input type="text" class="form-control" name="meta_title"
-                                        placeholder="{{ translate('Meta Title') }}">
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Description') }}</label>
-                                    <textarea name="meta_description" rows="5" class="form-control"></textarea>
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Keywords') }}</label>
-                                    <textarea class="resize-off form-control" name="meta_keywords"
-                                        placeholder="{{translate('Keyword, Keyword')}}"></textarea>
-                                    <small class="text-muted">{{ translate('Separate with coma') }}</small>
-                                </div>
-                                <div class="form-group mb-2">
-                                    <label class="col-from-label fs-13">{{ translate('Meta Image') }}</label>
-                                    <div class="input-group" data-toggle="aizuploader" data-type="image">
-                                        <div class="input-group-prepend">
-                                            <div class="input-group-text bg-soft-secondary font-weight-medium">
-                                                {{ translate('Browse') }}
-                                            </div>
-                                        </div>
-                                        <div class="form-control file-amount">{{ translate('Choose File') }}</div>
-                                        <input type="hidden" name="meta_img" class="selected-files">
-                                    </div>
-                                    <div class="file-preview box sm">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Refund --}}
-                    @if (addon_is_activated('refund_request'))
-                        <div class="card">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <!-- Refund -->
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Refund') }}
-                                </h5>
-                                <div class="w-100">
-                                    <div class="form-group row gutters-5">
-                                        <label class="col-md-2 col-from-label">{{translate('Refundable')}}?</label>
-                                        <div class="col-md-10">
-                                            <label class="aiz-switch aiz-switch-success mb-0 d-block">
-                                                <input type="checkbox" name="refundable" checked value="1"
-                                                    onchange="isRefundable()">
-                                                <span></span>
-                                            </label>
-                                            <small id="refundable-note" class="text-muted d-none"></small>
-                                        </div>
-                                    </div>
-
-                                    <div class="w-100 refund-block d-none">
-                                        <div class="form-group row gutters-5">
-                                            <div class="col-md-2"></div>
-                                            <div class="col-md-10">
-                                                <input type="hidden" name="refund_note_id" id="refund_note_id">
-
-                                                <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3"
-                                                    style="border-bottom: 1px dashed #e4e5eb;">
-                                                    {{translate('Refund Note')}}
-                                                </h5>
-                                                <div id="refund_note" class="">
-
-                                                </div>
-                                                <button type="button"
-                                                    class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
-                                                    onclick="noteModal('refund')">
-                                                    <i class="las la-plus"></i>
-                                                    <span class="ml-2">{{ translate('Select Refund Note') }}</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-
-                    {{-- Warranty --}}
-                    <div class="card">
-                        <div class="bg-white p-3 p-sm-2rem">
-                            <!-- Warranty -->
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Warranty') }}
-                            </h5>
-                            <div class="w-100">
-                                <div class="form-group row gutters-5">
-                                    <label class="col-md-2 col-from-label">{{translate('Warranty')}}</label>
-                                    <div class="col-md-10">
-                                        <label class="aiz-switch aiz-switch-success mb-0">
-                                            <input type="checkbox" name="has_warranty" onchange="warrantySelection()">
-                                            <span></span>
-                                        </label>
-                                    </div>
-                                </div>
-
-                                <div class="w-100 warranty_selection_div d-none">
-                                    <div class="form-group row">
-                                        <div class="col-md-2"></div>
-                                        <div class="col-md-10">
-                                            <select class="form-control aiz-selectpicker" name="warranty_id"
-                                                id="warranty_id" data-live-search="true">
-                                                <option value="">{{ translate('Select Warranty') }}</option>
-                                                @foreach (\App\Models\Warranty::all() as $warranty)
-                                                    <option value="{{ $warranty->id }}"
-                                                        @selected(old('warranty_id') == $warranty->id)>
-                                                        {{ $warranty->getTranslation('text') }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                            <input type="hidden" name="warranty_note_id" id="warranty_note_id">
-
-                                            <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3"
-                                                style="border-bottom: 1px dashed #e4e5eb;">
-                                                {{translate('Warranty Note')}}
-                                            </h5>
-                                            <div id="warranty_note" class="">
-
-                                            </div>
-                                            <button type="button"
-                                                class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
-                                                onclick="noteModal('warranty')">
-                                                <i class="las la-plus"></i>
-                                                <span class="ml-2">{{ translate('Select Warranty Note') }}</span>
+                                        <div class="text-right mt-2">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-toggle="add-more"
+                                                data-content='<div class="row gutters-5 mt-2"><div class="col"><input type="text" class="form-control" name="video_link[]" value="" placeholder="{{ translate('Youtube video or short link') }}"></div><div class="col-auto"><button type="button" class="btn btn-icon btn-sm btn-soft-danger" data-toggle="remove-parent" data-parent=".row"><i class="las la-times"></i></button></div></div>' data-target=".video-provider-link">
+                                                {{ translate('Add Another') }}
                                             </button>
                                         </div>
                                     </div>
+
+                                    <hr class="my-4">
+
+                                    <!-- PDF Specification -->
+                                    <div class="form-group mb-2">
+                                        <label class="col-from-label fs-13">{{ translate('PDF Specification') }}</label>
+                                        <div class="input-group" data-toggle="aizuploader" data-type="document">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text bg-soft-secondary font-weight-medium">
+                                                    {{ translate('Browse') }}
+                                                </div>
+                                            </div>
+                                            <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                            <input type="hidden" name="pdf" class="selected-files">
+                                        </div>
+                                        <div class="file-preview box sm">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
-                        {{-- Frequently Bought Products --}}
-                        <div class="card">
+                        <!-- Price & Variation -->
+                        <div class="card mb-4" id="price_variation">
                             <div class="bg-white p-3 p-sm-2rem">
-                                <!-- Frequently Bought -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Frequently Bought') }}
+                                    {{ translate('Price & Variation') }}
                                 </h5>
                                 <div class="w-100">
-                                    <div class="d-flex mb-3">
-                                        <div class="radio mar-btm mr-4">
-                                            <input id="fq_bought_select_products" type="radio"
-                                                name="frequently_bought_selection_type" value="product"
-                                                onchange="fq_bought_product_selection_type()" checked>
-                                            <label for="fq_bought_select_products"
-                                                class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Product')}}</label>
+                                    <!-- Colors -->
+                                    <div class="form-group row gutters-5 align-items-center">
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" value="{{ translate('Colors') }}" disabled>
                                         </div>
-                                        <div class="radio mar-btm">
-                                            <input id="fq_bought_select_category" type="radio"
-                                                name="frequently_bought_selection_type" value="category"
-                                                onchange="fq_bought_product_selection_type()">
-                                            <label for="fq_bought_select_category"
-                                                class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Category')}}</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="fq_bought_select_product_div">
-                                        <div id="selected-fq-bought-products">
-                                        </div>
-                                        <button type="button"
-                                            class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center"
-                                            onclick="showFqBoughtProductModal()">
-                                            <i class="las la-plus"></i>
-                                            <span class="ml-2">{{ translate('Add More') }}</span>
-                                        </button>
-                                    </div>
-
-                                    <div class="fq_bought_select_category_div d-none">
-                                        <div class="form-group mb-2">
-                                            <label class="col-from-label fs-13">{{translate('Category')}}</label>
-                                            <select class="form-control aiz-selectpicker"
-                                                data-placeholder="{{ translate('Select a Category')}}"
-                                                name="fq_bought_product_category_id" data-live-search="true" required>
-                                                @foreach ($categories as $category)
-                                                    <option value="{{ $category->id }}">
-                                                        {{ $category->getTranslation('name') }}
+                                        <div class="col-md-8">
+                                            <select class="form-control aiz-selectpicker" data-live-search="true"
+                                                name="colors[]" data-selected-text-format="count" id="colors" multiple disabled>
+                                                @foreach (\App\Models\Color::orderBy('name', 'asc')->get() as $key => $color)
+                                                    <option value="{{ $color->code }}"
+                                                        data-content="<span><span class='size-15px d-inline-block mr-2 rounded border' style='background:{{ $color->code }}'></span><span>{{ $color->name }}</span></span>">
                                                     </option>
-                                                    @foreach ($category->childrenCategories as $childCategory)
-                                                        @include('categories.child_category', ['child_category' => $childCategory])
-                                                    @endforeach
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <label class="aiz-switch aiz-switch-success mb-0 d-block">
+                                                <input value="1" type="checkbox" name="colors_active">
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <!-- Attributes -->
+                                    <div class="form-group row gutters-5">
+                                        <div class="col-md-3">
+                                            <input type="text" class="form-control" value="{{ translate('Attributes') }}"
+                                                disabled>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <select name="choice_attributes[]" id="choice_attributes"
+                                                class="form-control aiz-selectpicker" data-live-search="true"
+                                                data-selected-text-format="count" multiple
+                                                data-placeholder="{{ translate('Choose Attributes') }}">
+                                                @foreach (\App\Models\Attribute::all() as $key => $attribute)
+                                                    <option value="{{ $attribute->id }}">{{ $attribute->getTranslation('name') }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-4">
-
-                        <div class="card">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Product Category') }} <span class="text-danger">*</span>
-                                </h5>
-                                <div class="w-100">
-                                    <div class="form-group mb-0">
-                                        <select
-                                            class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror"
-                                            name="category_id" id="category_id" data-live-search="true" required
-                                            onchange="$('#category_ids_hidden').val(this.value);">
-                                            <option value="">{{ translate('Select Category') }}</option>
-                                            @foreach ($categories as $category)
-                                                <option value="{{ $category->id }}"
-                                                    @selected(old('category_id') == $category->id)>
-                                                    {{ $category->getTranslation('name') }}
-                                                </option>
-                                                @foreach ($category->childrenCategories as $childCategory)
-                                                    <option value="{{ $childCategory->id }}"
-                                                        @selected(old('category_id') == $childCategory->id)>&nbsp;&nbsp;&nbsp;--
-                                                        {{ $childCategory->getTranslation('name') }}
-                                                    </option>
-                                                    @foreach ($childCategory->childrenCategories as $subChildCategory)
-                                                        <option value="{{ $subChildCategory->id }}"
-                                                            @selected(old('category_id') == $subChildCategory->id)>
-                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
-                                                            {{ $subChildCategory->getTranslation('name') }}
-                                                        </option>
-                                                    @endforeach
-                                                @endforeach
-                                            @endforeach
-                                        </select>
-                                        <input type="hidden" name="category_ids[]" id="category_ids_hidden"
-                                            value="{{ old('category_id') }}">
-                                        @error('category_ids')
-                                            <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                    <div class="mb-3">
+                                        <small
+                                            class="text-muted">{{ translate('Choose the attributes of this product and then input values of each attribute') }}</small>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                                    <div class="customer_choice_options" id="customer_choice_options">
+                                    </div>
 
+                                    <hr class="my-4">
 
-
-                        <div class="card">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Shipping Configuration') }}
-                                </h5>
-                                <div class="w-100">
-                                    @if (get_setting('shipping_type') == 'product_wise_shipping')
-                                        <div class="form-group row gutters-5 align-items-center">
-                                            <label
-                                                class="col-md-6 col-from-label fs-13">{{ translate('Free Shipping') }}</label>
-                                            <div class="col-md-6 text-right">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="radio" name="shipping_type" value="free" checked>
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group row gutters-5 align-items-center">
-                                            <label class="col-md-6 col-from-label fs-13">{{ translate('Flat Rate') }}</label>
-                                            <div class="col-md-6 text-right">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="radio" name="shipping_type" value="flat_rate">
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div class="flat_rate_shipping_div" style="display: none">
+                                    <div class="row gutters-5">
+                                        <div class="col-md-6">
+                                            <!-- Unit price -->
                                             <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{ translate('Shipping cost') }}</label>
+                                                <label class="col-from-label fs-13">{{ translate('Unit price') }} <span
+                                                        class="text-danger">*</span></label>
                                                 <input type="number" lang="en" min="0" value="0" step="0.01"
-                                                    placeholder="{{ translate('Shipping cost') }}" name="flat_shipping_cost"
+                                                    placeholder="{{ translate('Unit price') }}" name="unit_price"
                                                     class="form-control" required>
                                             </div>
                                         </div>
-
-                                        <div class="form-group row gutters-5 align-items-center">
-                                            <label
-                                                class="col-md-8 col-from-label fs-13">{{translate('Is Product Quantity Mulitiply')}}</label>
-                                            <div class="col-md-4 text-right">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="checkbox" name="is_quantity_multiplied" value="1">
-                                                    <span></span>
+                                        <div class="col-md-6">
+                                            <!-- Discount Date Range -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('Discount Date Range') }}
                                                 </label>
+                                                <input type="text" class="form-control aiz-date-range" name="date_range"
+                                                    placeholder="{{ translate('Select Date') }}" data-time-picker="true"
+                                                    data-format="DD-MM-Y HH:mm:ss" data-separator=" to " autocomplete="off">
                                             </div>
                                         </div>
-                                    @else
-                                        <small class="text-muted">
-                                            {{ translate('Shipping configuration is maintained by Admin.') }}
-                                        </small>
+                                        <div class="col-md-6">
+                                            <!-- Discount -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('Discount') }} <span
+                                                        class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <input type="number" lang="en" min="0" value="0" step="0.01"
+                                                        placeholder="{{ translate('Discount') }}" name="discount"
+                                                        class="form-control" required>
+                                                    <div class="input-group-append">
+                                                        <select class="form-control aiz-selectpicker" name="discount_type">
+                                                            <option value="amount">{{ translate('Flat') }}</option>
+                                                            <option value="percent">{{ translate('Percent') }}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <!-- SKU -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('SKU') }}</label>
+                                                <div class="input-group">
+                                                    <input type="text" placeholder="{{ translate('SKU') }}" name="sku"
+                                                        id="sku_input" class="form-control">
+                                                    <div class="input-group-append">
+                                                        <button type="button" class="btn btn-soft-primary"
+                                                            onclick="generateSKU()">
+                                                            {{ translate('Auto Generate') }}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6" id="show-hide-div">
+                                            <!-- Quantity -->
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{ translate('Quantity') }} <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="number" lang="en" min="0" value="0" step="1"
+                                                    placeholder="{{ translate('Quantity') }}" name="current_stock"
+                                                    class="form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @if(get_setting('product_external_link_for_seller') == 1)
+                                        <div class="row gutters-5">
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label class="col-from-label fs-13">{{ translate('External link') }}</label>
+                                                    <input type="text" placeholder="{{ translate('External link') }}"
+                                                        name="external_link" class="form-control">
+                                                    <small
+                                                        class="text-muted">{{ translate('Leave it blank if you do not use external site link') }}</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group mb-2">
+                                                    <label
+                                                        class="col-from-label fs-13">{{ translate('External link button text') }}</label>
+                                                    <input type="text" placeholder="{{ translate('External link button text') }}"
+                                                        name="external_link_btn" class="form-control">
+                                                    <small
+                                                        class="text-muted">{{ translate('Leave it blank if you do not use external site link') }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
                                     @endif
+                                    <div class="sku_combination" id="sku_combination">
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="card">
+                        <!-- Vat & Tax -->
+                        <div class="card mb-4" id="vat_tax">
                             <div class="bg-white p-3 p-sm-2rem">
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Low Stock Quantity Warning') }}
-                                </h5>
-                                <div class="w-100">
-                                    <div class="form-group mb-0">
-                                        <label class="col-from-label fs-13">{{ translate('Quantity') }}</label>
-                                        <input type="number" name="low_stock_quantity" value="1" min="0" step="1"
-                                            class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Stock Visibility State') }}
-                                </h5>
-                                <div class="w-100">
-                                    <div class="form-group row gutters-5 align-items-center">
-                                        <label
-                                            class="col-md-6 col-from-label fs-13">{{ translate('Show Stock Quantity') }}</label>
-                                        <div class="col-md-6 text-right">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="quantity" checked>
-                                                <span></span>
-                                            </label>
+                                @if (addon_is_activated('gst_system'))
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{ translate('TN VED & GST') }}
+                                    </h5>
+                                    <div class="w-100">
+                                        <div class="form-group mb-0">
+                                            <label class="col-from-label fs-13">{{ translate('GST Rate') }} <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" lang="en" min="0" value="0" step="0.01"
+                                                placeholder="{{ translate('GST Rate') }}" name="gst_rate" class="form-control"
+                                                required>
                                         </div>
                                     </div>
-
-                                    <div class="form-group row gutters-5 align-items-center">
-                                        <label
-                                            class="col-md-6 col-from-label fs-13">{{ translate('Show Stock With Text Only') }}</label>
-                                        <div class="col-md-6 text-right">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="text">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group row gutters-5 align-items-center">
-                                        <label class="col-md-6 col-from-label fs-13">{{ translate('Hide Stock') }}</label>
-                                        <div class="col-md-6 text-right">
-                                            <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input type="radio" name="stock_visibility_state" value="hide">
-                                                <span></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Cash On Delivery') }}
-                                </h5>
-                                <div class="w-100">
-                                    @if (get_setting('cash_payment') == '1')
-                                        <div class="form-group row gutters-5 align-items-center">
-                                            <label class="col-md-6 col-from-label fs-13">{{ translate('Status') }}</label>
-                                            <div class="col-md-6 text-right">
-                                                <label class="aiz-switch aiz-switch-success mb-0">
-                                                    <input type="checkbox" name="cash_on_delivery" value="1" checked="">
-                                                    <span></span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    @else
-                                        <small class="text-muted">
-                                            {{ translate('Cash On Delivery activation is maintained by Admin.') }}
-                                        </small>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="bg-white p-3 p-sm-2rem">
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('Estimate Shipping Time') }}
-                                </h5>
-                                <div class="w-100">
-                                    <div class="form-group mb-0">
-                                        <label class="col-from-label fs-13">{{ translate('Shipping Days') }}</label>
-                                        <div class="input-group">
-                                            <input type="number" class="form-control" name="est_shipping_days" min="1"
-                                                step="1" placeholder="{{ translate('Shipping Days') }}">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text">{{ translate('Days') }}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            @if (addon_is_activated('gst_system'))
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                    {{ translate('TN VED & GST') }}
-                                </h5>
-                                <div class="w-100">
-                                    <div class="form-group mb-2">
-                                        <label class="col-from-label fs-13">{{ translate('TN VED (HS Code)') }} <span
-                                                class="text-danger">*</span></label>
-                                        <select class="form-control" name="hsn_code" id="hsn_code_select">
-                                            <option></option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group mb-0">
-                                        <label class="col-from-label fs-13">{{ translate('GST Rate') }} <span
-                                                class="text-danger">*</span></label>
-                                        <input type="number" lang="en" min="0" value="0" step="0.01"
-                                            placeholder="{{ translate('GST Rate') }}" name="gst_rate" class="form-control"
-                                            required>
-                                    </div>
-                                </div>
-
-                            @else
+                                @else
                                     <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
                                         {{ translate('VAT & Tax') }}
                                     </h5>
@@ -929,14 +489,389 @@
                                             </div>
                                         @endforeach
                                     </div>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Advanced Settings Toggle -->
+                        <div class="text-center mb-4">
+                            <button type="button" class="btn btn-soft-primary px-5 py-2 fw-700 shadow-sm"
+                                data-toggle="collapse" href="#advancedSettings" aria-expanded="false"
+                                aria-controls="advancedSettings">
+                                <i class="las la-cog mr-2"></i>{{ translate('Advanced Settings') }}
+                            </button>
+                        </div>
+
+                        <div class="collapse" id="advancedSettings">
+                            <!-- SEO Meta Tags -->
+                            <div class="card mb-4" id="seo">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{ translate('SEO Meta Tags') }}
+                                    </h5>
+                                    <div class="w-100">
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label fs-13">{{ translate('Meta Title') }}</label>
+                                            <input type="text" class="form-control" name="meta_title"
+                                                placeholder="{{ translate('Meta Title') }}">
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label fs-13">{{ translate('Description') }}</label>
+                                            <textarea name="meta_description" rows="5" class="form-control"></textarea>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label fs-13">{{ translate('Keywords') }}</label>
+                                            <textarea class="resize-off form-control" name="meta_keywords"
+                                                placeholder="{{translate('Keyword, Keyword')}}"></textarea>
+                                            <small class="text-muted">{{ translate('Separate with coma') }}</small>
+                                        </div>
+                                        <div class="form-group mb-2">
+                                            <label class="col-from-label fs-13">{{ translate('Meta Image') }}</label>
+                                            <div class="input-group" data-toggle="aizuploader" data-type="image">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text bg-soft-secondary font-weight-medium">
+                                                        {{ translate('Browse') }}
+                                                    </div>
+                                                </div>
+                                                <div class="form-control file-amount">{{ translate('Choose File') }}</div>
+                                                <input type="hidden" name="meta_img" class="selected-files">
+                                            </div>
+                                            <div class="file-preview box sm">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Refund -->
+                            @if (addon_is_activated('refund_request'))
+                                <div class="card mb-4" id="refund">
+                                    <div class="bg-white p-3 p-sm-2rem">
+                                        <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                            {{ translate('Refund') }}
+                                        </h5>
+                                        <div class="w-100">
+                                            <div class="form-group row gutters-5">
+                                                <label class="col-md-2 col-from-label">{{translate('Refundable')}}?</label>
+                                                <div class="col-md-10">
+                                                    <label class="aiz-switch aiz-switch-success mb-0 d-block">
+                                                        <input type="checkbox" name="refundable" checked value="1"
+                                                            onchange="isRefundable()">
+                                                        <span></span>
+                                                    </label>
+                                                    <small id="refundable-note" class="text-muted d-none"></small>
+                                                </div>
+                                            </div>
+
+                                            <div class="w-100 refund-block d-none">
+                                                <div class="form-group row gutters-5">
+                                                    <div class="col-md-2"></div>
+                                                    <div class="col-md-10">
+                                                        <input type="hidden" name="refund_note_id" id="refund_note_id">
+                                                        <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3" style="border-bottom: 1px dashed #e4e5eb;">
+                                                            {{translate('Refund Note')}}
+                                                        </h5>
+                                                        <div id="refund_note" class=""></div>
+                                                        <button type="button"
+                                                            class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                                            onclick="noteModal('refund')">
+                                                            <i class="las la-plus"></i>
+                                                            <span class="ml-2">{{ translate('Select Refund Note') }}</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             @endif
+
+                            <!-- Warranty -->
+                            <div class="card mb-4" id="warranty">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{ translate('Warranty') }}
+                                    </h5>
+                                    <div class="w-100">
+                                        <div class="form-group row gutters-5">
+                                            <label class="col-md-2 col-from-label">{{translate('Warranty')}}</label>
+                                            <div class="col-md-10">
+                                                <label class="aiz-switch aiz-switch-success mb-0">
+                                                    <input type="checkbox" name="has_warranty" onchange="warrantySelection()">
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="w-100 warranty_selection_div d-none">
+                                            <div class="form-group row">
+                                                <div class="col-md-2"></div>
+                                                <div class="col-md-10">
+                                                    <select class="form-control aiz-selectpicker" name="warranty_id"
+                                                        id="warranty_id" data-live-search="true">
+                                                        <option value="">{{ translate('Select Warranty') }}</option>
+                                                        @foreach (\App\Models\Warranty::all() as $warranty)
+                                                            <option value="{{ $warranty->id }}"
+                                                                @selected(old('warranty_id') == $warranty->id)>
+                                                                {{ $warranty->getTranslation('text') }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+
+                                                    <input type="hidden" name="warranty_note_id" id="warranty_note_id">
+                                                    <h5 class="fs-14 fw-600 mb-3 mt-4 pb-3" style="border-bottom: 1px dashed #e4e5eb;">
+                                                        {{translate('Warranty Note')}}
+                                                    </h5>
+                                                    <div id="warranty_note" class=""></div>
+                                                    <button type="button"
+                                                        class="btn btn-block border border-dashed hov-bg-soft-secondary mt-2 fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                                        onclick="noteModal('warranty')">
+                                                        <i class="las la-plus"></i>
+                                                        <span class="ml-2">{{ translate('Select Warranty Note') }}</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Frequently Bought Products -->
+                            <div class="card mb-4" id="frequently_bought">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{ translate('Frequently Bought') }}
+                                    </h5>
+                                    <div class="w-100">
+                                        <div class="d-flex mb-3">
+                                            <div class="radio mar-btm mr-4">
+                                                <input id="fq_bought_select_products" type="radio"
+                                                    name="frequently_bought_selection_type" value="product"
+                                                    onchange="fq_bought_product_selection_type()" checked>
+                                                <label for="fq_bought_select_products"
+                                                    class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Product')}}</label>
+                                            </div>
+                                            <div class="radio mar-btm">
+                                                <input id="fq_bought_select_category" type="radio"
+                                                    name="frequently_bought_selection_type" value="category"
+                                                    onchange="fq_bought_product_selection_type()">
+                                                <label for="fq_bought_select_category"
+                                                    class="fs-14 fw-500 mb-0 ml-2">{{translate('Select Category')}}</label>
+                                            </div>
+                                        </div>
+
+                                        <div class="fq_bought_select_product_div">
+                                            <div id="selected-fq-bought-products"></div>
+                                            <button type="button"
+                                                class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center"
+                                                onclick="showFqBoughtProductModal()">
+                                                <i class="las la-plus"></i>
+                                                <span class="ml-2">{{ translate('Add More') }}</span>
+                                            </button>
+                                        </div>
+
+                                        <div class="fq_bought_select_category_div d-none">
+                                            <div class="form-group mb-2">
+                                                <label class="col-from-label fs-13">{{translate('Category')}}</label>
+                                                <select class="form-control aiz-selectpicker"
+                                                    data-placeholder="{{ translate('Select a Category')}}"
+                                                    name="fq_bought_product_category_id" data-live-search="true">
+                                                    @foreach ($categories as $category)
+                                                        <option value="{{ $category->id }}">
+                                                            {{ $category->getTranslation('name') }}
+                                                        </option>
+                                                        @foreach ($category->childrenCategories as $childCategory)
+                                                            @include('categories.child_category', ['child_category' => $childCategory])
+                                                        @endforeach
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shipping Configuration -->
+                            <div class="card mb-4" id="shipping">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{ translate('Shipping Configuration') }}
+                                    </h5>
+                                    <div class="w-100">
+                                        @if (get_setting('shipping_type') == 'product_wise_shipping')
+                                            <div class="form-group row gutters-5 align-items-center">
+                                                <label class="col-md-6 col-from-label fs-13">{{ translate('Free Shipping') }}</label>
+                                                <div class="col-md-6 text-right">
+                                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                                        <input type="radio" name="shipping_type" value="free" checked>
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row gutters-5 align-items-center">
+                                                <label class="col-md-6 col-from-label fs-13">{{ translate('Flat Rate') }}</label>
+                                                <div class="col-md-6 text-right">
+                                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                                        <input type="radio" name="shipping_type" value="flat_rate">
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="flat_rate_shipping_div" style="display: none">
+                                                <div class="form-group mb-2">
+                                                    <label class="col-from-label fs-13">{{ translate('Shipping cost') }}</label>
+                                                    <input type="number" lang="en" min="0" value="0" step="0.01"
+                                                        placeholder="{{ translate('Shipping cost') }}" name="flat_shipping_cost"
+                                                        class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="form-group row gutters-5 align-items-center">
+                                                <label class="col-md-8 col-from-label fs-13">{{translate('Is Product Quantity Mulitiply')}}</label>
+                                                <div class="col-md-4 text-right">
+                                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                                        <input type="checkbox" name="is_quantity_multiplied" value="1">
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <small class="text-muted">{{ translate('Shipping configuration is maintained by Admin.') }}</small>
+                                        @endif
+
+                                        <hr class="my-4">
+
+                                        <!-- Estimate Shipping Time -->
+                                        <div class="form-group mb-0 mt-3">
+                                            <label class="col-from-label fs-13">{{ translate('Estimate Shipping Time (Days)') }}</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" name="est_shipping_days" min="1"
+                                                    step="1" placeholder="{{ translate('Shipping Days') }}">
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">{{ translate('Days') }}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Low Stock Quantity Warning -->
+                            <div class="card mb-4" id="low_stock_warning">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{ translate('Low Stock Quantity Warning') }}
+                                    </h5>
+                                    <div class="w-100">
+                                        <div class="form-group mb-0">
+                                            <label class="col-from-label fs-13">{{ translate('Quantity') }}</label>
+                                            <input type="number" name="low_stock_quantity" value="1" min="0" step="1"
+                                                class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stock Visibility State -->
+                            <div class="card mb-4" id="stock_visibility">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{ translate('Stock Visibility State') }}
+                                    </h5>
+                                    <div class="w-100">
+                                        <div class="form-group row gutters-5 align-items-center">
+                                            <label class="col-md-6 col-from-label fs-13">{{ translate('Show Stock Quantity') }}</label>
+                                            <div class="col-md-6 text-right">
+                                                <label class="aiz-switch aiz-switch-success mb-0">
+                                                    <input type="radio" name="stock_visibility_state" value="quantity" checked>
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row gutters-5 align-items-center">
+                                            <label class="col-md-6 col-from-label fs-13">{{ translate('Show Stock With Text Only') }}</label>
+                                            <div class="col-md-6 text-right">
+                                                <label class="aiz-switch aiz-switch-success mb-0">
+                                                    <input type="radio" name="stock_visibility_state" value="text">
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row gutters-5 align-items-center">
+                                            <label class="col-md-6 col-from-label fs-13">{{ translate('Hide Stock') }}</label>
+                                            <div class="col-md-6 text-right">
+                                                <label class="aiz-switch aiz-switch-success mb-0">
+                                                    <input type="radio" name="stock_visibility_state" value="hide">
+                                                    <span></span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cash On Delivery -->
+                            <div class="card mb-4" id="cod">
+                                <div class="bg-white p-3 p-sm-2rem">
+                                    <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                        {{ translate('Cash On Delivery') }}
+                                    </h5>
+                                    <div class="w-100">
+                                        @if (get_setting('cash_payment') == '1')
+                                            <div class="form-group row gutters-5 align-items-center">
+                                                <label class="col-md-6 col-from-label fs-13">{{ translate('Status') }}</label>
+                                                <div class="col-md-6 text-right">
+                                                    <label class="aiz-switch aiz-switch-success mb-0">
+                                                        <input type="checkbox" name="cash_on_delivery" value="1" checked="">
+                                                        <span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        @else
+                                            <small class="text-muted">{{ translate('Cash On Delivery activation is maintained by Admin.') }}</small>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div> <!-- End Advanced Settings Collapse -->
+                    </div> <!-- End product-form-sections -->
+
+                    <!-- VAT & Tax Section -->
+                    <div class="card mb-4" id="vat_tax">
+                        <div class="bg-white p-3 p-sm-2rem">
+                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                {{translate('VAT & Tax')}}
+                            </h5>
+                            <div class="w-100">
+                                @foreach(\App\Models\Tax::where('tax_status', 1)->get() as $tax)
+                                <div class="form-group mb-3">
+                                    <label class="col-from-label fs-13">
+                                        {{$tax->name}}
+                                        <input type="hidden" value="{{$tax->id}}" name="tax_id[]">
+                                    </label>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <input type="number" lang="en" min="0" value="0" step="0.01"
+                                                placeholder="{{ translate('Tax') }}" name="tax[]" class="form-control" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <select class="form-control aiz-selectpicker" name="tax_type[]">
+                                                <option value="amount">{{translate('Flat')}}</option>
+                                                <option value="percent">{{translate('Percent')}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </div>
                         </div>
                     </div>
-                    <div class="col-12 mt-4 text-right">
-                        <button type="submit" name="button" value="publish"
-                            class="btn btn-primary btn-lg min-w-150px fs-15 fw-700 shadow-primary">{{ translate('Upload Product') }}</button>
-                    </div>
                 </div>
+                
+                <div class="col-12 mt-4 text-right">
+                    <button type="submit" name="button" value="publish"
+                        class="btn btn-primary btn-lg min-w-150px fs-15 fw-700 shadow-primary">{{ translate('Upload Product') }}</button>
+                </div>
+            </div>
 
         </form>
     </div>
