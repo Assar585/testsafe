@@ -227,7 +227,7 @@
                                 @endcan
                                 <!--View Product-->
                                 @if(!$product->draft)
-                                <a href="{{ route('product', $product->slug) }}" target="_blank"
+                                <a href="{{ $product->slug ? route('product', $product->slug) : '#' }}" target="_blank"
                                     class="d-flex align-items-center px-20px py-10px hov-bg-light hov-text-blue">
                                     <span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="13"

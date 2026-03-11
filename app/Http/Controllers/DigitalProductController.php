@@ -34,12 +34,12 @@ class DigitalProductController extends Controller
      */
     public function index(Request $request)
     {
-        $sort_search    = null;
-        $products       = Product::query();
+        $sort_search = null;
+        $products = Product::query();
         $products->where('added_by', 'admin');
         if ($request->has('search')) {
-            $sort_search    = $request->search;
-            $products       = $products->where('name', 'like', '%' . $sort_search . '%');
+            $sort_search = $request->search;
+            $products = $products->where('name', 'like', '%' . $sort_search . '%');
         }
         $products = $products->where('digital', 1)->orderBy('created_at', 'desc')->paginate(10);
         $type = 'Admin';
@@ -60,7 +60,7 @@ class DigitalProductController extends Controller
 
         if (addon_is_activated('gst_system')) {
             $business_info = admin_business_info();
-            if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+            if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                 flash(translate('Please Update Your GST Information'))->warning();
                 return back();
             }
@@ -80,7 +80,7 @@ class DigitalProductController extends Controller
     {
         if (addon_is_activated('gst_system')) {
             $business_info = admin_business_info();
-            if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+            if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                 flash(translate('Please Update Your GST Information'))->warning();
                 return back();
             }
@@ -88,7 +88,10 @@ class DigitalProductController extends Controller
 
         // Product Store
         $product = (new ProductService)->store($request->except([
-            '_token', 'tax_id', 'tax', 'tax_type'
+            '_token',
+            'tax_id',
+            'tax',
+            'tax_type'
         ]));
 
         $request->merge(['product_id' => $product->id, 'current_stock' => 0]);
@@ -98,25 +101,37 @@ class DigitalProductController extends Controller
 
         //Product Stock
         (new ProductStockService)->store($request->only([
-            'unit_price', 'current_stock', 'product_id'
+            'unit_price',
+            'current_stock',
+            'product_id'
         ]), $product);
 
         //VAT & Tax
         if ($request->tax_id) {
             (new ProductTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id'
             ]));
         }
 
         // Frequently Bought Products
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id'
         ]));
 
         // Product Translations
-        $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
+        $lang = $request->lang ?? env('DEFAULT_LANGUAGE', 'en');
+        $request->merge(['lang' => $lang]);
         ProductTranslation::create($request->only([
-            'lang', 'name', 'description', 'product_id'
+            'lang',
+            'name',
+            'description',
+            'product_id'
         ]));
 
         flash(translate('Product has been inserted successfully'))->success();
@@ -147,12 +162,12 @@ class DigitalProductController extends Controller
     {
         if (addon_is_activated('gst_system')) {
             $business_info = admin_business_info();
-            if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+            if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                 flash(translate('Please Update Your GST Information'))->warning();
                 return back();
             }
         }
-        
+
         $lang = $request->lang;
         $product = Product::findOrFail($id);
         $categories = Category::where('parent_id', 0)
@@ -173,50 +188,62 @@ class DigitalProductController extends Controller
     {
         if (addon_is_activated('gst_system')) {
             $business_info = admin_business_info();
-            if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
+            if (empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
                 flash(translate('Please Update Your GST Information'))->warning();
                 return back();
             }
         }
-        
-        $product                    = Product::findOrFail($id);
+
+        $product = Product::findOrFail($id);
 
         //Product Update
         $product = (new ProductService)->update($request->except([
-             '_token', 'tax_id', 'tax', 'tax_type'
-         ]), $product);
+            '_token',
+            'tax_id',
+            'tax',
+            'tax_type'
+        ]), $product);
 
         //Product Stock
         foreach ($product->stocks as $key => $stock) {
             $stock->delete();
         }
 
-        $request->merge(['product_id' => $product->id,'current_stock' => 0]);
+        $request->merge(['product_id' => $product->id, 'current_stock' => 0]);
 
         //Product categories
         $product->categories()->sync($request->category_ids);
 
         (new ProductStockService)->store($request->only([
-            'unit_price', 'current_stock', 'product_id'
+            'unit_price',
+            'current_stock',
+            'product_id'
         ]), $product);
 
         //VAT & Tax
         if ($request->tax_id) {
             ProductTax::where('product_id', $product->id)->delete();
             (new ProductTaxService)->store($request->only([
-                'tax_id', 'tax', 'tax_type', 'product_id'
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id'
             ]));
         }
 
         // Frequently Bought Products
         $product->frequently_bought_products()->delete();
         (new FrequentlyBoughtProductService)->store($request->only([
-            'product_id', 'frequently_bought_selection_type', 'fq_bought_product_ids', 'fq_bought_product_category_id'
+            'product_id',
+            'frequently_bought_selection_type',
+            'fq_bought_product_ids',
+            'fq_bought_product_category_id'
         ]));
 
         // Product Translations
+        $lang = $request->lang ?? env('DEFAULT_LANGUAGE', 'en');
         ProductTranslation::updateOrCreate(
-            $request->only(['lang', 'product_id']),
+            ['lang' => $lang, 'product_id' => $product->id],
             $request->only(['name', 'description'])
         );
 
@@ -235,12 +262,12 @@ class DigitalProductController extends Controller
      */
     public function destroy($id)
     {
-       (new ProductService)->destroy($id);
+        (new ProductService)->destroy($id);
 
         flash(translate('Product has been deleted successfully'))->success();
         Artisan::call('view:clear');
         Artisan::call('cache:clear');
-        
+
         return back();
     }
 
