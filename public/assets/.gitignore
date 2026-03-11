@@ -1,4 +1,3 @@
-*
 !fonts/
 !css/
 !js/
@@ -10,4 +9,11 @@
 !*.gif
 !*.webp
 !*.txt
+!*.css
+!*.js
+!*.ttf
+!*.woff
+!*.woff2
+!*.eot
+!*.json
 !.gitignore
