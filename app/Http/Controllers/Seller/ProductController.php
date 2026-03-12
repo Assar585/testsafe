@@ -619,6 +619,7 @@ class ProductController extends Controller
             $q->where('user_id', $user_id);
         })->exists();
 
+        return response()->json(['exists' => $exists]);
     }
     public function hs_code_search(Request $request)
     {
