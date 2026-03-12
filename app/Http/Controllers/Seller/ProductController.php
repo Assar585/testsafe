@@ -613,31 +613,32 @@ class ProductController extends Controller
     }
     public function hs_code_search(Request $request)
     {
-        $q = strtolower(trim($request->get('q', '')));
-        \Log::info("HS Code Search START [Seller]", ['q' => $q]);
+        try {
+            $q = strtolower(trim($request->get('q', '')));
+            @file_put_contents(public_path('debug_log.txt'), "HS Code Search START [Seller] q: $q\n", FILE_APPEND);
 
-        $results = [];
-        $seen = [];
-        $limit = 5;
+            $results = [];
+            $seen = [];
+            $limit = 5;
 
-        $jsonPaths = [
-            public_path('assets/data/hs_codes_un.json'),
-            base_path('resources/data/hs_codes_un.json'),
-            public_path('assets/data/hs_codes.json'),
-            base_path('resources/data/hs_codes.json'),
-            '/app/public/assets/data/hs_codes_un.json', // Railway-specific absolute path
-            '/app/public/assets/data/hs_codes.json',
-        ];
+            $jsonPaths = [
+                public_path('assets/data/hs_codes_un.json'),
+                base_path('resources/data/hs_codes_un.json'),
+                public_path('assets/data/hs_codes.json'),
+                base_path('resources/data/hs_codes.json'),
+                '/app/public/assets/data/hs_codes_un.json', // Railway-specific absolute path
+                '/app/public/assets/data/hs_codes.json',
+            ];
 
-        foreach ($jsonPaths as $path) {
-            if (count($results) >= $limit)
-                break;
+            foreach ($jsonPaths as $path) {
+                if (count($results) >= $limit)
+                    break;
 
-            if (file_exists($path)) {
-                try {
-                    $jsonContent = file_get_contents($path);
+                if (file_exists($path)) {
+                    @file_put_contents(public_path('debug_log.txt'), "Checking path: $path\n", FILE_APPEND);
+                    $jsonContent = @file_get_contents($path);
                     if ($jsonContent === false) {
-                        \Log::error("Seller HS Code Search: Failed to read file: $path");
+                        @file_put_contents(public_path('debug_log.txt'), "Failed to read file: $path\n", FILE_APPEND);
                         continue;
                     }
 
@@ -646,17 +647,14 @@ class ProductController extends Controller
 
                     $data = json_decode($jsonContent, true);
                     if ($data === null) {
-                        \Log::error("Seller HS Code Search: JSON Decode Failed for $path. Error: " . json_last_error_msg());
+                        @file_put_contents(public_path('debug_log.txt'), "JSON Decode Failed for $path: " . json_last_error_msg() . "\n", FILE_APPEND);
                         continue;
                     }
 
                     $items = isset($data['results']) ? $data['results'] : $data;
                     if (!is_array($items)) {
-                        \Log::warning("Seller HS Code Search: Data is not an array in $path");
                         continue;
                     }
-
-                    \Log::info("Seller HS Code Search: Searching in " . basename($path) . " (" . count($items) . " items)");
 
                     foreach ($items as $item) {
                         if (count($results) >= $limit)
@@ -679,16 +677,13 @@ class ProductController extends Controller
                             $seen[$id] = true;
                         }
                     }
-                } catch (\Exception $e) {
-                    \Log::error("Seller HS Code Search EXCEPTION in $path: " . $e->getMessage());
                 }
-            } else {
-                \Log::debug("Seller HS Code Search: File not found: $path");
             }
+            @file_put_contents(public_path('debug_log.txt'), "HS Code Search END [Seller]. Found: " . count($results) . "\n", FILE_APPEND);
+            return response()->json($results, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            @file_put_contents(public_path('debug_log.txt'), "HS Code Search EXCEPTION [Seller]: " . $e->getMessage() . "\n", FILE_APPEND);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        \Log::info("Seller HS Code Search END", ['results_count' => count($results)]);
-
-        return response()->json($results, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 }
