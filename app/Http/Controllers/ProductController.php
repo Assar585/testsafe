@@ -237,7 +237,16 @@ class ProductController extends Controller
         try {
             @file_put_contents(public_path('debug_log.txt'), "Product store START\n", FILE_APPEND);
             
-            // Use except to be safe and include all fields like 'description'
+            // Ensure fields exist to avoid "Undefined array key"
+            $request->merge([
+                'flash_deal_id' => $request->flash_deal_id ?? null,
+                'flash_discount' => $request->flash_discount ?? 0,
+                'flash_discount_type' => $request->flash_discount_type ?? 'amount',
+                'category_ids' => $request->category_ids ?? [],
+                'description' => $request->description ?? '',
+            ]);
+
+            // Use except to be safe and include all fields
             $product = $this->productService->store($request->except([
                 '_token',
                 'sku',
@@ -426,7 +435,7 @@ class ProductController extends Controller
                 'tax',
                 'tax_type',
                 'product_id'
-            ]), $product);
+            ]));
         }
 
         //Flash Deal

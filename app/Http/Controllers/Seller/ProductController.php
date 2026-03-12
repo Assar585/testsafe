@@ -106,6 +106,14 @@ class ProductController extends Controller
             }
         }
 
+        // Ensure fields exist to avoid "Undefined array key"
+        $request->merge([
+            'flash_deal_id' => $request->flash_deal_id ?? null,
+            'flash_discount' => $request->flash_discount ?? 0,
+            'flash_discount_type' => $request->flash_discount_type ?? 'amount',
+            'category_ids' => $request->category_ids ?? [],
+        ]);
+
         $product = $this->productService->store($request->except([
             '_token',
             'sku',
