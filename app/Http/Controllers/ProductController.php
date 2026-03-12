@@ -464,7 +464,8 @@ class ProductController extends Controller
             'fq_bought_product_category_id'
         ]));
 
-        $product_translation = ProductTranslation::firstOrNew(['lang' => $request->lang, 'product_id' => $product->id]);
+        $lang = $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'));
+        $product_translation = ProductTranslation::firstOrNew(['lang' => $lang, 'product_id' => $product->id]);
         $product_translation->name = $request->name;
         $product_translation->unit = $request->unit;
         $product_translation->description = $request->description;

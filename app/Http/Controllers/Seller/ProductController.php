@@ -271,16 +271,17 @@ class ProductController extends Controller
         ]));
 
         // Product Translations
+        $lang = $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'));
         ProductTranslation::updateOrCreate(
-            $request->only([
-                'lang',
-                'product_id'
-            ]),
-            $request->only([
-                'name',
-                'unit',
-                'description'
-            ])
+            [
+                'lang' => $lang,
+                'product_id' => $product->id
+            ],
+            [
+                'name' => $request->name,
+                'unit' => $request->unit,
+                'description' => $request->description
+            ]
         );
 
 
