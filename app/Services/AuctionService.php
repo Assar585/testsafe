@@ -47,9 +47,14 @@ class AuctionService
         $product->thumbnail_img = $request->thumbnail_img;
 
         $tags = array();
-        if($request->tags[0] != null){
-            foreach (json_decode($request->tags[0]) as $key => $tag) {
-                array_push($tags, $tag->value);
+        if (isset($request->tags[0]) && $request->tags[0] != null) {
+            $decoded_tags = json_decode($request->tags[0]);
+            if (is_array($decoded_tags)) {
+                foreach ($decoded_tags as $key => $tag) {
+                    if (isset($tag->value)) {
+                        array_push($tags, $tag->value);
+                    }
+                }
             }
         }
         $product->tags = implode(',', $tags);
@@ -196,9 +201,14 @@ class AuctionService
         $product->thumbnail_img          = $request->thumbnail_img;
 
         $tags = array();
-        if($request->tags[0] != null){
-            foreach (json_decode($request->tags[0]) as $key => $tag) {
-                array_push($tags, $tag->value);
+        if (isset($request->tags[0]) && $request->tags[0] != null) {
+            $decoded_tags = json_decode($request->tags[0]);
+            if (is_array($decoded_tags)) {
+                foreach ($decoded_tags as $key => $tag) {
+                    if (isset($tag->value)) {
+                        array_push($tags, $tag->value);
+                    }
+                }
             }
         }
         $product->tags           = implode(',', $tags);

@@ -178,8 +178,6 @@
                                             <div class="form-group mb-2">
                                                 <label class="col-from-label fs-13">{{translate('Product Category')}} <span
                                                         class="text-danger">*</span></label>
-                                                <input type="hidden" name="category_ids[]" id="category_ids_hidden"
-                                                    value="{{ old('category_id') }}">
                                                 <select
                                                     class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror"
                                                     name="category_id" id="category_id" data-live-search="true" required

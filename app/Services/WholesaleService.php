@@ -17,9 +17,14 @@ class WholesaleService
         $collection = collect($data);
         
         $tags = array();
-        if ($collection['tags'][0] != null) {
-            foreach (json_decode($collection['tags'][0]) as $key => $tag) {
-                array_push($tags, $tag->value);
+        if (isset($collection['tags'][0]) && $collection['tags'][0] != null) {
+            $decoded_tags = json_decode($collection['tags'][0]);
+            if (is_array($decoded_tags)) {
+                foreach ($decoded_tags as $key => $tag) {
+                    if (isset($tag->value)) {
+                        array_push($tags, $tag->value);
+                    }
+                }
             }
         }
         $collection['tags'] = implode(',', $tags);
@@ -108,9 +113,14 @@ class WholesaleService
         $product->stock_visibility_state = $request->stock_visibility_state;
 
         $tags = array();
-        if($request->tags[0] != null){
-            foreach (json_decode($request->tags[0]) as $key => $tag) {
-                array_push($tags, $tag->value);
+        if (isset($request->tags[0]) && $request->tags[0] != null) {
+            $decoded_tags = json_decode($request->tags[0]);
+            if (is_array($decoded_tags)) {
+                foreach ($decoded_tags as $key => $tag) {
+                    if (isset($tag->value)) {
+                        array_push($tags, $tag->value);
+                    }
+                }
             }
         }
         $product->tags           = implode(',', $tags);

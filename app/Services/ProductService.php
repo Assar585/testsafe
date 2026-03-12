@@ -40,9 +40,14 @@ class ProductService
             $user_id = User::where('user_type', 'admin')->first()->id;
         }
         $tags = array();
-        if ($collection['tags'][0] != null) {
-            foreach (json_decode($collection['tags'][0]) as $key => $tag) {
-                array_push($tags, $tag->value);
+        if (isset($collection['tags'][0]) && $collection['tags'][0] != null) {
+            $decoded_tags = json_decode($collection['tags'][0]);
+            if (is_array($decoded_tags)) {
+                foreach ($decoded_tags as $key => $tag) {
+                    if (isset($tag->value)) {
+                        array_push($tags, $tag->value);
+                    }
+                }
             }
         }
         $collection['tags'] = implode(',', $tags);
@@ -79,7 +84,7 @@ class ProductService
 
         $slug = Str::slug($collection['name']);
         $same_slug_count = Product::where('slug', 'LIKE', $slug . '%')->count();
-        $slug_suffix = $same_slug_count ? '-' . $same_slug_count + 1 : '';
+        $slug_suffix = $same_slug_count ? '-' . ($same_slug_count + 1) : '';
         $slug .= $slug_suffix;
 
         $colors = json_encode(array());
@@ -171,7 +176,7 @@ class ProductService
         $collection['discount']= $collection['discount'] ?? 0.00;
         $collection['weight']= $collection['weight'] ?? 0.00;
         $same_slug_count = Product::where('slug', 'LIKE', $slug . '%')->count();
-        $slug_suffix = $same_slug_count > 1 ? '-' . $same_slug_count + 1 : '';
+        $slug_suffix = $same_slug_count > 1 ? '-' . ($same_slug_count + 1) : '';
         $slug .= $slug_suffix;
         $collection['draft'] = 0;
 
@@ -200,9 +205,14 @@ class ProductService
 
 
         $tags = array();
-        if ($collection['tags'][0] != null) {
-            foreach (json_decode($collection['tags'][0]) as $key => $tag) {
-                array_push($tags, $tag->value);
+        if (isset($collection['tags'][0]) && $collection['tags'][0] != null) {
+            $decoded_tags = json_decode($collection['tags'][0]);
+            if (is_array($decoded_tags)) {
+                foreach ($decoded_tags as $key => $tag) {
+                    if (isset($tag->value)) {
+                        array_push($tags, $tag->value);
+                    }
+                }
             }
         }
         $collection['tags'] = implode(',', $tags);
