@@ -171,8 +171,23 @@ class AuctionProductController extends Controller
 
     public function product_store_admin(ProductRequest $request)
     {
-        (new AuctionService)->store($request);
-        return redirect()->route('auction.inhouse_products');
+        try {
+            (new AuctionService)->store($request);
+            flash(translate('Auction Product has been inserted successfully'))->success();
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Auction Product has been inserted successfully'),
+                'redirect' => route('auction.inhouse_products')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function product_store_seller(ProductRequest $request)
@@ -183,7 +198,10 @@ class AuctionProductController extends Controller
                 Auth::user()->shop->seller_package->product_upload_limit <= Auth::user()->products()->count()
             ) {
                 flash(translate('Upload limit has been reached. Please upgrade your package.'))->warning();
-                return back();
+                return response()->json([
+                    'success' => false,
+                    'message' => translate('Upload limit has been reached. Please upgrade your package.')
+                ], 403);
             }
         }
 
@@ -191,13 +209,30 @@ class AuctionProductController extends Controller
             $shop = Auth::user()->shop;
             if ($shop && !$shop->gst_verification) {
                 flash(translate('GST verification is pending for your account.'))->warning();
-                return back();
+                return response()->json([
+                    'success' => false,
+                    'message' => translate('GST verification is pending for your account.')
+                ], 403);
             }
         }
 
+        try {
+            (new AuctionService)->store($request);
+            flash(translate('Auction Product has been inserted successfully'))->success();
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
 
-        (new AuctionService)->store($request);
-        return redirect()->route('auction_products.seller.index');
+            return response()->json([
+                'success' => true,
+                'message' => translate('Auction Product has been inserted successfully'),
+                'redirect' => route('auction_products.seller.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -274,8 +309,23 @@ class AuctionProductController extends Controller
      */
     public function product_update_admin(ProductRequest $request, $id)
     {
-        (new AuctionService)->update($request, $id);
-        return back();
+        try {
+            (new AuctionService)->update($request, $id);
+            flash(translate('Auction Product has been updated successfully'))->success();
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Auction Product has been updated successfully'),
+                'redirect' => route('auction.inhouse_products')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function product_update_seller(ProductRequest $request, $id)
@@ -284,11 +334,30 @@ class AuctionProductController extends Controller
             $shop = Auth::user()->shop;
             if ($shop && !$shop->gst_verification) {
                 flash(translate('GST verification is pending for your account.'))->warning();
-                return back();
+                return response()->json([
+                    'success' => false,
+                    'message' => translate('GST verification is pending for your account.')
+                ], 403);
             }
         }
-        (new AuctionService)->update($request, $id);
-        return back();
+        
+        try {
+            (new AuctionService)->update($request, $id);
+            flash(translate('Auction Product has been updated successfully'))->success();
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Auction Product has been updated successfully'),
+                'redirect' => route('auction_products.seller.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function get_products_by_brand(Request $request)

@@ -324,11 +324,17 @@ class ProductController extends Controller
 
             Artisan::call('cache:clear');
 
-            return redirect()->route('products.all');
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been inserted successfully'),
+                'redirect' => route('products.all')
+            ]);
         } catch (\Exception $e) {
             @file_put_contents(public_path('debug_log.txt'), "Product store EXCEPTION: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
-            flash(translate('Something went wrong: ') . $e->getMessage())->error();
-            return back();
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -473,18 +479,29 @@ class ProductController extends Controller
             'fq_bought_product_category_id'
         ]));
 
-        $lang = $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'));
-        $product_translation = ProductTranslation::firstOrNew(['lang' => $lang, 'product_id' => $product->id]);
-        $product_translation->name = $request->name;
-        $product_translation->unit = $request->unit;
-        $product_translation->description = $request->description;
-        $product_translation->save();
+        try {
+            $lang = $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'));
+            $product_translation = ProductTranslation::firstOrNew(['lang' => $lang, 'product_id' => $product->id]);
+            $product_translation->name = $request->name;
+            $product_translation->unit = $request->unit;
+            $product_translation->description = $request->description;
+            $product_translation->save();
 
-        flash(translate('Product has been updated successfully'))->success();
+            flash(translate('Product has been updated successfully'))->success();
 
-        Artisan::call('cache:clear');
+            Artisan::call('cache:clear');
 
-        return back();
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been updated successfully'),
+                'redirect' => route('products.all')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

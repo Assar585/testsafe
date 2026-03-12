@@ -101,23 +101,36 @@ class CustomerProductController extends Controller
         $customer_product->meta_img             = $request->meta_img;
         $customer_product->pdf                  = $request->pdf;
         $customer_product->slug                 = strtolower(preg_replace('/[^A-Za-z0-9\-]/', '', str_replace(' ', '-', $request->name)).'-'.Str::random(5));
-        if($customer_product->save()){
-            $user = Auth::user();
-            $user->remaining_uploads -= 1;
-            $user->save();
+        try {
+            if($customer_product->save()){
+                $user = Auth::user();
+                $user->remaining_uploads -= 1;
+                $user->save();
 
-            $customer_product_translation               = CustomerProductTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'customer_product_id' => $customer_product->id]);
-            $customer_product_translation->name         = $request->name;
-            $customer_product_translation->unit         = $request->unit;
-            $customer_product_translation->description  = $request->description;
-            $customer_product_translation->save();
+                $customer_product_translation               = CustomerProductTranslation::firstOrNew(['lang' => env('DEFAULT_LANGUAGE'), 'customer_product_id' => $customer_product->id]);
+                $customer_product_translation->name         = $request->name;
+                $customer_product_translation->unit         = $request->unit;
+                $customer_product_translation->description  = $request->description;
+                $customer_product_translation->save();
 
-            flash(translate('Product has been inserted successfully'))->success();
-            return redirect()->route('customer_products.index');
-        }
-        else{
-            flash(translate('Something went wrong'))->error();
-            return back();
+                flash(translate('Product has been inserted successfully'))->success();
+                return response()->json([
+                    'success' => true,
+                    'message' => translate('Product has been inserted successfully'),
+                    'redirect' => route('customer_products.index')
+                ]);
+            }
+            else{
+                return response()->json([
+                    'success' => false,
+                    'message' => translate('Something went wrong')
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -188,20 +201,33 @@ class CustomerProductController extends Controller
         $customer_product->meta_img             = $request->meta_img;
         $customer_product->pdf                  = $request->pdf;
         $customer_product->slug                 = strtolower($request->slug);
-        if($customer_product->save()){
+        try {
+            if($customer_product->save()){
 
-            $customer_product_translation               = CustomerProductTranslation::firstOrNew(['lang' => $request->lang, 'customer_product_id' => $customer_product->id]);
-            $customer_product_translation->name         = $request->name;
-            $customer_product_translation->unit         = $request->unit;
-            $customer_product_translation->description  = $request->description;
-            $customer_product_translation->save();
+                $customer_product_translation               = CustomerProductTranslation::firstOrNew(['lang' => $request->lang, 'customer_product_id' => $customer_product->id]);
+                $customer_product_translation->name         = $request->name;
+                $customer_product_translation->unit         = $request->unit;
+                $customer_product_translation->description  = $request->description;
+                $customer_product_translation->save();
 
-            flash(translate('Product has been inserted successfully'))->success();
-            return back();
-        }
-        else{
-            flash(translate('Something went wrong'))->error();
-            return back();
+                flash(translate('Product has been updated successfully'))->success();
+                return response()->json([
+                    'success' => true,
+                    'message' => translate('Product has been updated successfully'),
+                    'redirect' => route('customer_products.index')
+                ]);
+            }
+            else{
+                return response()->json([
+                    'success' => false,
+                    'message' => translate('Something went wrong')
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
         }
     }
 

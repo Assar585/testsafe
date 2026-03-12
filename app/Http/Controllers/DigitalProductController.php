@@ -134,11 +134,23 @@ class DigitalProductController extends Controller
             'product_id'
         ]));
 
-        flash(translate('Product has been inserted successfully'))->success();
+        try {
+            flash(translate('Product has been inserted successfully'))->success();
 
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-        return redirect()->route('digitalproducts.index');
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been inserted successfully'),
+                'redirect' => route('digitalproducts.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -247,11 +259,23 @@ class DigitalProductController extends Controller
             $request->only(['name', 'description'])
         );
 
-        flash(translate('Product has been updated successfully'))->success();
+        try {
+            flash(translate('Product has been updated successfully'))->success();
 
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-        return back();
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been updated successfully'),
+                'redirect' => route('digitalproducts.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

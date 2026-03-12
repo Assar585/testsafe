@@ -186,12 +186,23 @@ class ProductController extends Controller
             Notification::send($users, new ShopProductNotification($data));
         }
 
-        flash(translate('Product has been inserted successfully'))->success();
+        try {
+            flash(translate('Product has been inserted successfully'))->success();
 
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
 
-        return redirect()->route('seller.products');
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been inserted successfully'),
+                'redirect' => route('seller.products')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function edit(Request $request, $id)
@@ -285,12 +296,23 @@ class ProductController extends Controller
         );
 
 
-        flash(translate('Product has been updated successfully'))->success();
+        try {
+            flash(translate('Product has been updated successfully'))->success();
 
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
 
-        return back();
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been updated successfully'),
+                'redirect' => route('seller.products')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function sku_combination(Request $request)

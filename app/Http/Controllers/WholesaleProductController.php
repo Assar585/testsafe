@@ -251,12 +251,23 @@ class WholesaleProductController extends Controller
             'product_id'
         ]));
 
-        flash(translate('Product has been inserted successfully'))->success();
+        try {
+            flash(translate('Product has been inserted successfully'))->success();
 
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
 
-        return redirect()->route('wholesale_products.in_house');
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been inserted successfully'),
+                'redirect' => route('wholesale_products.in_house')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function product_store_seller(WholesaleProductRequest $request)
@@ -320,12 +331,23 @@ class WholesaleProductController extends Controller
             'product_id'
         ]));
 
-        flash(translate('Product has been inserted successfully'))->success();
+        try {
+            flash(translate('Product has been inserted successfully'))->success();
 
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
 
-        return redirect()->route('seller.wholesale_products_list');
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been inserted successfully'),
+                'redirect' => route('seller.wholesale_products_list')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
 
@@ -395,29 +417,46 @@ class WholesaleProductController extends Controller
 
     public function product_update_admin(WholesaleProductRequest $request, $id)
     {
-        (new WholesaleService)->update($request, $id);
-        flash(translate('Product has been updated successfully'))->success();
+        try {
+            (new WholesaleService)->update($request, $id);
+            flash(translate('Product has been updated successfully'))->success();
 
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-        return back();
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been updated successfully'),
+                'redirect' => route('wholesale_products.in_house')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function product_update_seller(WholesaleProductRequest $request, $id)
     {
-        if (addon_is_activated('gst_system')) {
-            $shop = Auth::user()->shop;
-            if ($shop && !$shop->gst_verification) {
-                flash(translate('GST verification is pending for your account.'))->warning();
-                return back();
-            }
-        }
-        (new WholesaleService)->update($request, $id);
-        flash(translate('Product has been updated successfully'))->success();
+        try {
+            (new WholesaleService)->update($request, $id);
+            flash(translate('Product has been updated successfully'))->success();
 
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-        return back();
+            Artisan::call('view:clear');
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been updated successfully'),
+                'redirect' => route('seller.wholesale_products_list')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
