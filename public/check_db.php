@@ -9,12 +9,14 @@ $kernel->bootstrap();
 
 use App\Models\Product;
 
-echo "DB_HOST: " . env('DB_HOST') . "<br>";
-echo "DB_DATABASE: " . env('DB_DATABASE') . "<br>";
-echo "Product count: " . Product::count() . "<br>";
-echo "Last 5 Products:<br>";
-foreach(Product::latest()->take(5)->get() as $p) {
-    echo "- [$p->id] $p->name (Added by: $p->added_by, Created at: $p->created_at)<br>";
+echo "Total Products: " . Product::count() . "<br>";
+echo "Auction Products (any user): " . Product::where('auction_product', 1)->count() . "<br>";
+echo "Wholesale Products (any user): " . Product::where('wholesale_product', 1)->count() . "<br>";
+echo "Digital Products (any user): " . Product::where('digital', 1)->count() . "<br>";
+echo "Normal Products: " . Product::where('auction_product', 0)->where('wholesale_product', 0)->where('digital', 0)->count() . "<br>";
+
+echo "<br>Last 10 Products with IDs and Flags:<br>";
+foreach(Product::latest()->take(10)->get() as $p) {
+    echo "- [$p->id] $p->name | Auction: $p->auction_product | Wholesale: $p->wholesale_product | Digital: $p->digital | Added by: $p->added_by<br>";
 }
 echo "--- Done ---";
-// unlink(__FILE__); // Keep it for a moment
