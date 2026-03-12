@@ -642,24 +642,5 @@ class ProductController extends Controller
         $combinations = (new CombinationService())->generate_combination($options);
         return view('backend.product.products.sku_combinations_edit', compact('combinations', 'unit_price', 'colors_active', 'product_name', 'product', 'base_sku'));
     }
-
-    public function check_sku_availability(Request $request)
-    {
-        $sku = $request->sku;
-        $product_id = $request->product_id;
-        $user_id = auth()->user()->id;
-
-        $query = \App\Models\ProductStock::where('sku', $sku);
-        if ($product_id) {
-            $query->where('product_id', '!=', $product_id);
-        }
-
-        $exists = $query->whereHas('product', function ($q) use ($user_id) {
-            $q->where('user_id', $user_id);
-        })->exists();
-
-        return response()->json(['exists' => $exists]);
-    }
 }
-
 
