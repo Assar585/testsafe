@@ -280,6 +280,8 @@ class ProductController extends Controller
     {
         try {
             $q = strtolower(trim($request->get('q', '')));
+            $debug_msg = "HS Code Search START [Admin] q: $q\n";
+            @file_put_contents(public_path('debug_log.txt'), $debug_msg, FILE_APPEND);
             \Log::info("HS Code Search START [Admin]", ['q' => $q]);
 
             $results = [];
@@ -300,8 +302,10 @@ class ProductController extends Controller
                     break;
 
                 if (file_exists($path)) {
+                    @file_put_contents(public_path('debug_log.txt'), "Checking path: $path\n", FILE_APPEND);
                     $jsonContent = @file_get_contents($path);
                     if ($jsonContent === false) {
+                        @file_put_contents(public_path('debug_log.txt'), "Failed to read file: $path\n", FILE_APPEND);
                         \Log::error("HS Code Search: Failed to read file: $path");
                         continue;
                     }
@@ -311,12 +315,14 @@ class ProductController extends Controller
 
                     $data = json_decode($jsonContent, true);
                     if ($data === null) {
+                        @file_put_contents(public_path('debug_log.txt'), "JSON Decode Failed for $path: " . json_last_error_msg() . "\n", FILE_APPEND);
                         \Log::error("HS Code Search: JSON Decode Failed for $path. Error: " . json_last_error_msg());
                         continue;
                     }
 
                     $items = isset($data['results']) ? $data['results'] : $data;
                     if (!is_array($items)) {
+                        @file_put_contents(public_path('debug_log.txt'), "Data is not an array in $path\n", FILE_APPEND);
                         continue;
                     }
 
@@ -343,9 +349,10 @@ class ProductController extends Controller
                     }
                 }
             }
-
+            @file_put_contents(public_path('debug_log.txt'), "HS Code Search END. Found: " . count($results) . "\n", FILE_APPEND);
             return response()->json($results, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
+            @file_put_contents(public_path('debug_log.txt'), "HS Code Search EXCEPTION: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
             \Log::error("HS Code Search CRITICAL ERROR: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
@@ -361,17 +368,54 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         try {
-            $product = $this->productService->store($request->except([
-                '_token',
-                'sku',
-                'choice',
-                'tax_id',
+            @file_put_contents(public_path('debug_log.txt'), "Product store START\n", FILE_APPEND);
+            $product = $this->productService->store($request->only([
+                'name',
+                'added_by',
+                'category_id',
+                'category_ids',
+                'brand_id',
+                'unit',
+                'min_qty',
+                'low_stock_quantity',
+                'tags',
+                'photos',
+                'thumbnail_img',
+                'video_provider',
+                'video_link',
+                'unit_price',
+                'purchase_price',
                 'tax',
                 'tax_type',
-                'flash_deal_id',
-                'flash_discount',
-                'flash_discount_type'
+                'discount',
+                'discount_type',
+                'current_stock',
+                'barcode',
+                'meta_title',
+                'meta_description',
+                'meta_img',
+                'pdf',
+                'colors_active',
+                'colors',
+                'choice_no',
+                'choice',
+                'weight',
+                'date_range',
+                'hsn_code',
+                'button',
+                'refundable',
+                'is_quantity_multiplied',
+                'est_shipping_days',
+                'cash_on_delivery',
+                'featured',
+                'todays_deal',
+                'shipping_type',
+                'flat_shipping_cost',
+                'shipping_cost',
+                'has_warranty',
+                'warranty_id'
             ]));
+            @file_put_contents(public_path('debug_log.txt'), "Product store: Product created with ID: " . $product->id . "\n", FILE_APPEND);
             $request->merge(['product_id' => $product->id]);
 
             //Product categories
@@ -429,11 +473,13 @@ class ProductController extends Controller
             ]));
 
             flash(translate('Product has been inserted successfully'))->success();
+            @file_put_contents(public_path('debug_log.txt'), "Product store SUCCESS\n", FILE_APPEND);
 
             Artisan::call('cache:clear');
 
             return redirect()->route('products.all');
         } catch (\Exception $e) {
+            @file_put_contents(public_path('debug_log.txt'), "Product store EXCEPTION: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
             \Log::error("Product store ERROR: " . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'request' => $request->all()
