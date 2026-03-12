@@ -10,7 +10,7 @@
 /storage/framework/sessions
 /storage/framework/views
 /storage/logs
-/public/uploads
+# /public/uploads
 /public/storage
 /*.sql
 /*.sql.gz

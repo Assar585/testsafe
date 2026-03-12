@@ -69,44 +69,135 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function admin_products(Request $request)
-    {
-        CoreComponentRepository::instantiateShopRepository();
-
-        $seller_type = 'admin';
-        $product_types = ['All Products', 'Physical Products', 'Digital Products', 'Drafts'];
-
-        return view('backend.product.products.index', compact('seller_type', 'product_types'));
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function seller_products(Request $request, $product_type)
-    {
-        $seller_type = 'seller';
-        if ($product_type === 'physical') {
-            $product_types = ['Physical Products'];
-        } elseif ($product_type === 'digital') {
-            $product_types = ['Digital Products'];
-        } else {
-            $product_types = ['All Seller Products', 'Physical Products', 'Digital Products'];
-        }
-        if (get_setting('product_approve_by_admin') == 1) {
-            $product_types[] = 'Not Approved';
-        }
-
-        return view('backend.product.products.index', compact('seller_type', 'product_types'));
-    }
 
     public function all_products(Request $request)
     {
         $seller_type = 'all';
         $product_types = ['All Products', 'Admin Products', 'Seller Products'];
+        $brand_id = $request->brand_id;
+        $category_id = $request->category_id;
+        $back_to = $request->back_to;
 
-        return view('backend.product.products.index', compact('seller_type', 'product_types'));
+        return view('backend.product.products.index', compact('seller_type', 'product_types', 'brand_id', 'category_id', 'back_to'));
+    }
+
+    public function admin_products(Request $request)
+    {
+        $seller_type = 'admin';
+        $product_types = ['All Products', 'Physical Products', 'Digital Products', 'Drafts'];
+        $brand_id = $request->brand_id;
+        $category_id = $request->category_id;
+        $back_to = $request->back_to;
+
+        return view('backend.product.products.index', compact('seller_type', 'product_types', 'brand_id', 'category_id', 'back_to'));
+    }
+
+    public function seller_products(Request $request, $product_type)
+    {
+        $seller_type = 'seller';
+        $product_types = ['All Products', 'Physical Products', 'Digital Products', 'Drafts', 'Not Approved'];
+        $brand_id = $request->brand_id;
+        $category_id = $request->category_id;
+        $back_to = $request->back_to;
+
+        return view('backend.product.products.index', compact('seller_type', 'product_types', 'brand_id', 'category_id', 'back_to'));
+    }
+
+    public function get_filter_products(Request $request)
+    {
+        $col_name = null;
+        $query = null;
+        $sort_search = null;
+        $products = Product::where('auction_product', 0)->where('wholesale_product', 0);
+        if ($request->product_type == 'drafts') {
+            $products = $products->where('draft', 1)->where('added_by', 'admin');
+        } else {
+            $products = $products->where('draft', 0);
+            if ($request->seller_type == 'admin') {
+                $products = $products->where('added_by', 'admin');
+            } elseif ($request->seller_type == 'seller') {
+                $products = $products->where('added_by', 'seller');
+                if ($request->user_id != null) {
+                    $products = $products->where('user_id', $request->user_id);
+                }
+            }
+            if ($request->product_type != 'drafts') {
+                if ($request->product_type == 'digital_products') {
+                    $products = $products->where('digital', 1);
+                } else if ($request->product_type == 'physical_products') {
+                    $products = $products->where('digital', 0);
+                } else if ($request->product_type == 'not_approved') {
+                    $products = $products->where('approved', 0);
+                } else if ($request->product_type == 'pos_product_list') {
+                    $products = $products->where('pos', 1);
+                }
+            }
+        }
+
+        if ($request->search != null) {
+            $sort_search = $request->search;
+            $products = $products
+                ->where(function ($q) use ($sort_search) {
+                    $q->where('name', 'like', '%' . $sort_search . '%')
+                      ->orWhereHas('stocks', function ($sq) use ($sort_search) {
+                          $sq->where('sku', 'like', '%' . $sort_search . '%');
+                      });
+                });
+        }
+        if ($request->type != null) {
+            $var = explode(",", $request->type);
+            $col_name = $var[0];
+            $query = $var[1];
+            $products = $products->orderBy($col_name, $query);
+        }
+
+        $filters = $request->selected_filter ?? [];
+        if (!empty($filters)) {
+            if (in_array('low-stock', $filters)) {
+                $products->where(function ($query) {
+                    $query->whereRaw("
+                        (
+                            SELECT CASE
+                                WHEN products.variant_product = 1 
+                                    THEN (SELECT SUM(qty) FROM product_stocks WHERE product_stocks.product_id = products.id)
+                                ELSE 
+                                    (SELECT qty FROM product_stocks WHERE product_stocks.product_id = products.id LIMIT 1)
+                            END
+                        ) <= products.low_stock_quantity
+                    ");
+                });
+            }
+            if (in_array('all-discount', $filters)) {
+                $products->where('discount', '>', 0);
+            }
+            if (in_array('all-publish', $filters)) {
+                $products->where('published', 1);
+            }
+        }
+        if ($request->filled('brand_id')) {
+            $products = $products->where('brand_id', $request->brand_id);
+        }
+        if ($request->filled('category_id')) {
+            $products = $products->whereHas('categories', function ($query) use ($request) {
+                $query->where('categories.id', $request->category_id);
+            });
+        }
+
+        if ($request->product_type == 'pos_product_list') {
+            $products = $products->orderBy('updated_at', 'desc')->paginate(15);
+        } else {
+            $products = $products->orderBy('created_at', 'desc')->paginate(15);
+        }
+
+        $type = $request->seller_type;
+        $ptoduct_type = $request->product_type;
+
+        $view = view(
+            'backend.product.products.products_table',
+            compact('products', 'type', 'col_name', 'query', 'sort_search', 'ptoduct_type')
+        )->render();
+
+        return response()->json(['html' => $view]);
     }
 
     /**
