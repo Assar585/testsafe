@@ -17,13 +17,22 @@ class WholesaleService
         $collection = collect($data);
         
         $tags = array();
-        if (isset($collection['tags'][0]) && $collection['tags'][0] != null) {
-            $decoded_tags = json_decode($collection['tags'][0]);
-            if (is_array($decoded_tags)) {
-                foreach ($decoded_tags as $key => $tag) {
-                    if (isset($tag->value)) {
-                        array_push($tags, $tag->value);
+        if (isset($collection['tags']) && $collection['tags'] != null) {
+            $raw_tags = is_array($collection['tags']) ? ($collection['tags'][0] ?? null) : $collection['tags'];
+            if ($raw_tags != null) {
+                $decoded_tags = json_decode($raw_tags);
+                if (is_array($decoded_tags)) {
+                    foreach ($decoded_tags as $key => $tag) {
+                        if (isset($tag->value)) {
+                            array_push($tags, $tag->value);
+                        }
                     }
+                } elseif (is_array($raw_tags)) {
+                    foreach ($raw_tags as $tag) {
+                        array_push($tags, $tag);
+                    }
+                } else {
+                    $tags = explode(',', (string)$raw_tags);
                 }
             }
         }

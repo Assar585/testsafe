@@ -40,13 +40,22 @@ class ProductService
             $user_id = User::where('user_type', 'admin')->first()->id;
         }
         $tags = array();
-        if (isset($collection['tags'][0]) && $collection['tags'][0] != null) {
-            $decoded_tags = json_decode($collection['tags'][0]);
-            if (is_array($decoded_tags)) {
-                foreach ($decoded_tags as $key => $tag) {
-                    if (isset($tag->value)) {
-                        array_push($tags, $tag->value);
+        if (isset($collection['tags']) && $collection['tags'] != null) {
+            $raw_tags = is_array($collection['tags']) ? ($collection['tags'][0] ?? null) : $collection['tags'];
+            if ($raw_tags != null) {
+                $decoded_tags = json_decode($raw_tags);
+                if (is_array($decoded_tags)) {
+                    foreach ($decoded_tags as $key => $tag) {
+                        if (isset($tag->value)) {
+                            array_push($tags, $tag->value);
+                        }
                     }
+                } elseif (is_array($raw_tags)) {
+                    foreach ($raw_tags as $tag) {
+                        array_push($tags, $tag);
+                    }
+                } else {
+                    $tags = explode(',', (string)$raw_tags);
                 }
             }
         }
@@ -115,17 +124,21 @@ class ProductService
         unset($collection['colors_active']);
 
         $choice_options = array();
-        if (isset($collection['choice_no']) && $collection['choice_no']) {
+        if (isset($collection['choice_no']) && is_array($collection['choice_no'])) {
             $str = '';
             $item = array();
             foreach ($collection['choice_no'] as $key => $no) {
                 $str = 'choice_options_' . $no;
                 $item['attribute_id'] = $no;
                 $attribute_data = array();
-                // foreach (json_decode($request[$str][0]) as $key => $eachValue) {
-                foreach ($collection[$str] as $key => $eachValue) {
-                    // array_push($data, $eachValue->value);
-                    array_push($attribute_data, $eachValue);
+                
+                $options_raw = $collection[$str] ?? [];
+                $options = is_array($options_raw) ? $options_raw : json_decode($options_raw, true);
+
+                if (is_array($options)) {
+                    foreach ($options as $key => $eachValue) {
+                        array_push($attribute_data, $eachValue);
+                    }
                 }
                 unset($collection[$str]);
 
@@ -205,13 +218,22 @@ class ProductService
 
 
         $tags = array();
-        if (isset($collection['tags'][0]) && $collection['tags'][0] != null) {
-            $decoded_tags = json_decode($collection['tags'][0]);
-            if (is_array($decoded_tags)) {
-                foreach ($decoded_tags as $key => $tag) {
-                    if (isset($tag->value)) {
-                        array_push($tags, $tag->value);
+        if (isset($collection['tags']) && $collection['tags'] != null) {
+            $raw_tags = is_array($collection['tags']) ? ($collection['tags'][0] ?? null) : $collection['tags'];
+            if ($raw_tags != null) {
+                $decoded_tags = json_decode($raw_tags);
+                if (is_array($decoded_tags)) {
+                    foreach ($decoded_tags as $key => $tag) {
+                        if (isset($tag->value)) {
+                            array_push($tags, $tag->value);
+                        }
                     }
+                } elseif (is_array($raw_tags)) {
+                    foreach ($raw_tags as $tag) {
+                        array_push($tags, $tag);
+                    }
+                } else {
+                    $tags = explode(',', (string)$raw_tags);
                 }
             }
         }
@@ -281,17 +303,21 @@ class ProductService
         unset($collection['colors_active']);
 
         $choice_options = array();
-        if (isset($collection['choice_no']) && $collection['choice_no']) {
+        if (isset($collection['choice_no']) && is_array($collection['choice_no'])) {
             $str = '';
             $item = array();
             foreach ($collection['choice_no'] as $key => $no) {
                 $str = 'choice_options_' . $no;
                 $item['attribute_id'] = $no;
                 $attribute_data = array();
-                // foreach (json_decode($request[$str][0]) as $key => $eachValue) {
-                foreach ($collection[$str] as $key => $eachValue) {
-                    // array_push($data, $eachValue->value);
-                    array_push($attribute_data, $eachValue);
+                
+                $options_raw = $collection[$str] ?? [];
+                $options = is_array($options_raw) ? $options_raw : json_decode($options_raw, true);
+
+                if (is_array($options)) {
+                    foreach ($options as $key => $eachValue) {
+                        array_push($attribute_data, $eachValue);
+                    }
                 }
                 unset($collection[$str]);
 
@@ -547,9 +573,23 @@ class ProductService
         $published = 0;
 
         $tags = array();
-        if (isset($collection['tags'][0]) && $collection['tags'][0] != null) {
-            foreach (json_decode($collection['tags'][0]) as $key => $tag) {
-                array_push($tags, $tag->value);
+        if (isset($collection['tags']) && $collection['tags'] != null) {
+            $raw_tags = is_array($collection['tags']) ? ($collection['tags'][0] ?? null) : $collection['tags'];
+            if ($raw_tags != null) {
+                $decoded_tags = json_decode($raw_tags);
+                if (is_array($decoded_tags)) {
+                    foreach ($decoded_tags as $key => $tag) {
+                        if (isset($tag->value)) {
+                            array_push($tags, $tag->value);
+                        }
+                    }
+                } elseif (is_array($raw_tags)) {
+                    foreach ($raw_tags as $tag) {
+                        array_push($tags, $tag);
+                    }
+                } else {
+                    $tags = explode(',', (string)$raw_tags);
+                }
             }
         }
         $collection['tags'] = implode(',', $tags);
@@ -597,7 +637,7 @@ class ProductService
         unset($collection['colors_active']);
 
         $choice_options = array();
-        if (isset($collection['choice_no']) && $collection['choice_no']) {
+        if (isset($collection['choice_no']) && is_array($collection['choice_no'])) {
             $item = array();
             foreach ($collection['choice_no'] as $key => $no) {
                 $str = 'choice_options_' . $no;
@@ -605,8 +645,13 @@ class ProductService
                 $attribute_data = array();
                 
                 if (isset($collection[$str])) {
-                    foreach ($collection[$str] as $eachValue) {
-                        array_push($attribute_data, $eachValue);
+                    $options_raw = $collection[$str] ?? [];
+                    $options = is_array($options_raw) ? $options_raw : json_decode($options_raw, true);
+
+                    if (is_array($options)) {
+                        foreach ($options as $eachValue) {
+                            array_push($attribute_data, $eachValue);
+                        }
                     }
                     unset($collection[$str]);
                 }

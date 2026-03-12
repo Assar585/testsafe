@@ -278,35 +278,35 @@ class ProductController extends Controller
 
     public function hs_code_search(Request $request)
     {
-        $q = strtolower(trim($request->get('q', '')));
-        \Log::info("HS Code Search START [Admin]", ['q' => $q]);
+        try {
+            $q = strtolower(trim($request->get('q', '')));
+            \Log::info("HS Code Search START [Admin]", ['q' => $q]);
 
-        $results = [];
-        $seen = [];
-        $limit = 5;
+            $results = [];
+            $seen = [];
+            $limit = 5;
 
-        $jsonPaths = [
-            public_path('assets/data/hs_codes_un.json'),
-            base_path('resources/data/hs_codes_un.json'),
-            public_path('assets/data/hs_codes.json'),
-            base_path('resources/data/hs_codes.json'),
-            '/app/public/assets/data/hs_codes_un.json', // Railway-specific absolute path
-            '/app/public/assets/data/hs_codes.json',
-        ];
+            $jsonPaths = [
+                public_path('assets/data/hs_codes_un.json'),
+                base_path('resources/data/hs_codes_un.json'),
+                public_path('assets/data/hs_codes.json'),
+                base_path('resources/data/hs_codes.json'),
+                '/app/public/assets/data/hs_codes_un.json',
+                '/app/public/assets/data/hs_codes.json',
+            ];
 
-        foreach ($jsonPaths as $path) {
-            if (count($results) >= $limit)
-                break;
+            foreach ($jsonPaths as $path) {
+                if (count($results) >= $limit)
+                    break;
 
-            if (file_exists($path)) {
-                try {
-                    $jsonContent = file_get_contents($path);
+                if (file_exists($path)) {
+                    $jsonContent = @file_get_contents($path);
                     if ($jsonContent === false) {
                         \Log::error("HS Code Search: Failed to read file: $path");
                         continue;
                     }
 
-                    // Remove BOM and non-printable characters at the start
+                    // Remove BOM
                     $jsonContent = preg_replace('/^[\xEF\xBB\xBF\xFE\xFF\xFF\xFE]*/', '', $jsonContent);
 
                     $data = json_decode($jsonContent, true);
@@ -317,11 +317,8 @@ class ProductController extends Controller
 
                     $items = isset($data['results']) ? $data['results'] : $data;
                     if (!is_array($items)) {
-                        \Log::warning("HS Code Search: Data is not an array in $path");
                         continue;
                     }
-
-                    \Log::info("HS Code Search: Searching in " . basename($path) . " (" . count($items) . " items)");
 
                     foreach ($items as $item) {
                         if (count($results) >= $limit)
@@ -344,17 +341,14 @@ class ProductController extends Controller
                             $seen[$id] = true;
                         }
                     }
-                } catch (\Exception $e) {
-                    \Log::error("HS Code Search EXCEPTION in $path: " . $e->getMessage());
                 }
-            } else {
-                \Log::debug("HS Code Search: File not found: $path");
             }
+
+            return response()->json($results, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
+        } catch (\Exception $e) {
+            \Log::error("HS Code Search CRITICAL ERROR: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        \Log::info("HS Code Search END", ['results_count' => count($results)]);
-
-        return response()->json($results, 200, ['Content-Type' => 'application/json; charset=utf-8'], JSON_UNESCAPED_UNICODE);
     }
 
 
@@ -366,79 +360,87 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        $product = $this->productService->store($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]));
-        $request->merge(['product_id' => $product->id]);
-
-        //Product categories
-        $product->categories()->attach($request->category_ids);
-
-        //VAT & Tax
-        if ($request->tax_id) {
-            $this->productTaxService->store($request->only([
+        try {
+            $product = $this->productService->store($request->except([
+                '_token',
+                'sku',
+                'choice',
                 'tax_id',
                 'tax',
                 'tax_type',
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type'
+            ]));
+            $request->merge(['product_id' => $product->id]);
+
+            //Product categories
+            $product->categories()->attach($request->category_ids);
+
+            //VAT & Tax
+            if ($request->tax_id) {
+                $this->productTaxService->store($request->only([
+                    'tax_id',
+                    'tax',
+                    'tax_type',
+                    'product_id'
+                ]));
+            }
+
+            // Delete other Taxes if GST Rate is updated
+            if ($request->has('gst_rate') && addon_is_activated('gst_system')) {
+                $product->taxes()->delete();
+            }
+
+            //Flash Deal
+            $this->productFlashDealService->store($request->only([
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type'
+            ]), $product);
+
+            //Product Stock
+            $this->productStockService->store($request->only([
+                'colors_active',
+                'colors',
+                'choice_no',
+                'unit_price',
+                'sku',
+                'current_stock',
+                'product_id'
+            ]), $product);
+
+            // Frequently Bought Products
+            $this->frequentlyBoughtProductService->store($request->only([
+                'product_id',
+                'frequently_bought_selection_type',
+                'fq_bought_product_ids',
+                'fq_bought_product_category_id'
+            ]));
+
+            // Product Translations
+            $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
+            ProductTranslation::create($request->only([
+                'lang',
+                'name',
+                'unit',
+                'description',
                 'product_id'
             ]));
+
+            flash(translate('Product has been inserted successfully'))->success();
+
+            Artisan::call('cache:clear');
+
+            return redirect()->route('products.all');
+        } catch (\Exception $e) {
+            \Log::error("Product store ERROR: " . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'request' => $request->all()
+            ]);
+            flash(translate('Something went wrong: ') . $e->getMessage())->error();
+            return back();
         }
-
-        // Delete other Taxes if GST Rate is updated
-        if ($request->has('gst_rate') && addon_is_activated('gst_system')) {
-            $product->taxes()->delete();
-        }
-
-        //Flash Deal
-        $this->productFlashDealService->store($request->only([
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]), $product);
-
-        //Product Stock
-        $this->productStockService->store($request->only([
-            'colors_active',
-            'colors',
-            'choice_no',
-            'unit_price',
-            'sku',
-            'current_stock',
-            'product_id'
-        ]), $product);
-
-        // Frequently Bought Products
-        $this->frequentlyBoughtProductService->store($request->only([
-            'product_id',
-            'frequently_bought_selection_type',
-            'fq_bought_product_ids',
-            'fq_bought_product_category_id'
-        ]));
-
-        // Product Translations
-        $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
-        ProductTranslation::create($request->only([
-            'lang',
-            'name',
-            'unit',
-            'description',
-            'product_id'
-        ]));
-
-        flash(translate('Product has been inserted successfully'))->success();
-
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-
-        return redirect()->route('products.admin');
     }
 
     public function store_as_draft(ProductDraftRequest $request)
