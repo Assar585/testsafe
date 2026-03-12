@@ -310,7 +310,7 @@ class ProductController extends Controller
             ]));
 
             // Product Translations
-            $request->merge(['lang' => env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en')]);
+            $request->merge(['lang' => $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'))]);
             ProductTranslation::create($request->only([
                 'lang',
                 'name',
@@ -641,6 +641,21 @@ class ProductController extends Controller
         $base_sku = $request->sku;
         $combinations = (new CombinationService())->generate_combination($options);
         return view('backend.product.products.sku_combinations_edit', compact('combinations', 'unit_price', 'colors_active', 'product_name', 'product', 'base_sku'));
+    }
+
+    public function check_sku_availability(Request $request)
+    {
+        $sku = $request->sku;
+        $product_id = $request->product_id;
+
+        $query = \App\Models\ProductStock::where('sku', $sku);
+        if ($product_id) {
+            $query->where('product_id', '!=', $product_id);
+        }
+
+        $exists = $query->exists();
+
+        return response()->json(['exists' => $exists]);
     }
 }
 

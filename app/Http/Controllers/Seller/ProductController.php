@@ -165,7 +165,7 @@ class ProductController extends Controller
         ]));
 
         // Product Translations
-        $request->merge(['lang' => env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en')]);
+        $request->merge(['lang' => $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'))]);
         ProductTranslation::create($request->only([
             'lang',
             'name',
@@ -619,6 +619,7 @@ class ProductController extends Controller
             $q->where('user_id', $user_id);
         })->exists();
 
+        return response()->json(['exists' => $exists]);
     }
     public function hs_code_search(Request $request)
     {
