@@ -671,6 +671,7 @@ class ProductService
         
         unset($collection['button']);
 
+        $lang = $collection['lang'] ?? (env('DEFAULT_LANGUAGE') ?? config('app.locale', 'en'));
      
         $productData = $collection->merge(compact(
             'user_id',
@@ -690,11 +691,27 @@ class ProductService
             $product = Product::find($collection['id']);
             if ($product) {
                 $product->update($productData);
-                return $product;
             }
+        } else {
+            $product = Product::create($productData);
         }
 
-        return Product::create($productData);
+        // Product Translations
+        if ($product) {
+            \App\Models\ProductTranslation::updateOrCreate(
+                [
+                    'product_id' => $product->id,
+                    'lang' => $lang
+                ],
+                [
+                    'name' => $collection['name'] ?? '',
+                    'unit' => $collection['unit'] ?? '',
+                    'description' => $collection['description'] ?? '',
+                ]
+            );
+        }
+
+        return $product;
     }
 
     public function products_search(array $data)

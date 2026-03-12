@@ -334,18 +334,27 @@ class ProductController extends Controller
 
     public function store_as_draft(ProductDraftRequest $request)
     {
-        //Log::info('Product stoate Request:', $request->all());
-        if (isset($request->id)) {
-            $product = Product::find($request->id);
-            if ($product) {
-                $product = $this->productService->update($request->except(['_token']), $product);
+        try {
+            if (isset($request->id)) {
+                $product = Product::find($request->id);
+                if ($product) {
+                    $product = $this->productService->update($request->except(['_token']), $product);
+                }
+            } else {
+                $product = $this->productService->storeOrUpdateDraft($request->except(['_token']));
             }
-        } else {
-            $product = $this->productService->storeOrUpdateDraft($request->except(['_token']));
-        }
 
-        flash(translate('Product has been saved as draft successfully'))->success();
-        return redirect()->route('products.all');
+            return response()->json([
+                'success' => true,
+                'product_id' => $product->id,
+                'message' => translate('Product has been saved as draft successfully')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

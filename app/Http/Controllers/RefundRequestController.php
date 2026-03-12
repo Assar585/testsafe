@@ -706,21 +706,28 @@ class RefundRequestController extends Controller
 
     public function checkRefundableCategory(Request $request)
     {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id'
-        ]);
+        try {
+            $request->validate([
+                'category_id' => 'required|exists:categories,id'
+            ]);
 
-        $category = Category::findOrFail($request->category_id);
+            $category = Category::findOrFail($request->category_id);
 
-        $isRefundable = $category->refund_request_time > 0;
+            $isRefundable = $category->refund_request_time > 0;
 
-        return response()->json([
-            'status' => 'success',
-            'is_refundable' => $isRefundable,
-            'message' => $isRefundable
-                ? 'Category is refundable.'
-                : 'Category is not refundable.'
-        ]);
+            return response()->json([
+                'status' => 'success',
+                'is_refundable' => $isRefundable,
+                'message' => $isRefundable
+                    ? 'Category is refundable.'
+                    : 'Category is not refundable.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Could not verify category refund status: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function checkSellerRefundableCategory(Request $request)
