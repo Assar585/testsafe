@@ -11,23 +11,21 @@ class FrequentlyBoughtProductService
     {
         $collection = collect($data);
         
-        if(isset($collection['fq_bought_product_ids']) && 
-            $collection['fq_bought_product_ids'] != null && 
-                $collection['frequently_bought_selection_type'] == 'product' ){
-            foreach($collection['fq_bought_product_ids'] as $fq_product){
+        $selection_type = $collection->get('frequently_bought_selection_type');
+        $product_id = $collection->get('product_id');
 
+        if($selection_type == 'product' && $collection->get('fq_bought_product_ids')) {
+            foreach($collection->get('fq_bought_product_ids') as $fq_product){
                 FrequentlyBoughtProduct::insert([
-                    'product_id' => $collection['product_id'],
+                    'product_id' => $product_id,
                     'frequently_bought_product_id' => $fq_product,
                 ]);
             }
         }
-        elseif(isset($collection['fq_bought_product_category_id']) && 
-                $collection['fq_bought_product_category_id'] != null && 
-                    $collection['frequently_bought_selection_type'] == 'category') {
+        elseif($selection_type == 'category' && $collection->get('fq_bought_product_category_id')) {
             FrequentlyBoughtProduct::insert([
-                'product_id' => $collection['product_id'],
-                'category_id' => $collection['fq_bought_product_category_id'],
+                'product_id' => $product_id,
+                'category_id' => $collection->get('fq_bought_product_category_id'),
             ]);
         }
         

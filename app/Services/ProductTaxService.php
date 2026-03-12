@@ -10,13 +10,18 @@ class ProductTaxService
     {
         $collection = collect($data);
 
-        if ($collection['tax_id']) {
-            foreach ($collection['tax_id'] as $key => $val) {
+        $tax_ids = $collection->get('tax_id');
+        if (is_array($tax_ids)) {
+            $taxes = $collection->get('tax', []);
+            $tax_types = $collection->get('tax_type', []);
+            $product_id = $collection->get('product_id');
+
+            foreach ($tax_ids as $key => $val) {
                 $product_tax = new ProductTax();
                 $product_tax->tax_id = $val;
-                $product_tax->product_id = $collection['product_id'];
-                $product_tax->tax = $collection['tax'][$key];
-                $product_tax->tax_type = $collection['tax_type'][$key];
+                $product_tax->product_id = $product_id;
+                $product_tax->tax = $taxes[$key] ?? 0;
+                $product_tax->tax_type = $tax_types[$key] ?? 'amount';
                 $product_tax->save();
             }
         }
