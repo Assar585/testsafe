@@ -61,7 +61,7 @@
                                                 <label class="col-from-label fs-13">{{translate('Product Name')}} <span
                                                         class="text-danger">*</span></label>
                                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                                    name="name" placeholder="{{translate('Product Name')}}"
+                                                    name="name" id="product_name" placeholder="{{translate('Product Name')}}"
                                                     value="{{ $product->getTranslation('name', $lang) }}">
                                             </div>
                                             <!-- Brand -->
@@ -190,7 +190,7 @@
                                             @endif
                                         </div>
                                         <div class="">
-                                            <textarea class="aiz-text-editor"
+                                            <textarea class="aiz-text-editor" id="product_description"
                                                 name="description">{{ $product->getTranslation('description', $lang) }}</textarea>
                                         </div>
                                     </div>
@@ -471,8 +471,8 @@
                                                     <input type="hidden" name="choice_no[]"
                                                         value="{{ $choice_option->attribute_id }}">
                                                     <input type="text" class="form-control" name="choice[]"
-                                                        value="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}"
-                                                        placeholder="{{ translate('Choice Title') }}" disabled>
+                                                        value="{{ \App\Models\Attribute::find($choice_option->attribute_id)->getTranslation('name') }}"
+                                                        placeholder="{{ translate('Choice Title') }}" readonly>
                                                 </div>
                                                 <div class="col-lg-8">
                                                     <select class="form-control aiz-selectpicker attribute_choice"
@@ -1000,18 +1000,56 @@
                 }
             });
 
-            var str = {!! $product->attributes !!};
-            $.each(str, function (index, value) {
-                flag = false;
-                $.each($("#choice_attributes option:selected"), function (j, attribute) {
-                    if (value == $(attribute).val()) { flag = true; }
+            $('input[name="choice_no[]"]').each(function () {
+                var choice_no = $(this).val();
+                var found = false;
+                $('#choice_attributes option:selected').each(function () {
+                    if ($(this).val() == choice_no) {
+                        found = true;
+                    }
                 });
-                if (!flag) {
-                    $('input[name="choice_no[]"][value="' + value + '"]').parent().parent().remove();
+                if (!found) {
+                    $(this).closest('.form-group').remove();
                 }
             });
+
             update_sku();
         });
+
+        // AI Generation Handler
+        function generateDescriptionAI() {
+            if (!$('#product_name').val() || !$('#category_id').val()) {
+                AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
+                return;
+            }
+
+            let originalBtnHtml = $('button[onclick="generateDescriptionAI()"]').html();
+            $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
+
+            $.post('{{ route('seller.ai.generate') }}', {
+                _token: '{{ csrf_token() }}',
+                product_name: $('#product_name').val(),
+                category_id: $('#category_id').val()
+            }, function (data) {
+                if (data.success) {
+                    $('#product_description').val(data.description).siblings('.note-editor').find('.note-editable').html(data.description);
+                    $('input[name="meta_title"]').val(data.meta_title);
+                    $('textarea[name="meta_description"]').val(data.meta_description);
+
+                    AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
+                } else {
+                    AIZ.plugins.notify('danger', data.message || '{{ translate("Failed to generate description.") }}');
+                }
+            }).fail(function (xhr) {
+                let errorMessage = '{{ translate("An error occurred during AI generation.") }}';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                AIZ.plugins.notify('danger', errorMessage);
+            }).always(function () {
+                $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
+            });
+        }
 
         // Warranty
         function warrantySelection() {
