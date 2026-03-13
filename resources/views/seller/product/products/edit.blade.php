@@ -10,7 +10,7 @@
             <h1 class="h3">{{ translate('Update your product') }}</h1>
         </div>
         <div class="col-md-6 text-right">
-            <a href="{{ route('seller.products.index') }}" class="btn btn-link text-reset">
+            <a href="{{ route('seller.products') }}" class="btn btn-link text-reset">
                 <i class="las la-angle-left"></i>
                 <span>{{translate('Back to product list')}}</span>
             </a>
