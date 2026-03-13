@@ -30,7 +30,7 @@
 @endif
 
 <form class="" action="{{route('seller.products.update', $product->id)}}" method="POST" enctype="multipart/form-data"
-    id="choice_form">
+    id="aizSubmitForm">
     <div class="row gutters-5">
         <div class="col-12">
             <input name="_method" type="hidden" value="POST">
@@ -1108,9 +1108,9 @@
     function update_sku(){
         $.ajax({
            type:"POST",
-           url:'{{ route('seller.products.sku_combination_edit') }}',
-           data:$('#choice_form').serialize(),
-           success: function(data){
+                url: '{{ route('seller.products.sku_combination') }}',
+                data: $('#aizSubmitForm').serialize(),
+                success: function (data) {
                $('#sku_combination').html(data);
                setTimeout(() => {
                         AIZ.uploader.previewGenerate();

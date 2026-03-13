@@ -35,7 +35,7 @@
                 <input type="hidden" id="data_type" value="physical">
 
                 <form action="{{ route('seller.products.store') }}" method="POST" enctype="multipart/form-data"
-                    id="choice_form">
+                    id="aizSubmitForm">
                     @csrf
                     <input type="hidden" name="added_by" value="seller">
 
@@ -1021,7 +1021,7 @@
             $.ajax({
                 type: "POST",
                 url: '{{ route('seller.products.sku_combination') }}',
-                data: $('#choice_form').serialize(),
+                data: $('#aizSubmitForm').serialize(),
                 success: function (data) {
                     $('#sku_combination').html(data);
                     AIZ.uploader.previewGenerate();
