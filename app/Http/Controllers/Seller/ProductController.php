@@ -445,34 +445,46 @@ class ProductController extends Controller
         return 0;
     }
 
-    public function duplicate($id)
+    public function duplicate(Request $request, $id)
     {
         try {
-            $product = Product::find($id);
+            $product = Product::findOrFail($id);
 
             if (Auth::user()->id != $product->user_id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => translate('This product is not yours.')
-                ], 403);
+                if ($request->ajax()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => translate('This product is not yours.')
+                    ], 403);
+                }
+                flash(translate('This product is not yours.'))->warning();
+                return back();
             }
 
             if (addon_is_activated('seller_subscription')) {
                 if (!seller_package_validity_check()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => translate('Please upgrade your package.')
-                    ], 403);
+                    if ($request->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => translate('Please upgrade your package.')
+                        ], 403);
+                    }
+                    flash(translate('Please upgrade your package.'))->warning();
+                    return back();
                 }
             }
 
             if (addon_is_activated('gst_system')) {
                 $shop = Auth::user()->shop;
                 if ($shop && !$shop->gst_verification) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => translate('GST verification is pending for your account.')
-                    ], 403);
+                    if ($request->ajax()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => translate('GST verification is pending for your account.')
+                        ], 403);
+                    }
+                    flash(translate('GST verification is pending for your account.'))->warning();
+                    return back();
                 }
             }
 
@@ -495,16 +507,25 @@ class ProductController extends Controller
 
             Artisan::call('cache:clear');
 
-            return response()->json([
-                'success' => true,
-                'message' => translate('Product has been duplicated successfully'),
-                'redirect' => route('seller.products')
-            ]);
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => translate('Product has been duplicated successfully'),
+                    'redirect' => route('seller.products')
+                ]);
+            }
+
+            flash(translate('Product has been duplicated successfully'))->success();
+            return redirect()->route('seller.products');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => translate('Something went wrong: ') . $e->getMessage()
-            ], 500);
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => translate('Something went wrong: ') . $e->getMessage()
+                ], 500);
+            }
+            flash(translate('Something went wrong: ') . $e->getMessage())->error();
+            return back();
         }
     }
 
