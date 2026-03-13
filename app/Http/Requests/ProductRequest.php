@@ -29,7 +29,7 @@ class ProductRequest extends FormRequest
         $rules['name']          = 'required|max:255';
         $rules['category_ids']  = 'required';
         $rules['category_id']   = ['required', Rule::in($this->category_ids)];
-        $rules['unit']         = 'sometimes|required|regex:/^[A-Za-z\s]+$/';
+        $rules['unit']         = 'sometimes|required';
         $rules['min_qty']      = 'sometimes|required|numeric';
         $rules['unit_price']    = 'sometimes|required|numeric|gt:0';
         if ($this->get('discount_type') == 'amount') {
@@ -73,7 +73,6 @@ class ProductRequest extends FormRequest
             'current_stock.numeric'     => translate('Current stock must be numeric'),
             'starting_bid.required'     => translate('Starting Bid is required'),
             'starting_bid.numeric'      => translate('Starting Bid must be numeric'),
-            'starting_bid.required'     => translate('Minimum Starting Bid is 1'),
             'auction_date_range.required' => translate('Auction Date Range is required'),
         ];
 

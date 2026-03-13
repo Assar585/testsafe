@@ -114,30 +114,37 @@ class ProductController extends Controller
             'category_ids' => $request->category_ids ?? [],
         ]);
 
-        $product = $this->productService->store($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]));
-        $request->merge(['product_id' => $product->id]);
-
-        ///Product categories
-        $product->categories()->attach($request->category_ids);
-
-        //VAT & Tax
-        if ($request->tax_id) {
-            $this->productTaxService->store($request->only([
+        try {
+            $product = $this->productService->store($request->except([
+                '_token',
+                'sku',
+                'choice',
                 'tax_id',
                 'tax',
                 'tax_type',
-                'product_id'
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type'
             ]));
+            $request->merge(['product_id' => $product->id]);
+
+            ///Product categories
+            $product->categories()->attach($request->category_ids);
+
+            //VAT & Tax
+            if ($request->tax_id) {
+                $this->productTaxService->store($request->only([
+                    'tax_id',
+                    'tax',
+                    'tax_type',
+                    'product_id'
+                ]));
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
         }
 
         // Delete other Taxes if GST Rate is updated
@@ -226,34 +233,41 @@ class ProductController extends Controller
     public function update(ProductRequest $request, Product $product)
     {
         //Product
-        $product = $this->productService->update($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]), $product);
+        try {
+            $product = $this->productService->update($request->except([
+                '_token',
+                'sku',
+                'choice',
+                'tax_id',
+                'tax',
+                'tax_type',
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type'
+            ]), $product);
 
-        $request->merge(['product_id' => $product->id]);
+            $request->merge(['product_id' => $product->id]);
 
-        //Product categories
-        $product->categories()->sync($request->category_ids);
+            //Product categories
+            $product->categories()->sync($request->category_ids);
 
-        //Product Stock
-        $product->stocks()->delete();
-        $this->productStockService->store($request->only([
-            'colors_active',
-            'colors',
-            'choice_no',
-            'unit_price',
-            'sku',
-            'current_stock',
-            'product_id'
-        ]), $product);
+            //Product Stock
+            $product->stocks()->delete();
+            $this->productStockService->store($request->only([
+                'colors_active',
+                'colors',
+                'choice_no',
+                'unit_price',
+                'sku',
+                'current_stock',
+                'product_id'
+            ]), $product);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
 
         //VAT & Tax
         if ($request->tax_id) {
