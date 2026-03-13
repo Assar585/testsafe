@@ -45,7 +45,7 @@
                                 <div class="col-xxl-7 col-xl-6">
                                     <div class="form-group mb-3">
                                         <label class="col-from-label fs-13">{{translate('Product Name')}} <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="name" placeholder="{{translate('Product Name')}}" required>
+                                        <input type="text" class="form-control" name="name" id="product_name" placeholder="{{translate('Product Name')}}" required>
                                     </div>
                                     <div class="form-group mb-3">
                                         <label class="col-from-label fs-13">{{ translate('Product File')}} <span class="text-danger">*</span></label>
@@ -70,29 +70,25 @@
                                 <div class="col-xxl-5 col-xl-6 mt-4 mt-xl-0">
                                     <div class="form-group mb-3">
                                         <label class="col-from-label fs-13">{{translate('Product Category')}} <span class="text-danger">*</span></label>
-                                        <div class="w-100 border p-3" style="max-height: 250px; overflow-y: auto;">
-                                            <ul id="treeview" class="hummingbird-base">
-                                                @foreach ($categories as $category)
-                                                    <li>
-                                                        <i class="las la-plus"></i>
-                                                        <label>
-                                                            <input id="category-{{ $category->id }}" name="category_id"
-                                                                type="radio" value="{{ $category->id }}" required>
-                                                            {{ $category->getTranslation('name') }}
-                                                        </label>
-                                                        @if (count($category->childrenCategories) > 0)
-                                                            <ul>
-                                                                @foreach ($category->childrenCategories as $childCategory)
-                                                                    @include('seller.product.products.child_category', [
-                                                                        'child_category' => $childCategory,
-                                                                    ])
-                                                                @endforeach
-                                                            </ul>
-                                                        @endif
-                                                    </li>
+                                        <select class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror" name="category_id" id="category_id" data-live-search="true" required>
+                                            <option value="">{{ translate('Select Category') }}</option>
+                                            @foreach ($categories as $category)
+                                                <option value="{{ $category->id }}">
+                                                    {{ $category->getTranslation('name') }}
+                                                </option>
+                                                @foreach ($category->childrenCategories as $childCategory)
+                                                    <option value="{{ $childCategory->id }}">
+                                                        &nbsp;&nbsp;&nbsp;-- {{ $childCategory->getTranslation('name') }}
+                                                    </option>
+                                                    @foreach ($childCategory->childrenCategories as $subChildCategory)
+                                                        <option value="{{ $subChildCategory->id }}">
+                                                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
+                                                            {{ $subChildCategory->getTranslation('name') }}
+                                                        </option>
+                                                    @endforeach
                                                 @endforeach
-                                            </ul>
-                                        </div>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     
                                     @if (addon_is_activated('gst_system'))
@@ -111,12 +107,21 @@
                     <!-- Product Description -->
                     <div class="card mb-4" id="product_description">
                         <div class="bg-white p-3 p-sm-2rem">
-                            <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{translate('Product Description')}}
-                            </h5>
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0 fs-17 fw-700">
+                                    {{translate('Product Description')}}
+                                </h5>
+                                @if(Route::has('seller.ai.generate'))
+                                <button type="button" class="btn btn-sm btn-soft-primary"
+                                    onclick="generateDescriptionAI()">
+                                    <i class="las la-magic"></i> {{translate('Generate description by AI')}}
+                                </button>
+                                @endif
+                            </div>
+                            <div class="border-bottom border-gray border-dashed mb-3"></div>
                             <div class="w-100">
                                 <div class="form-group mb-0">
-                                    <textarea class="aiz-text-editor" name="description"></textarea>
+                                    <textarea class="aiz-text-editor" id="product_description" name="description"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -336,20 +341,11 @@
 @endsection
 
 @section('script')
-    <!-- Treeview js -->
-    <script src="{{ static_asset('assets/js/hummingbird-treeview.js') }}"></script>
-
     <script type="text/javascript">
         $(document).ready(function () {
-            $("#treeview").hummingbird();
+            // $("#treeview").hummingbird(); // Removed fixed dropdown dropdown
 
-            $('#treeview input:checkbox').on("click", function () {
-                let $this = $(this);
-                if ($this.prop('checked') && ($('#treeview input:radio:checked').length == 0)) {
-                    let val = $this.val();
-                    $('#treeview input:radio[value=' + val + ']').prop('checked', true);
-                }
-            });
+            // Category selection removal if needed, but selectpicker handles it
 
             // HS Code Select2 AJAX autocomplete
             if ($('#hsn_code_select').length) {
@@ -372,6 +368,49 @@
                 });
             }
         });
+
+        // AI Generation Handler
+        function generateDescriptionAI() {
+            var productName = $('#product_name').val();
+            var categoryId = $('#category_id').val();
+
+            if (!productName || !categoryId) {
+                AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
+                return;
+            }
+
+            let originalBtnHtml = $('button[onclick="generateDescriptionAI()"]').html();
+            $('button[onclick="generateDescriptionAI()"]').html('<i class="las la-spinner la-spin"></i> {{ translate("Generating...") }}').prop('disabled', true);
+
+            $.post('{{ route('seller.ai.generate') }}', {
+                _token: '{{ csrf_token() }}',
+                product_name: productName,
+                category_id: categoryId
+            }, function (data) {
+                if (data.success) {
+                    if ($('#product_description').length) {
+                        $('#product_description').val(data.description);
+                        if ($('#product_description').siblings('.note-editor').length) {
+                            $('#product_description').siblings('.note-editor').find('.note-editable').html(data.description);
+                        }
+                    }
+                    $('input[name="meta_title"]').val(data.meta_title);
+                    $('textarea[name="meta_description"]').val(data.meta_description);
+
+                    AIZ.plugins.notify('success', '{{ translate("AI Description & SEO Meta Tags generated successfully!") }}');
+                } else {
+                    AIZ.plugins.notify('danger', data.message || '{{ translate("Failed to generate description.") }}');
+                }
+            }).fail(function (xhr) {
+                let errorMessage = '{{ translate("An error occurred during AI generation.") }}';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    errorMessage = xhr.responseJSON.message;
+                }
+                AIZ.plugins.notify('danger', errorMessage);
+            }).always(function () {
+                $('button[onclick="generateDescriptionAI()"]').html(originalBtnHtml).prop('disabled', false);
+            });
+        }
 
         function fq_bought_product_selection_type() {
             var productSelectionType = $("input[name='frequently_bought_selection_type']:checked").val();
