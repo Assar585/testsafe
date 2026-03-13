@@ -485,7 +485,8 @@ class ProductController extends Controller
         $categories = Category::where('parent_id', 0)
             ->with('childrenCategories')
             ->get();
-        return view('backend.product.products.edit', compact('product', 'categories', 'tags', 'lang'));
+        $type = 'admin';
+        return view('backend.product.products.edit', compact('product', 'categories', 'tags', 'lang', 'type'));
     }
 
     /**
@@ -506,7 +507,8 @@ class ProductController extends Controller
         $categories = Category::where('parent_id', 0)
             ->with('childrenCategories')
             ->get();
-        return view('backend.product.products.edit', compact('product', 'categories', 'tags', 'lang'));
+        $type = 'seller';
+        return view('backend.product.products.edit', compact('product', 'categories', 'tags', 'lang', 'type'));
     }
 
     /**
@@ -609,6 +611,19 @@ class ProductController extends Controller
 
         Artisan::call('cache:clear');
 
+        return 1;
+    }
+
+    public function bulk_product_delete(Request $request)
+    {
+        if ($request->id) {
+            foreach ($request->id as $product_id) {
+                $this->productService->destroy($product_id);
+            }
+        }
+
+        flash(translate('Products has been deleted successfully'))->success();
+        Artisan::call('cache:clear');
         return 1;
     }
 
