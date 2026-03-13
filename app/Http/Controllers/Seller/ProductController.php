@@ -426,47 +426,65 @@ class ProductController extends Controller
 
     public function duplicate($id)
     {
-        $product = Product::find($id);
+        try {
+            $product = Product::find($id);
 
-        if (Auth::user()->id != $product->user_id) {
-            flash(translate('This product is not yours.'))->warning();
-            return back();
-        }
-
-        if (addon_is_activated('seller_subscription')) {
-            if (!seller_package_validity_check()) {
-                flash(translate('Please upgrade your package.'))->warning();
-                return back();
+            if (Auth::user()->id != $product->user_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => translate('This product is not yours.')
+                ], 403);
             }
-        }
 
-        if (addon_is_activated('gst_system')) {
-            $shop = Auth::user()->shop;
-            if ($shop && !$shop->gst_verification) {
-                flash(translate('GST verification is pending for your account.'))->warning();
-                return redirect()->route('seller.products');
+            if (addon_is_activated('seller_subscription')) {
+                if (!seller_package_validity_check()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => translate('Please upgrade your package.')
+                    ], 403);
+                }
             }
-        }
 
-        //Product
-        $product_new = $this->productService->product_duplicate_store($product);
+            if (addon_is_activated('gst_system')) {
+                $shop = Auth::user()->shop;
+                if ($shop && !$shop->gst_verification) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => translate('GST verification is pending for your account.')
+                    ], 403);
+                }
+            }
 
-        //Product Stock
-        $this->productStockService->product_duplicate_store($product->stocks, $product_new);
+            //Product
+            $product_new = $this->productService->product_duplicate_store($product);
 
-        //VAT & Tax
-        $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
+            //Product Stock
+            $this->productStockService->product_duplicate_store($product->stocks, $product_new);
 
-        // Product Categories
-        foreach ($product->product_categories as $product_category) {
-            ProductCategory::insert([
-                'product_id' => $product_new->id,
-                'category_id' => $product_category->category_id,
+            //VAT & Tax
+            $this->productTaxService->product_duplicate_store($product->taxes, $product_new);
+
+            // Product Categories
+            foreach ($product->product_categories as $product_category) {
+                ProductCategory::insert([
+                    'product_id' => $product_new->id,
+                    'category_id' => $product_category->category_id,
+                ]);
+            }
+
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been duplicated successfully'),
+                'redirect' => route('seller.products')
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
         }
-
-        flash(translate('Product has been duplicated successfully'))->success();
-        return redirect()->route('seller.products');
     }
 
     public function destroy($id)

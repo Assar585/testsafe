@@ -662,14 +662,22 @@ class ProductController extends Controller
 
     public function duplicate(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
-        $product_new = $this->productService->product_duplicate_store($product);
+        try {
+            $product = Product::findOrFail($id);
+            $product_new = $this->productService->product_duplicate_store($product);
 
-        flash(translate('Product has been duplicated successfully'))->success();
-        if ($product_new->added_by == 'admin') {
-            return redirect()->route('products.all');
-        } else {
-            return redirect()->route('seller.products.all');
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => translate('Product has been duplicated successfully'),
+                'redirect' => $product_new->added_by == 'admin' ? route('products.all') : route('seller.products.all')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
         }
     }
 
