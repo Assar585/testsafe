@@ -26,6 +26,14 @@ php /var/www/artisan migrate --force || echo "Warning: Migration failed..."
 
 echo "Startup initialization complete. Proceeding to start services..."
 
+# Fix permissions for storage and bootstrap/cache (critical for logging and viewing)
+echo "Fixing permissions..."
+find /var/www/storage -type d -exec chmod 775 {} \;
+find /var/www/storage -type f -exec chmod 664 {} \;
+find /var/www/bootstrap/cache -type d -exec chmod 775 {} \;
+find /var/www/bootstrap/cache -type f -exec chmod 664 {} \;
+chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
 # Start Nginx
 service nginx start
 
