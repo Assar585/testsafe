@@ -76,8 +76,43 @@
                                             <div class="form-group mb-2">
                                                 <label class="col-from-label fs-13">{{ translate('Unit') }} <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" name="unit"
-                                                    placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}" required>
+                                                <select
+                                                    class="form-control aiz-selectpicker @error('unit') is-invalid @enderror"
+                                                    name="unit" data-live-search="true" required>
+                                                    <option value="{{ translate('Piece') }}" @selected(old('unit', translate('Piece')) == translate('Piece'))>{{ translate('Piece') }}
+                                                    </option>
+                                                    <option value="{{ translate('Service') }}"
+                                                        @selected(old('unit') == translate('Service'))>
+                                                        {{ translate('Service') }}
+                                                    </option>
+                                                    <option value="{{ translate('KG') }}"
+                                                        @selected(old('unit') == translate('KG'))>{{ translate('KG') }}
+                                                    </option>
+                                                    <option value="{{ translate('Ton') }}"
+                                                        @selected(old('unit') == translate('Ton'))>{{ translate('Ton') }}
+                                                    </option>
+                                                    <option value="{{ translate('Gram') }}"
+                                                        @selected(old('unit') == translate('Gram'))>{{ translate('Gram') }}
+                                                    </option>
+                                                    <option value="{{ translate('Liter') }}"
+                                                        @selected(old('unit') == translate('Liter'))>{{ translate('Liter') }}
+                                                    </option>
+                                                    <option value="{{ translate('Milliliter') }}"
+                                                        @selected(old('unit') == translate('Milliliter'))>
+                                                        {{ translate('Milliliter') }}
+                                                    </option>
+                                                    <option value="{{ translate('Meter') }}"
+                                                        @selected(old('unit') == translate('Meter'))>{{ translate('Meter') }}
+                                                    </option>
+                                                    <option value="{{ translate('Sq. Meter') }}"
+                                                        @selected(old('unit') == translate('Sq. Meter'))>
+                                                        {{ translate('Sq. Meter') }}
+                                                    </option>
+                                                    <option value="{{ translate('Cubic Meter') }}"
+                                                        @selected(old('unit') == translate('Cubic Meter'))>
+                                                        {{ translate('Cubic Meter') }}
+                                                    </option>
+                                                </select>
                                             </div>
                                             <!-- Weight -->
                                             <div class="form-group mb-2">
@@ -358,7 +393,7 @@
                                             <div class="form-group mb-2">
                                                 <label class="col-from-label fs-13">{{ translate('Unit price') }} <span
                                                         class="text-danger">*</span></label>
-                                                <input type="number" lang="en" min="0" value="0" step="0.01"
+                                                <input type="number" lang="en" min="0" value="{{ old('unit_price') }}" step="0.01"
                                                     placeholder="{{ translate('Unit price') }}" name="unit_price"
                                                     class="form-control" required>
                                             </div>

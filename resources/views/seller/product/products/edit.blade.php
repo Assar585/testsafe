@@ -75,9 +75,21 @@
                             </div>
                             <div class="form-group mb-3">
                                 <label class="col-from-label fs-13">{{translate('Unit')}} <i class="las la-language text-danger" title="{{translate('Translatable')}}"></i></label>
-                                <input type="text" class="form-control" name="unit"
-                                    placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}"
-                                    value="{{$product->getTranslation('unit', $lang)}}" required>
+                                <select class="form-control aiz-selectpicker @error('unit') is-invalid @enderror" name="unit" data-live-search="true" required>
+                                    @php
+                                        $current_unit = old('unit', $product->getTranslation('unit', $lang));
+                                    @endphp
+                                    <option value="{{ translate('Piece') }}" @selected($current_unit == translate('Piece'))>{{ translate('Piece') }}</option>
+                                    <option value="{{ translate('Service') }}" @selected($current_unit == translate('Service'))>{{ translate('Service') }}</option>
+                                    <option value="{{ translate('KG') }}" @selected($current_unit == translate('KG'))>{{ translate('KG') }}</option>
+                                    <option value="{{ translate('Ton') }}" @selected($current_unit == translate('Ton'))>{{ translate('Ton') }}</option>
+                                    <option value="{{ translate('Gram') }}" @selected($current_unit == translate('Gram'))>{{ translate('Gram') }}</option>
+                                    <option value="{{ translate('Liter') }}" @selected($current_unit == translate('Liter'))>{{ translate('Liter') }}</option>
+                                    <option value="{{ translate('Milliliter') }}" @selected($current_unit == translate('Milliliter'))>{{ translate('Milliliter') }}</option>
+                                    <option value="{{ translate('Meter') }}" @selected($current_unit == translate('Meter'))>{{ translate('Meter') }}</option>
+                                    <option value="{{ translate('Sq. Meter') }}" @selected($current_unit == translate('Sq. Meter'))>{{ translate('Sq. Meter') }}</option>
+                                    <option value="{{ translate('Cubic Meter') }}" @selected($current_unit == translate('Cubic Meter'))>{{ translate('Cubic Meter') }}</option>
+                                </select>
                             </div>
                             <div class="form-group mb-3">
                                 <label class="col-from-label fs-13">{{translate('Weight')}} <small>({{ translate('In Kg') }})</small></label>
