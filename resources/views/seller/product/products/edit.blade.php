@@ -471,7 +471,7 @@
                                                         value="{{ $choice_option->attribute_id }}">
                                                     <input type="text" class="form-control" name="choice[]"
                                                         value="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}"
-                                                        placeholder="{{ translate('Choice Title') }}" disabled title="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}">
+                                                        placeholder="{{ translate('Choice Title') }}" readonly title="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}">
                                                 </div>
                                                 <div class="col-md-8">
                                                     <select class="form-control aiz-selectpicker attribute_choice"
@@ -915,7 +915,7 @@
                         <div class="form-group row">\
                             <div class="col-md-3">\
                                 <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly>\
+                                <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly title="' + name + '">\
                             </div>\
                             <div class="col-md-8">\
                                 <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
