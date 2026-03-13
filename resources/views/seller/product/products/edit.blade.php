@@ -460,21 +460,20 @@
                                     </div>
                                     <div>
                                         <p>{{ translate('Choose the attributes of this product and then input values of each attribute') }}</p>
-                                        <br>
                                     </div>
 
                                     <!-- choice options -->
                                     <div class="customer_choice_options" id="customer_choice_options">
                                         @foreach (json_decode($product->choice_options ?? '[]') as $key => $choice_option)
                                             <div class="form-group row">
-                                                <div class="col-lg-3">
+                                                <div class="col-md-3">
                                                     <input type="hidden" name="choice_no[]"
                                                         value="{{ $choice_option->attribute_id }}">
                                                     <input type="text" class="form-control" name="choice[]"
-                                                        value="{{ \App\Models\Attribute::find($choice_option->attribute_id)->getTranslation('name') }}"
-                                                        placeholder="{{ translate('Choice Title') }}" readonly>
+                                                        value="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}"
+                                                        placeholder="{{ translate('Choice Title') }}" disabled title="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}">
                                                 </div>
-                                                <div class="col-lg-8">
+                                                <div class="col-md-8">
                                                     <select class="form-control aiz-selectpicker attribute_choice"
                                                         data-live-search="true"
                                                         name="choice_options_{{ $choice_option->attribute_id }}[]"
@@ -1009,7 +1008,7 @@
                     }
                 });
                 if (!found) {
-                    $(this).closest('.form-group').remove();
+                    $(this).parent().parent().remove();
                 }
             });
 
@@ -1018,7 +1017,10 @@
 
         // AI Generation Handler
         function generateDescriptionAI() {
-            if (!$('#product_name').val() || !$('#category_id').val()) {
+            var productName = $('#product_name').val();
+            var categoryId = $('#category_id').val();
+
+            if (!productName || !categoryId) {
                 AIZ.plugins.notify('danger', '{{ translate("Please enter a Product Name and select a Category first to generate an AI description.") }}');
                 return;
             }
@@ -1028,11 +1030,16 @@
 
             $.post('{{ route('seller.ai.generate') }}', {
                 _token: '{{ csrf_token() }}',
-                product_name: $('#product_name').val(),
-                category_id: $('#category_id').val()
+                product_name: productName,
+                category_id: categoryId
             }, function (data) {
                 if (data.success) {
-                    $('#product_description').val(data.description).siblings('.note-editor').find('.note-editable').html(data.description);
+                    if ($('#product_description').length) {
+                        $('#product_description').val(data.description);
+                        if ($('#product_description').siblings('.note-editor').length) {
+                            $('#product_description').siblings('.note-editor').find('.note-editable').html(data.description);
+                        }
+                    }
                     $('input[name="meta_title"]').val(data.meta_title);
                     $('textarea[name="meta_description"]').val(data.meta_description);
 
