@@ -182,7 +182,7 @@
                                     <div class="form-group">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <label class="fs-13 mb-0">{{translate('Description')}}</label>
-                                            @if(route_has('seller.ai.generate'))
+                                            @if(Route::has('seller.ai.generate'))
                                             <button type="button" class="btn btn-sm btn-soft-primary"
                                                 onclick="generateDescriptionAI()">
                                                 <i class="las la-magic"></i> {{translate('Generate description by AI')}}
