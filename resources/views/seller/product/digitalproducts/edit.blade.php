@@ -26,7 +26,7 @@
         </div>
     @endif
 
-    <form class="" action="{{ route('seller.digitalproducts.update', $product->id) }}" method="POST" enctype="multipart/form-data" id="choice_form">
+    <form class="" action="{{ route('seller.digitalproducts.update', $product->id) }}" method="POST" enctype="multipart/form-data" id="aizSubmitForm">
         <input name="_method" type="hidden" value="PATCH">
         <input type="hidden" name="id" value="{{ $product->id }}">
         <input type="hidden" name="lang" value="{{ $lang }}">
