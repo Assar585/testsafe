@@ -469,9 +469,13 @@
                                                 <div class="col-md-3">
                                                     <input type="hidden" name="choice_no[]"
                                                         value="{{ $choice_option->attribute_id }}">
-                                                    <input type="text" class="form-control" name="choice[]"
-                                                        value="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}"
-                                                        placeholder="{{ translate('Choice Title') }}" readonly title="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}">
+                                                    <div class="p-2 border rounded bg-soft-secondary text-dark" style="min-height: 40px; display: flex; align-items: center;">
+                                                        <span class="fs-14 fw-600">
+                                                            {{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') ?: translate('Attribute') . ' #' . $choice_option->attribute_id }}
+                                                        </span>
+                                                    </div>
+                                                    <input type="hidden" name="choice[]"
+                                                        value="{{ optional(\App\Models\Attribute::find($choice_option->attribute_id))->getTranslation('name') }}">
                                                 </div>
                                                 <div class="col-md-8">
                                                     <select class="form-control aiz-selectpicker attribute_choice"
@@ -915,7 +919,10 @@
                         <div class="form-group row">\
                             <div class="col-md-3">\
                                 <input type="hidden" name="choice_no[]" value="'+ i + '">\
-                                <input type="text" class="form-control" name="choice[]" value="'+ name + '" placeholder="{{ translate('Choice Title') }}" readonly title="' + name + '">\
+                                <div class="p-2 border rounded bg-soft-secondary text-dark" style="min-height: 40px; display: flex; align-items: center;">\
+                                    <span class="fs-14 fw-600">'+ name + '</span>\
+                                </div>\
+                                <input type="hidden" name="choice[]" value="'+ name + '">\
                             </div>\
                             <div class="col-md-8">\
                                 <select class="form-control aiz-selectpicker attribute_choice" data-live-search="true" name="choice_options_'+ i + '[]" data-selected-text-format="count" multiple required>\
