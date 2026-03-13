@@ -112,6 +112,8 @@ class ProductController extends Controller
             'flash_discount' => $request->flash_discount ?? 0,
             'flash_discount_type' => $request->flash_discount_type ?? 'amount',
             'category_ids' => $request->category_ids ?? [],
+            'colors_active' => $request->colors_active ?? 0,
+            'colors' => $request->colors ?? [],
         ]);
 
         try {
@@ -232,6 +234,11 @@ class ProductController extends Controller
 
     public function update(ProductRequest $request, Product $product)
     {
+        $request->merge([
+            'colors_active' => $request->colors_active ?? 0,
+            'colors' => $request->colors ?? [],
+        ]);
+
         //Product
         try {
             $product = $this->productService->update($request->except([

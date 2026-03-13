@@ -100,6 +100,7 @@ class ProductService
         if (
             isset($collection['colors_active']) &&
             $collection['colors_active'] &&
+            isset($collection['colors']) &&
             $collection['colors'] &&
             count($collection['colors']) > 0
         ) {
@@ -280,6 +281,7 @@ class ProductService
         if (
             isset($collection['colors_active']) && 
             $collection['colors_active'] &&
+            isset($collection['colors']) &&
             $collection['colors'] &&
             count($collection['colors']) > 0
         ) {
