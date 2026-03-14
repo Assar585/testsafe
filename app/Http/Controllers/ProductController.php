@@ -207,20 +207,18 @@ class ProductController extends Controller
      */
     public function create()
     {
-        CoreComponentRepository::initializeCache();
+        CoreComponentRepository::instantiateShopRepository();
+
+        if (addon_is_activated('seller_subscription')) {
+            if (auth()->user()->user_type == 'seller' && !seller_package_validity_check()) {
+                flash(translate('Please upgrade your package.'))->warning();
+                return redirect()->route('seller.seller_packages_list');
+            }
+        }
 
         $categories = Category::where('parent_id', 0)
-            ->where('digital', 0)
             ->with('childrenCategories')
             ->get();
-            if (addon_is_activated('gst_system')) {
-                $business_info = admin_business_info();
-                if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
-                    flash(translate('Please Update Your GST Information'))->warning();
-                    return back();
-                }
-            }
-
         return view('backend.product.products.create', compact('categories'));
     }
 
@@ -327,98 +325,20 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        $product = $this->productService->store($request->except([
-            '_token',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]));
-        $request->merge(['product_id' => $product->id]);
-
-        //Product categories
-        $product->categories()->attach($request->category_ids);
-
-        //VAT & Tax
-        if ($request->tax_id) {
-            $this->productTaxService->store($request->only([
-                'tax_id',
-                'tax',
-                'tax_type',
-                'product_id'
-            ]));
-        }
-
-        // Delete other Taxes if GST Rate is updated
-        if ($request->has('gst_rate') && addon_is_activated('gst_system')) {
-            $product->taxes()->delete();
-        }
-
-        //Flash Deal
-        $this->productFlashDealService->store($request->only([
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]), $product);
-
-        //Product Stock
-        $this->productStockService->store($request->only([
-            'colors_active',
-            'colors',
-            'choice_no',
-            'unit_price',
-            'sku',
-            'current_stock',
-            'product_id'
-        ]), $product);
-
-        // Frequently Bought Products
-        $this->frequentlyBoughtProductService->store($request->only([
-            'product_id',
-            'frequently_bought_selection_type',
-            'fq_bought_product_ids',
-            'fq_bought_product_category_id'
-        ]));
-
-        // Product Translations
-        $request->merge(['lang' => env('DEFAULT_LANGUAGE')]);
-        ProductTranslation::create($request->only([
-            'lang',
-            'name',
-            'unit',
-            'description',
-            'product_id'
-        ]));
-
-        flash(translate('Product has been inserted successfully'))->success();
-
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-
-        return redirect()->route('products.admin');
-    }
-
-    public function store_as_draft(ProductDraftRequest $request)
-    {
-        //Log::info('Product stoate Request:', $request->all());
-        if(isset($request->id)) {
-            $product = Product::find($request->id);
-            if ($product && $product->draft != 1) {
-                return response()->json([
-                'success' => false,
-                'message' => translate('Only draft products can be automatically saved as draft.'),
-                'redirect' => ''
-                ]);
-            }
-        }
-
         try {
-            // Prepare product data
-            $productData = $request->except([
+            @file_put_contents(public_path('debug_log.txt'), "Product store START\n", FILE_APPEND);
+            
+            // Ensure fields exist to avoid "Undefined array key"
+            $request->merge([
+                'flash_deal_id' => $request->flash_deal_id ?? null,
+                'flash_discount' => $request->flash_discount ?? 0,
+                'flash_discount_type' => $request->flash_discount_type ?? 'amount',
+                'category_ids' => $request->category_ids ?? [],
+                'description' => $request->description ?? '',
+            ]);
+
+            // Use except to be safe and include all fields
+            $product = $this->productService->store($request->except([
                 '_token',
                 'sku',
                 'choice',
@@ -427,51 +347,41 @@ class ProductController extends Controller
                 'tax_type',
                 'flash_deal_id',
                 'flash_discount',
-                'flash_discount_type',
-                'featured',
-                'todays_deal',
-            ]);
+                'flash_discount_type'
+            ]));
 
-            // Add draft-specific fields
-            $productData['published'] = 0;
-            $productData['draft'] = 1;
-            $productData['name'] = $productData['name'] ? $productData['name']:'Draft  Product';
-            $productData['unit_price'] = $productData['unit_price'] ?? 0.0;
-            $productData['current_stock'] = $productData['current_stock'] ?? 0;
-            $productData['qty'] = $productData['qty'] ?? 0;
-
-            // Create or update draft product
-            $product = $this->productService->storeOrUpdateDraft($productData);
+            @file_put_contents(public_path('debug_log.txt'), "Product store: Product created with ID: " . $product->id . "\n", FILE_APPEND);
+            
             $request->merge(['product_id' => $product->id]);
 
-            // Sync categories if present
-            if ($request->filled('category_ids')) {
-                $product->categories()->sync($request->category_ids);
+            //Product categories
+            if ($request->has('category_ids')) {
+                $product->categories()->attach($request->category_ids);
             }
 
-            // Save tax if exist
-            if ($request->filled('tax_id')) {
-                $this->productTaxService->store([
-                    'tax_id' => $request->tax_id,
-                    'tax' => $request->tax,
-                    'tax_type' => $request->tax_type,
-                    'product_id' => $product->id
-                ]);
+            //VAT & Tax
+            if ($request->tax_id) {
+                $this->productTaxService->store($request->only([
+                    'tax_id',
+                    'tax',
+                    'tax_type',
+                    'product_id'
+                ]));
             }
 
-            // Flash deal exist
-            if ($request->filled('flash_deal_id')) {
-                $this->productFlashDealService->store([
-                    'flash_deal_id' => $request->flash_deal_id,
-                    'flash_discount' => $request->flash_discount,
-                    'flash_discount_type' => $request->flash_discount_type
-                ], $product);
+            // Delete other Taxes if GST Rate is updated
+            if ($request->has('gst_rate') && addon_is_activated('gst_system')) {
+                $product->taxes()->delete();
             }
 
-            // Product stock if present
-            if ($product->stocks()->exists()) {
-                $product->stocks()->delete();
-            }
+            //Flash Deal
+            $this->productFlashDealService->store($request->only([
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type'
+            ]), $product);
+
+            //Product Stock
             $this->productStockService->store($request->only([
                 'colors_active',
                 'colors',
@@ -482,49 +392,64 @@ class ProductController extends Controller
                 'product_id'
             ]), $product);
 
+            // Frequently Bought Products
+            $this->frequentlyBoughtProductService->store($request->only([
+                'product_id',
+                'frequently_bought_selection_type',
+                'fq_bought_product_ids',
+                'fq_bought_product_category_id'
+            ]));
 
-            // Frequently bought products if present
-            if ($request->filled('frequently_bought_selection_type')) {
-                $this->frequentlyBoughtProductService->store([
-                    'product_id' => $product->id,
-                    'frequently_bought_selection_type' => $request->frequently_bought_selection_type,
-                    'fq_bought_product_ids' => $request->fq_bought_product_ids,
-                    'fq_bought_product_category_id' => $request->fq_bought_product_category_id
-                ]);
-            }
+            // Product Translations
+            $request->merge(['lang' => $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'))]);
+            ProductTranslation::create($request->only([
+                'lang',
+                'name',
+                'unit',
+                'description',
+                'product_id'
+            ]));
 
-            // Product translations
-            ProductTranslation::updateOrCreate(
-                [
-                    'product_id' => $product->id, 
-                    'lang' => env('DEFAULT_LANGUAGE', 'en')
-                ],
-                [
-                    'name' => $request->name,
-                    'unit' => $request->unit,
-                    'description' => $request->description
-                ]
-            );
+            flash(translate('Product has been inserted successfully'))->success();
+            @file_put_contents(public_path('debug_log.txt'), "Product store SUCCESS\n", FILE_APPEND);
 
-            // Clear caches
-            Artisan::call('view:clear');
             Artisan::call('cache:clear');
 
             return response()->json([
                 'success' => true,
-                'product_id' => $product->id,
-                'message' => translate('Draft saved successfully'),
+                'message' => translate('Product has been inserted successfully'),
+                'redirect' => route('products.all')
             ]);
-
         } catch (\Exception $e) {
-            \Log::error('Draft save failed: '.$e->getMessage(), [
-                'request' => $request->all(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
+            @file_put_contents(public_path('debug_log.txt'), "Product store EXCEPTION: " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n", FILE_APPEND);
             return response()->json([
                 'success' => false,
-                'message' => translate('Failed to save draft: ') . $e->getMessage(),
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function store_as_draft(ProductDraftRequest $request)
+    {
+        try {
+            if (isset($request->id)) {
+                $product = Product::find($request->id);
+                if ($product) {
+                    $product = $this->productService->update($request->except(['_token']), $product);
+                }
+            } else {
+                $product = $this->productService->storeOrUpdateDraft($request->except(['_token']));
+            }
+
+            return response()->json([
+                'success' => true,
+                'product_id' => $product->id,
+                'message' => translate('Product has been saved as draft successfully')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
             ], 500);
         }
     }
@@ -590,26 +515,9 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ProductRequest $request, Product $product)
+    public function update(ProductRequest $request, $id)
     {
-        //Log::info('Product Update Request:', $request->all());
-        //Product
-        if (addon_is_activated('gst_system')) {
-            if($product->added_by=='admin'){
-                $business_info = admin_business_info();
-                if ( empty($business_info) || !is_array($business_info) || empty($business_info['gstin'])) {
-                    flash(translate('Please Update Your GST Information'))->warning();
-                    return back();
-                }
-            }else{
-                $shop = $product->user->shop;
-                if ($shop && !$shop->gst_verification) {
-                    flash(translate('GST verification is pending for This Seller'))->warning();
-                    return back();
-                }
-            }
-        }
-
+        $product = Product::findOrFail($id);
         $product = $this->productService->update($request->except([
             '_token',
             'sku',
@@ -622,14 +530,27 @@ class ProductController extends Controller
             'flash_discount_type'
         ]), $product);
 
-        $request->merge(['product_id' => $product->id]);
-
         //Product categories
         $product->categories()->sync($request->category_ids);
 
+        //VAT & Tax
+        if ($request->tax_id) {
+            $this->productTaxService->store($request->only([
+                'tax_id',
+                'tax',
+                'tax_type',
+                'product_id'
+            ]));
+        }
+
+        //Flash Deal
+        $this->productFlashDealService->store($request->only([
+            'flash_deal_id',
+            'flash_discount',
+            'flash_discount_type'
+        ]), $product);
 
         //Product Stock
-        $product->stocks()->delete();
         $this->productStockService->store($request->only([
             'colors_active',
             'colors',
@@ -640,31 +561,7 @@ class ProductController extends Controller
             'product_id'
         ]), $product);
 
-        //Flash Deal
-        $this->productFlashDealService->store($request->only([
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]), $product);
-
-        //VAT & Tax
-        if ($request->tax_id) {
-            $product->taxes()->delete();
-            $this->productTaxService->store($request->only([
-                'tax_id',
-                'tax',
-                'tax_type',
-                'product_id'
-            ]));
-        }
-
-        // Delete other Taxes if GST Rate is updated
-        if ($request->has('gst_rate') && addon_is_activated('gst_system')) {
-            $product->taxes()->delete();
-        }
-
         // Frequently Bought Products
-        $product->frequently_bought_products()->delete();
         $this->frequentlyBoughtProductService->store($request->only([
             'product_id',
             'frequently_bought_selection_type',
@@ -672,42 +569,29 @@ class ProductController extends Controller
             'fq_bought_product_category_id'
         ]));
 
-        // Product Translations
-        ProductTranslation::updateOrCreate(
-            $request->only([
-                'lang',
-                'product_id'
-            ]),
-            $request->only([
-                'name',
-                'unit',
-                'description'
-            ])
-        );
+        try {
+            $lang = $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'));
+            $product_translation = ProductTranslation::firstOrNew(['lang' => $lang, 'product_id' => $product->id]);
+            $product_translation->name = $request->name;
+            $product_translation->unit = $request->unit;
+            $product_translation->description = $request->description;
+            $product_translation->save();
 
-        // flash(translate('Product has been updated successfully'))->success();
-        Artisan::call('view:clear');
-        Artisan::call('cache:clear');
-        $redirrect_url = '';
-        if ($request->has('type') && $request->type == 'Seller') {
-             if($product->digital){
-               $redirrect_url = route('products.seller','digital');}
-            else{
-                $redirrect_url = route('products.seller','physical');
-            }
-        } else {
-            if($product->digital){
-                $redirrect_url = route('digitalproducts.index');
-            }else{
-                $redirrect_url = route('products.admin');
-            }
-        }
+            flash(translate('Product has been updated successfully'))->success();
 
-        return response()->json([
+            Artisan::call('cache:clear');
+
+            return response()->json([
                 'success' => true,
                 'message' => translate('Product has been updated successfully'),
-                'redirect' => $redirrect_url
+                'redirect' => route('products.all')
             ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Something went wrong: ') . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
