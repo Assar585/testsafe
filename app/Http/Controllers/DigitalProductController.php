@@ -184,11 +184,16 @@ class DigitalProductController extends Controller
 
         $lang = $request->lang;
         $product = Product::findOrFail($id);
+
+        $start_date = date('d-m-Y H:i:s', $product->discount_start_date);
+        $end_date = date('d-m-Y H:i:s', $product->discount_end_date);
+        $fq_bought_products = $product->frequently_bought_products;
+
         $categories = Category::where('parent_id', 0)
             ->where('digital', 1)
             ->with('childrenCategories')
             ->get();
-        return view('backend.product.digital_products.edit', compact('product', 'lang', 'categories'));
+        return view('backend.product.digital_products.edit', compact('product', 'lang', 'categories', 'start_date', 'end_date', 'fq_bought_products'));
     }
 
     /**
