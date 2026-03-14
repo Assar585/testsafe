@@ -33,7 +33,7 @@
         <form class="form form-horizontal mar-top" action="{{ route('digitalproducts.store') }}" method="POST"
             enctype="multipart/form-data" id="choice_form">
             <div class="row gutters-5">
-                <div class="col-lg-8">
+                <div class="col-12">
                     @csrf
                     <input type="hidden" name="added_by" value="admin">
                     <input type="hidden" name="digital" value="1">
@@ -279,9 +279,7 @@
                         </div>
                     </div>
     
-                </div>
-                <div class="col-lg-4">
-                    <div class="card">
+                    <div class="card mt-3">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
                                 {{ translate('Product Category') }}
