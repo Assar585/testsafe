@@ -85,15 +85,23 @@ Route::get('/debug/logs', function() {
     $files = is_dir($dir) ? scandir($dir) : ["Directory not found"];
     
     $path = storage_path('logs/laravel.log');
+    if (!file_exists($path)) {
+        $daily_logs = array_filter($files, function($f) { return str_starts_with($f, 'laravel-'); });
+        if (!empty($daily_logs)) {
+            sort($daily_logs);
+            $path = storage_path('logs/' . end($daily_logs));
+        }
+    }
+
     $content = "";
     if (file_exists($path)) {
         $lines = file($path);
         $content = implode("", array_slice($lines, -500));
     } else {
-        $content = "laravel.log not found. Try one of these: " . implode(", ", $files);
+        $content = "Log file not found. Try one of these: " . implode(", ", $files);
     }
     
-    return response("FILES: " . implode(", ", $files) . "\n\nCONTENT:\n" . $content)
+    return response("FILES: " . implode(", ", $files) . "\n\nPATH: " . $path . "\n\nCONTENT:\n" . $content)
         ->header('Content-Type', 'text/plain');
 });
 
