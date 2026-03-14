@@ -162,17 +162,17 @@
                                                     <option value="">{{ translate('Select Category') }}</option>
                                                     @foreach ($categories as $category)
                                                         <option value="{{ $category->id }}"
-                                                            @selected($product->category_id == $category->id)>
+                                                            @selected(old('category_id', $product->category_id) == $category->id)>
                                                             {{ $category->getTranslation('name') }}
                                                         </option>
                                                         @foreach ($category->childrenCategories as $childCategory)
                                                             <option value="{{ $childCategory->id }}"
-                                                                @selected($product->category_id == $childCategory->id)>
+                                                                @selected(old('category_id', $product->category_id) == $childCategory->id)>
                                                                 &nbsp;&nbsp;&nbsp;-- {{ $childCategory->getTranslation('name') }}
                                                             </option>
                                                             @foreach ($childCategory->childrenCategories as $subChildCategory)
                                                                 <option value="{{ $subChildCategory->id }}"
-                                                                    @selected($product->category_id == $subChildCategory->id)>
+                                                                    @selected(old('category_id', $product->category_id) == $subChildCategory->id)>
                                                                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;----
                                                                     {{ $subChildCategory->getTranslation('name') }}
                                                                 </option>
@@ -181,7 +181,10 @@
                                                     @endforeach
                                                 </select>
                                                 <input type="hidden" name="category_ids[]" id="category_ids_hidden"
-                                                    value="{{ $product->category_id }}">
+                                                    value="{{ old('category_id', $product->category_id) }}">
+                                                @error('category_id')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
                                             </div>
 
                                             <!-- HS Code -->
