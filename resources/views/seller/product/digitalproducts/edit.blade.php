@@ -133,7 +133,7 @@
                 </div>
 
                 <!-- Product Description -->
-                <div class="card mb-4" id="product_description">
+                <div class="card mb-4" id="product_description_card">
                     <div class="bg-white p-3 p-sm-2rem">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h5 class="mb-0 fs-17 fw-700">
