@@ -70,7 +70,10 @@
                                 <div class="col-xxl-5 col-xl-6 mt-4 mt-xl-0">
                                     <div class="form-group mb-3">
                                         <label class="col-from-label fs-13">{{translate('Product Category')}} <span class="text-danger">*</span></label>
-                                        <select class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror" name="category_id" id="category_id" data-live-search="true" required>
+                                        <input type="hidden" name="category_ids[]" id="category_ids_hidden" value="">
+                                        <select class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror" 
+                                                name="category_id" id="category_id" data-live-search="true" required
+                                                onchange="$('#category_ids_hidden').val(this.value)">
                                             <option value="">{{ translate('Select Category') }}</option>
                                             @foreach ($categories as $category)
                                                 <option value="{{ $category->id }}">

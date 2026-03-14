@@ -62,7 +62,7 @@ class ProductService
         $collection['tags'] = implode(',', $tags);
         $discount_start_date = null;
         $discount_end_date   = null;
-        if ($collection['date_range'] != null) {
+        if ($collection['date_range'] != null && str_contains($collection['date_range'], ' to ')) {
             $date_var               = explode(" to ", $collection['date_range']);
             $discount_start_date = strtotime($date_var[0]);
             $discount_end_date   = strtotime($date_var[1]);
@@ -241,7 +241,7 @@ class ProductService
         $collection['tags'] = implode(',', $tags);
         $discount_start_date = null;
         $discount_end_date   = null;
-        if ($collection['date_range'] != null) {
+        if ($collection['date_range'] != null && str_contains($collection['date_range'], ' to ')) {
             $date_var               = explode(" to ", $collection['date_range']);
             $discount_start_date = strtotime($date_var[0]);
             $discount_end_date   = strtotime($date_var[1]);
