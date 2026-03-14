@@ -31,7 +31,7 @@
         <input type="hidden" id="data_type" value="digital">
     
         <form class="form form-horizontal mar-top" action="{{ route('digitalproducts.store') }}" method="POST"
-            enctype="multipart/form-data" id="choice_form">
+            enctype="multipart/form-data" id="aizSubmitForm">
             @csrf
             <input type="hidden" name="added_by" value="admin">
             <input type="hidden" name="digital" value="1">

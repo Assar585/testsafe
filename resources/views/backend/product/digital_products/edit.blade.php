@@ -27,7 +27,7 @@
         <input type="hidden" id="data_type" value="digital">
 
         <form class="form form-horizontal mar-top" action="{{ route('digitalproducts.update', $product->id) }}"
-            method="POST" enctype="multipart/form-data" id="choice_form">
+            method="POST" enctype="multipart/form-data" id="aizSubmitForm">
             <div class="row gutters-5">
                 <div class="col-12">
                     <input name="_method" type="hidden" value="PATCH">
