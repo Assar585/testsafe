@@ -476,10 +476,7 @@ class ProductController extends Controller
         CoreComponentRepository::instantiateShopRepository();
 
         $product = Product::findOrFail($id);
-        if ($product->added_by == 'seller') {
-            flash(translate('This product is added by seller. You can not edit this product.'))->warning();
-            return redirect()->route('products.all');
-        }
+        
         $lang = $request->lang;
         $tags = json_decode($product->tags);
         $categories = Category::where('parent_id', 0)

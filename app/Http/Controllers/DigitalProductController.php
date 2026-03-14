@@ -309,10 +309,17 @@ class DigitalProductController extends Controller
 
             if (empty($product->file_name)) {
                 Log::error('Product file_name ID is empty', ['product_id' => $product->id]);
-                abort(404, 'Product file not associated.');
+                flash(translate('Product file not associated.'))->error();
+                return back();
             }
 
-            $upload = Upload::findOrFail($product->file_name);
+            $upload = Upload::find($product->file_name);
+            if (!$upload) {
+                Log::error('Upload record not found', ['upload_id' => $product->file_name]);
+                flash(translate('Upload record not found.'))->error();
+                return back();
+            }
+
             Log::info('Upload record found', ['upload_id' => $upload->id, 'file_name' => $upload->file_name]);
 
             if (env('FILESYSTEM_DRIVER') == "s3") {
@@ -324,12 +331,14 @@ class DigitalProductController extends Controller
                     return response()->download($path);
                 } else {
                     Log::error('File does not exist on server', ['path' => $path]);
-                    abort(404, 'Physical file missing.');
+                    flash(translate('Physical file missing on server: ') . $upload->file_name)->error();
+                    return back();
                 }
             }
         } catch (\Exception $e) {
             Log::error('Download error: ' . $e->getMessage());
-            abort(404, 'Download failed.');
+            flash(translate('Download failed: ') . $e->getMessage())->error();
+            return back();
         }
     }
 }
