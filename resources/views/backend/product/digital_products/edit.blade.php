@@ -360,17 +360,14 @@
                         </div>
                     </div>
 
-                </div>
-
-                <div class="col-lg-4">
-                    <div class="card">
+                    <div class="card mt-3">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Product Category') }}
+                                {{ translate('Product category') }}
                             </h5>
                             <div class="w-100">
                                 <div class="form-group mb-0">
-                                    <label class="col-from-label fs-13">{{translate('Product Category')}} <span
+                                    <label class="col-from-label fs-13">{{translate('Product category')}} <span
                                             class="text-danger">*</span></label>
                                     <input type="hidden" name="category_ids[]" id="category_ids_hidden"
                                         value="{{ $product->category_id }}">
