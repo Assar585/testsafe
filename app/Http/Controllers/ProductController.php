@@ -524,6 +524,9 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, $id)
     {
+        @file_put_contents(public_path('debug_log.txt'), "Product update START id: $id\n", FILE_APPEND);
+        @file_put_contents(public_path('debug_log.txt'), "Request data: " . json_encode($request->all()) . "\n", FILE_APPEND);
+        
         $product = Product::findOrFail($id);
         $product = $this->productService->update($request->except([
             '_token',
