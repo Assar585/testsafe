@@ -91,6 +91,14 @@ Route::controller(UpdateController::class)->group(function () {
 Route::get('/admin', [AdminController::class, 'admin_dashboard'])->name('admin.dashboard')->middleware(['auth', 'admin', 'prevent-back-history']);
 Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'admin', 'prevent-back-history']], function () {
 
+    Route::get('/debug/logs', function() {
+        $path = storage_path('logs/laravel.log');
+        if (!file_exists($path)) return "Log not found at $path";
+        $lines = file($path);
+        $content = implode("", array_slice($lines, -200));
+        return response($content)->header('Content-Type', 'text/plain');
+    });
+
     // cyber sources
     Route::controller(CybersourceSettingController::class)->group(function () {
         Route::get('/cybersource-configuration', 'configuration')->name('cybersource_configuration');
