@@ -32,12 +32,12 @@
     
         <form class="form form-horizontal mar-top" action="{{ route('digitalproducts.store') }}" method="POST"
             enctype="multipart/form-data" id="choice_form">
+            @csrf
+            <input type="hidden" name="added_by" value="admin">
+            <input type="hidden" name="digital" value="1">
+
             <div class="row gutters-5">
                 <div class="col-12">
-                    @csrf
-                    <input type="hidden" name="added_by" value="admin">
-                    <input type="hidden" name="digital" value="1">
-    
                     <div class="card">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -70,6 +70,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="card">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -107,6 +108,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="card">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -144,7 +146,7 @@
                             </div>
                         </div>
                     </div>
-    
+
                     <div class="card">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -212,6 +214,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="card">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -225,7 +228,7 @@
                             </div>
                         </div>
                     </div>
-    
+
                     {{-- Frequently Bought Products --}}
                     <div class="card">
                         <div class="bg-white p-3 p-sm-2rem">
@@ -246,11 +249,7 @@
         
                                 <div class="px-0">
                                     <div class="fq_bought_select_product_div">
-    
-                                        <div id="selected-fq-bought-products">
-    
-                                        </div>
-    
+                                        <div id="selected-fq-bought-products"></div>
                                         <button 
                                             type="button" 
                                             class="btn btn-block border border-dashed hov-bg-soft-secondary fs-14 rounded-0 d-flex align-items-center justify-content-center"
@@ -260,33 +259,33 @@
                                         </button>
                                     </div>
         
-                                        <div class="fq_bought_select_category_div d-none">
-                                            <div class="form-group mb-0">
-                                                <label class="col-from-label fs-13">{{translate('Category')}}</label>
-                                                <select class="form-control aiz-selectpicker" data-placeholder="{{ translate('Select a Category')}}" name="fq_bought_product_category_id" data-live-search="true">
-                                                    @foreach ($categories as $category)
-                                                        <option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
-                                                        @foreach ($category->childrenCategories as $childCategory)
-                                                            @include('categories.child_category', ['child_category' => $childCategory])
-                                                        @endforeach
+                                    <div class="fq_bought_select_category_div d-none">
+                                        <div class="form-group mb-0">
+                                            <label class="col-from-label fs-13">{{translate('Category')}}</label>
+                                            <select class="form-control aiz-selectpicker" data-placeholder="{{ translate('Select a Category')}}" name="fq_bought_product_category_id" data-live-search="true">
+                                                @foreach ($categories as $category)
+                                                    <option value="{{ $category->id }}">{{ $category->getTranslation('name') }}</option>
+                                                    @foreach ($category->childrenCategories as $childCategory)
+                                                        @include('categories.child_category', ['child_category' => $childCategory])
                                                     @endforeach
-                                                </select>
-                                            </div>
+                                                @endforeach
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-    
+
+                    {{-- Product Category --}}
                     <div class="card mt-3">
                         <div class="bg-white p-3 p-sm-2rem">
                             <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
-                                {{ translate('Product Category') }}
+                                {{ translate('Product category') }}
                             </h5>
                             <div class="w-100">
                                 <div class="form-group mb-0">
-                                    <label class="col-from-label fs-13">{{translate('Product Category')}} <span
+                                    <label class="col-from-label fs-13">{{translate('Product category')}} <span
                                             class="text-danger">*</span></label>
                                     <input type="hidden" name="category_ids[]" id="category_ids_hidden"
                                         value="{{ old('category_id') }}">
@@ -319,8 +318,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="col-12">
+
                     <div class="form-group mb-0 text-right mb-2">
                         <button type="submit" name="button" value="publish"
                             class="btn btn-primary btn-md fs-13 fw-700 px-5 radius-0">{{translate('Save Product')}}</button>
