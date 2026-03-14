@@ -80,6 +80,14 @@ Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
 
+Route::get('/debug/logs', function() {
+    $path = storage_path('logs/laravel.log');
+    if (!file_exists($path)) return "Log not found at $path";
+    $lines = file($path);
+    $content = implode("", array_slice($lines, -200));
+    return response($content)->header('Content-Type', 'text/plain');
+});
+
 Route::get('/nuclear_clear', function () {
     echo "<h1>Nuclear Cache Clear (via Laravel)</h1>";
     try {
