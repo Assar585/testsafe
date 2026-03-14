@@ -644,7 +644,10 @@
                                                 class="form-control aiz-selectpicker" multiple
                                                 data-placeholder="{{ translate('Choose Attributes') }}">
                                                 @foreach (\App\Models\Attribute::all() as $key => $attribute)
-                                                    <option value="{{ $attribute->id }}" @if($product->attributes != null && in_array($attribute->id, json_decode($product->attributes, true)))
+                                                    @php
+                                                        $attributes_array = is_array($product->attributes) ? $product->attributes : json_decode($product->attributes, true);
+                                                    @endphp
+                                                    <option value="{{ $attribute->id }}" @if($attributes_array != null && in_array($attribute->id, $attributes_array))
                                                     selected @endif>{{ $attribute->getTranslation('name') }}</option>
                                                 @endforeach
                                             </select>
@@ -1394,7 +1397,7 @@
                 }
             });
 
-            var str = @php echo $product->attributes @endphp;
+            var str = @php echo json_encode(is_array($product->attributes) ? $product->attributes : json_decode($product->attributes, true)) @endphp;
 
             $.each(str, function (index, value) {
                 flag = false;
@@ -1475,7 +1478,7 @@
         function isRefundable() {
             const refundType = "{{ get_setting('refund_type') }}";
             const $refundable = $('input[name="refundable"]');
-            const $mainCategoryRadio = $('input[name="category_id"]:checked');
+            const $mainCategoryRadio = $('[name="category_id"]');
             const $note = $('#refundable-note');
 
             $refundable.off('change.isRefundableLock');
@@ -1586,7 +1589,7 @@
             warrantySelection();
             isRefundable();
 
-            $(document).on('change', 'input[name="category_id"]', function () {
+            $(document).on('change', '[name="category_id"]', function () {
                 isRefundable();
             });
 
