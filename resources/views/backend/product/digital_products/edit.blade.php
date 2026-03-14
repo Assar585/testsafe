@@ -29,7 +29,7 @@
         <form class="form form-horizontal mar-top" action="{{ route('digitalproducts.update', $product->id) }}"
             method="POST" enctype="multipart/form-data" id="choice_form">
             <div class="row gutters-5">
-                <div class="col-lg-8">
+                <div class="col-12">
                     <input name="_method" type="hidden" value="PATCH">
                     <input type="hidden" name="id" value="{{ $product->id }}">
                     <input type="hidden" name="lang" value="{{ $lang }}">
