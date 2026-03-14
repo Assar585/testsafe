@@ -76,16 +76,27 @@
                                                         </option>
                                                     @endforeach
                                                 </select>
-                                                <small class="text-muted">{{translate("You can choose a brand if you'd like to display your product by brand.")}}</small>
+                                                <small class="text-muted fs-12">{{translate("You can choose a brand if you'd like to display your product by brand.")}}</small>
                                             </div>
                                             <!-- Unit -->
                                             <div class="form-group mb-2">
                                                 <label class="col-from-label fs-13">{{translate('Unit')}} <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" letter-only
-                                                    class="form-control @error('unit') is-invalid @enderror" name="unit"
-                                                    placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}"
-                                                    value="{{$product->getTranslation('unit', $lang)}}">
+                                                <select
+                                                    class="form-control aiz-selectpicker @error('unit') is-invalid @enderror"
+                                                    name="unit" data-live-search="true">
+                                                    @php $current_unit = $product->getTranslation('unit', $lang); @endphp
+                                                    <option value="{{ translate('Piece') }}" @selected($current_unit == translate('Piece'))>{{ translate('Piece') }}</option>
+                                                    <option value="{{ translate('Service') }}" @selected($current_unit == translate('Service'))>{{ translate('Service') }}</option>
+                                                    <option value="{{ translate('KG') }}" @selected($current_unit == translate('KG'))>{{ translate('KG') }}</option>
+                                                    <option value="{{ translate('Ton') }}" @selected($current_unit == translate('Ton'))>{{ translate('Ton') }}</option>
+                                                    <option value="{{ translate('Gram') }}" @selected($current_unit == translate('Gram'))>{{ translate('Gram') }}</option>
+                                                    <option value="{{ translate('Liter') }}" @selected($current_unit == translate('Liter'))>{{ translate('Liter') }}</option>
+                                                    <option value="{{ translate('Milliliter') }}" @selected($current_unit == translate('Milliliter'))>{{ translate('Milliliter') }}</option>
+                                                    <option value="{{ translate('Meter') }}" @selected($current_unit == translate('Meter'))>{{ translate('Meter') }}</option>
+                                                    <option value="{{ translate('Sq. Meter') }}" @selected($current_unit == translate('Sq. Meter'))>{{ translate('Sq. Meter') }}</option>
+                                                    <option value="{{ translate('Cubic Meter') }}" @selected($current_unit == translate('Cubic Meter'))>{{ translate('Cubic Meter') }}</option>
+                                                </select>
                                             </div>
                                             <!-- Weight -->
                                             <div class="form-group mb-2">
@@ -93,26 +104,24 @@
                                                     <small>({{ translate('In Kg') }})</small></label>
                                                 <input type="number" class="form-control" name="weight"
                                                     value="{{ $product->weight}}" step="0.01" placeholder="0.00">
+                                                <small class="text-muted fs-12">{{ translate('Used to calculate shipping cost.') }}</small>
                                             </div>
-                                            <!-- Quantity -->
-                                            <div class="form-group mb-2">
+                                            <!-- Minimum Purchase Qty -->
+                                            <div class="form-group mb-2 d-none">
                                                 <label class="col-from-label fs-13">{{translate('Minimum Purchase Qty')}}
                                                     <span class="text-danger">*</span></label>
                                                 <input type="number" lang="en"
                                                     class="form-control @error('min_qty') is-invalid @enderror"
-                                                    name="min_qty"
-                                                    value="@if($product->min_qty <= 1){{1}}@else{{$product->min_qty}}@endif"
-                                                    min="1" step="1" integer-only required>
-                                                <small class="text-muted">{{translate("The minimum quantity needs to be purchased by your customer.")}}</small>
+                                                    name="min_qty" value="{{ $product->min_qty }}" placeholder="1" min="1"
+                                                    step="1" integer-only>
                                             </div>
                                             <!-- Tags -->
                                             <div class="form-group mb-2">
                                                 <label class="col-from-label fs-13">{{translate('Tags')}}</label>
                                                 <input type="text" class="form-control aiz-tag-input" name="tags[]"
-                                                    id="tags" value="{{ $product->tags }}"
-                                                    placeholder="{{ translate('Type to add a tag') }}"
-                                                    data-role="tagsinput">
-                                                <small class="text-muted">{{translate('This is used for search. Input those words by which cutomer can find this product.')}}</small>
+                                                    id="product_tags" value="{{ $product->tags }}"
+                                                    placeholder="{{ translate('Type and hit enter to add a tag') }}">
+                                                <small class="text-muted fs-12">{{translate('This is used for search. Input those words by which cutomer can find this product. Automatically seeds with Product Name.')}}</small>
                                             </div>
 
                                             @if (addon_is_activated('pos_system'))
@@ -126,13 +135,11 @@
                                             @endif
                                         </div>
 
-                                        <!-- Product Category -->
                                         <div class="col-xxl-5 col-xl-6">
+                                            <!-- Product Category -->
                                             <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{translate('Product Category')}} <span
+                                                <label class="col-from-label fs-13">{{translate('Product category')}} <span
                                                         class="text-danger">*</span></label>
-                                                <input type="hidden" name="category_ids[]" id="category_ids_hidden"
-                                                    value="{{ $product->category_id }}">
                                                 <select
                                                     class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror"
                                                     name="category_id" id="category_id" data-live-search="true" required
@@ -158,22 +165,21 @@
                                                         @endforeach
                                                     @endforeach
                                                 </select>
-                                                @error('category_ids')
-                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                @enderror
+                                                <input type="hidden" name="category_ids[]" id="category_ids_hidden"
+                                                    value="{{ $product->category_id }}">
                                             </div>
-                                            <!-- HS Code - Server-side rendered -->
+
+                                            <!-- HS Code -->
                                             <div class="form-group mb-2 mt-3">
-                                                <label
-                                                    class="col-from-label fs-13">{{translate('TN VED (HS Code)')}}</label>
+                                                <label class="col-from-label fs-13">{{translate('TN VED (HS Code)')}}</label>
                                                 <select class="form-control" name="hsn_code" id="hsn_code_select">
                                                     @if($product->hsn_code)
                                                         <option value="{{ $product->hsn_code }}" selected>
-                                                            {{ $product->hsn_code }}
+                                                            {{ $product->hsn_code_name ?? $product->hsn_code }}
                                                         </option>
                                                     @endif
                                                 </select>
-                                                <small class="text-muted">{{ translate('Used for international shipping and customs.') }}</small>
+                                                <small class="text-muted fs-12">{{ translate('Used for international shipping and customs.') }}</small>
                                             </div>
                                         </div>
                                     </div>
