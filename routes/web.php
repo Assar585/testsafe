@@ -80,7 +80,7 @@ Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
 
-Route::get('/debug/logs', function() {
+Route::get('/debug/logs_v2', function() {
     $dir = storage_path('logs');
     $files = is_dir($dir) ? scandir($dir) : ["Directory not found"];
     
