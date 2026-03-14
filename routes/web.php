@@ -82,16 +82,19 @@ Route::get('/refresh-csrf', function () {
 
 Route::get('/debug/logs', function() {
     $dir = storage_path('logs');
-    if (!is_dir($dir)) return "Logs directory not found at $dir";
-    $files = scandir($dir);
+    $files = is_dir($dir) ? scandir($dir) : ["Directory not found"];
     
     $path = storage_path('logs/laravel.log');
-    if (!file_exists($path)) {
-        return "Log not found at $path. Files in directory: " . implode(", ", $files);
+    $content = "";
+    if (file_exists($path)) {
+        $lines = file($path);
+        $content = implode("", array_slice($lines, -500));
+    } else {
+        $content = "laravel.log not found. Try one of these: " . implode(", ", $files);
     }
-    $lines = file($path);
-    $content = implode("", array_slice($lines, -200));
-    return response($content)->header('Content-Type', 'text/plain');
+    
+    return response("FILES: " . implode(", ", $files) . "\n\nCONTENT:\n" . $content)
+        ->header('Content-Type', 'text/plain');
 });
 
 Route::get('/nuclear_clear', function () {
