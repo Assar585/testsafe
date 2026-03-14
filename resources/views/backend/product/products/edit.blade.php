@@ -60,7 +60,7 @@
 
                     <div class="product-form-sections">
                         <!-- General -->
-                        <div class="card mb-4" id="general">
+                        <div class="card shadow-none border-0 mb-4" id="general">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- Product Information -->
                                 <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
@@ -68,91 +68,103 @@
                                 </h5>
                                 <div class="w-100">
                                     <div class="row">
-                                        <div class="col-xxl-7 col-xl-6">
+                                        <div class="col-xxl-6 col-xl-6">
                                             <!-- Product Name -->
-                                            <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{translate('Product Name')}} <span
+                                            <div class="form-group mb-4">
+                                                <label class="fs-14 fw-700 text-dark mb-1">{{translate('Product Name')}} <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                                <input type="text" class="form-control rounded-2 fs-14 @error('name') is-invalid @enderror"
                                                     name="name" placeholder="{{translate('Product Name')}}"
                                                     value="{{ $product->getTranslation('name', $lang) }}">
                                             </div>
-                                            <!-- Brand -->
-                                            <div class="form-group mb-2" id="brand">
-                                                <label class="col-from-label fs-13">{{translate('Brand')}}</label>
-                                                <select class="form-control aiz-selectpicker" name="brand_id" id="brand_id"
-                                                    data-live-search="true">
-                                                    <option value="">{{ translate('Select Brand') }}</option>
-                                                    @foreach (\App\Models\Brand::all() as $brand)
-                                                        <option value="{{ $brand->id }}" @if($product->brand_id == $brand->id)
-                                                        selected @endif>{{ $brand->getTranslation('name') }}</option>
-                                                    @endforeach
-                                                </select>
-                                                <small
-                                                    class="text-muted">{{translate("You can choose a brand if you'd like to display your product by brand.")}}</small>
-                                            </div>
-                                            <!-- Unit -->
-                                            <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{translate('Unit')}} <span
-                                                        class="text-danger">*</span></label>
-                                                <input type="text" letter-only
-                                                    class="form-control @error('unit') is-invalid @enderror" name="unit"
-                                                    placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}"
-                                                    value="{{$product->getTranslation('unit', $lang)}}">
-                                            </div>
-                                            <!-- Weight -->
-                                            <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{translate('Weight')}}
-                                                    <small>({{ translate('In Kg') }})</small></label>
-                                                <input type="number" class="form-control" name="weight"
-                                                    value="{{ $product->weight}}" step="0.01" placeholder="0.00">
-                                            </div>
-                                            <!-- Quantity -->
-                                            <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{translate('Minimum Purchase Qty')}}
-                                                    <span class="text-danger">*</span></label>
-                                                <input type="number" lang="en"
-                                                    class="form-control @error('min_qty') is-invalid @enderror"
-                                                    name="min_qty"
-                                                    value="@if($product->min_qty <= 1){{1}}@else{{$product->min_qty}}@endif"
-                                                    min="1" step="1" integer-only required>
-                                                <small
-                                                    class="text-muted">{{translate("The minimum quantity needs to be purchased by your customer.")}}</small>
-                                                <small
-                                                    class="text-muted">{{translate("The minimum quantity needs to be purchased by your customer.")}}</small>
 
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <!-- Brand -->
+                                                    <div class="form-group mb-4" id="brand">
+                                                        <label class="fs-14 fw-700 text-dark mb-1">{{translate('Brand')}}</label>
+                                                        <select class="form-control aiz-selectpicker rounded-2 fs-14" name="brand_id" id="brand_id"
+                                                            data-live-search="true">
+                                                            <option value="">{{ translate('Select Brand') }}</option>
+                                                            @foreach (\App\Models\Brand::all() as $brand)
+                                                                <option value="{{ $brand->id }}" @if($product->brand_id == $brand->id)
+                                                                selected @endif>{{ $brand->getTranslation('name') }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        <small
+                                                            class="text-muted fs-12">{{translate("You can choose a brand if you'd like to display your product by brand.")}}</small>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <!-- Unit -->
+                                                    <div class="form-group mb-4">
+                                                        <label class="fs-14 fw-700 text-dark mb-1">{{translate('Unit')}} <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="text" letter-only
+                                                            class="form-control rounded-2 fs-14 @error('unit') is-invalid @enderror" name="unit"
+                                                            placeholder="{{ translate('Unit (e.g. KG, Pc etc)') }}"
+                                                            value="{{$product->getTranslation('unit', $lang)}}">
+                                                    </div>
+                                                </div>
                                             </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <!-- Weight -->
+                                                    <div class="form-group mb-4">
+                                                        <label class="fs-14 fw-700 text-dark mb-1">{{translate('Weight')}}
+                                                            <small class="fw-400">({{ translate('In Kg') }})</small></label>
+                                                        <input type="number" class="form-control rounded-2 fs-14" name="weight"
+                                                            value="{{ $product->weight}}" step="0.01" placeholder="0.00">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <!-- Quantity -->
+                                                    <div class="form-group mb-4">
+                                                        <label class="fs-14 fw-700 text-dark mb-1">{{translate('Minimum Purchase Qty')}}
+                                                            <span class="text-danger">*</span></label>
+                                                        <input type="number" lang="en"
+                                                            class="form-control rounded-2 fs-14 @error('min_qty') is-invalid @enderror"
+                                                            name="min_qty"
+                                                            value="@if($product->min_qty <= 1){{1}}@else{{$product->min_qty}}@endif"
+                                                            min="1" step="1" integer-only required>
+                                                        <small
+                                                            class="text-muted fs-12">{{translate("The minimum purchase quantity required.")}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             <!-- Tags -->
-                                            <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{translate('Tags')}}</label>
-                                                <input type="text" class="form-control aiz-tag-input" name="tags[]"
+                                            <div class="form-group mb-4">
+                                                <label class="fs-14 fw-700 text-dark mb-1">{{translate('Tags')}}</label>
+                                                <input type="text" class="form-control aiz-tag-input rounded-2 fs-14" name="tags[]"
                                                     id="tags" value="{{ $product->tags }}"
                                                     placeholder="{{ translate('Type to add a tag') }}"
                                                     data-role="tagsinput">
                                                 <small
-                                                    class="text-muted">{{translate('This is used for search. Input those words by which cutomer can find this product.')}}</small>
+                                                    class="text-muted fs-12">{{translate('Used for search. Separate with enter/comma.')}}</small>
                                             </div>
 
                                             @if (addon_is_activated('pos_system'))
                                                 <!-- Barcode -->
-                                                <div class="form-group mb-2">
-                                                    <label class="col-from-label fs-13">{{translate('Barcode')}}</label>
-                                                    <input type="text" class="form-control" name="barcode"
+                                                <div class="form-group mb-4">
+                                                    <label class="fs-14 fw-700 text-dark mb-1">{{translate('Barcode')}}</label>
+                                                    <input type="text" class="form-control rounded-2 fs-14" name="barcode"
                                                         placeholder="{{ translate('Barcode') }}"
                                                         value="{{ $product->barcode }}">
                                                 </div>
                                             @endif
                                         </div>
 
-                                        <!-- Product Category -->
-                                        <div class="col-xxl-5 col-xl-6">
-                                            <div class="form-group mb-2">
-                                                <label class="col-from-label fs-13">{{translate('Product Category')}} <span
+                                        <div class="col-xxl-6 col-xl-6">
+                                            <!-- Product Category -->
+                                            <div class="form-group mb-4">
+                                                <label class="fs-14 fw-700 text-dark mb-1">{{translate('Product Category')}} <span
                                                         class="text-danger">*</span></label>
                                                 <input type="hidden" name="category_ids[]" id="category_ids_hidden"
                                                     value="{{ $product->category_id }}">
                                                 <select
-                                                    class="form-control aiz-selectpicker @error('category_id') is-invalid @enderror"
+                                                    class="form-control aiz-selectpicker rounded-2 fs-14 @error('category_id') is-invalid @enderror"
                                                     name="category_id" id="category_id" data-live-search="true" required
                                                     onchange="$('#category_ids_hidden').val(this.value);">
                                                     <option value="">{{ translate('Select Category') }}</option>
@@ -176,15 +188,12 @@
                                                         @endforeach
                                                     @endforeach
                                                 </select>
-                                                @error('category_ids')
-                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                                                @enderror
                                             </div>
-                                            <!-- HS Code - Server-side rendered -->
-                                            <div class="form-group mb-2 mt-3">
-                                                <label
-                                                    class="col-from-label fs-13">{{translate('TN VED (HS Code)')}}</label>
-                                                <select class="form-control" name="hsn_code" id="hsn_code_select">
+
+                                            <!-- HS Code -->
+                                            <div class="form-group mb-4">
+                                                <label class="fs-14 fw-700 text-dark mb-1">{{translate('TN VED (HS Code)')}}</label>
+                                                <select class="form-control hsn-select2 rounded-2 fs-14" name="hsn_code" id="hsn_code_select">
                                                     @if($product->hsn_code)
                                                         <option value="{{ $product->hsn_code }}" selected>
                                                             {{ $product->hsn_code_name ?? $product->hsn_code }}
@@ -192,7 +201,7 @@
                                                     @endif
                                                 </select>
                                                 <small
-                                                    class="text-muted">{{ translate('Used for international shipping and customs.') }}</small>
+                                                    class="text-muted fs-12">{{ translate('Used for international shipping and customs.') }}</small>
                                             </div>
                                         </div>
                                     </div>
@@ -200,18 +209,17 @@
                                     <!-- Description -->
                                     <div class="form-group">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <label class="fs-13 mb-0">{{translate('Description')}}</label>
-                                            <button type="button" class="btn btn-sm btn-soft-primary"
+                                            <label class="fs-14 fw-700 text-dark mb-0">{{translate('Description')}}</label>
+                                            <button type="button" class="btn btn-sm btn-soft-primary rounded-2 px-3"
                                                 onclick="generateDescriptionAI()">
-                                                <i class="las la-magic"></i> {{translate('Generate description by AI')}}
+                                                <i class="las la-magic"></i> {{translate('Generate by AI')}}
                                             </button>
                                         </div>
-                                        <div class="">
-                                            <textarea class="aiz-text-editor"
-                                                name="description">{{ $product->getTranslation('description', $lang) }}</textarea>
-                                        </div>
+                                        <textarea class="aiz-text-editor"
+                                            name="description">{{ $product->getTranslation('description', $lang) }}</textarea>
                                     </div>
                                 </div>
+
 
                                 <!-- Refund -->
                                 @if (addon_is_activated('refund_request'))
@@ -411,10 +419,10 @@
                         </div>
 
                         <!-- Files & Media -->
-                        <div class="card mb-4" id="files_and_media">
+                        <div class="card shadow-none border-0 mb-4" id="files_and_media">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- Product Files & Media -->
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                <h5 class="mb-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
                                     {{ translate('Product Files & Media') }}
                                 </h5>
                                 <div class="w-100">
@@ -594,10 +602,10 @@
                             </div>
                         </div>
                         <!-- Price & Stock -->
-                        <div class="card mb-4" id="price_and_stocks">
+                        <div class="card shadow-none border-0 mb-4" id="price_and_stocks">
                             <div class="bg-white p-3 p-sm-2rem">
                                 <!-- tab Title -->
-                                <h5 class="mb-3 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
+                                <h5 class="mb-4 pb-3 fs-17 fw-700" style="border-bottom: 1px dashed #e4e5eb;">
                                     {{translate('Product price & stock')}}
                                 </h5>
                                 <div class="w-100">
