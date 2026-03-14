@@ -273,18 +273,60 @@ class DigitalProductController extends Controller
 
     public function download(Request $request)
     {
-        $product = Product::findOrFail(decrypt($request->id));
-        if (Auth::user()->id == $product->user_id) {
-            $upload = Upload::findOrFail($product->file_name);
-            if (env('FILESYSTEM_DRIVER') == "s3") {
-                return \Storage::disk('s3')->download($upload->file_name, $upload->file_original_name . "." . $upload->extension);
-            } else {
-                if (file_exists(base_path('public/' . $upload->file_name))) {
-                    return response()->download(base_path('public/' . $upload->file_name));
+        try {
+            $decrypted_id = decrypt($request->id);
+            \Log::info("Digital Download attempt", [
+                'user_id' => Auth::user()->id,
+                'decrypted_id' => $decrypted_id
+            ]);
+
+            $product = Product::findOrFail($decrypted_id);
+            \Log::info("Product found", [
+                'product_id' => $product->id,
+                'product_user_id' => $product->user_id,
+                'digital' => $product->digital,
+                'file_name' => $product->file_name
+            ]);
+
+            if (Auth::user()->id == $product->user_id) {
+                if (empty($product->file_name)) {
+                    \Log::error("Product file_name is empty", ['product_id' => $product->id]);
+                    abort(404, "Product file not associated.");
                 }
+
+                $upload = Upload::findOrFail($product->file_name);
+                \Log::info("Upload record found", [
+                    'upload_id' => $upload->id,
+                    'file_name' => $upload->file_name,
+                    'driver' => env('FILESYSTEM_DRIVER')
+                ]);
+
+                if (env('FILESYSTEM_DRIVER') == "s3") {
+                    return \Storage::disk('s3')->download($upload->file_name, $upload->file_original_name . "." . $upload->extension);
+                } else {
+                    $full_path = base_path('public/' . $upload->file_name);
+                    \Log::info("Checking local file", ['path' => $full_path]);
+                    if (file_exists($full_path)) {
+                        return response()->download($full_path);
+                    } else {
+                        \Log::error("File does not exist on server", ['path' => $full_path]);
+                        abort(404, "Physical file missing.");
+                    }
+                }
+            } else {
+                \Log::warning("Ownership mismatch", [
+                    'auth_user' => Auth::user()->id,
+                    'product_owner' => $product->user_id
+                ]);
+                abort(404, "Product does not belong to user.");
             }
-        } else {
-            abort(404);
+        } catch (\Exception $e) {
+            \Log::error("Download method exception", [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            abort(404, "Exception in download.");
         }
     }
+
 }
