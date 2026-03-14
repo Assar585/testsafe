@@ -524,12 +524,17 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, $id)
     {
-        @file_put_contents(public_path('debug_log.txt'), "Product update START id: $id\n", FILE_APPEND);
-        @file_put_contents(public_path('debug_log.txt'), "Request data: " . json_encode($request->all()) . "\n", FILE_APPEND);
+        \Log::info("Product update START id: $id", $request->except(['_token', 'password']));
         
         $product = Product::findOrFail($id);
         $product = $this->productService->update($request->except([
             '_token',
+            'sku_combinations',
+            'qty_combinations',
+            'price_combinations',
+            'img_combinations',
+            'lang',
+            'category_ids',
             'sku',
             'choice',
             'tax_id',
