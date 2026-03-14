@@ -250,7 +250,8 @@ class ProductController extends Controller
                 'tax_type',
                 'flash_deal_id',
                 'flash_discount',
-                'flash_discount_type'
+                'flash_discount_type',
+                'category_ids'
             ]), $product);
 
             $request->merge(['product_id' => $product->id]);
