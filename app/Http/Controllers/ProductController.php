@@ -73,7 +73,7 @@ class ProductController extends Controller
     public function all_products(Request $request)
     {
         $seller_type = 'all';
-        $product_types = ['All Products', 'Admin Products', 'Seller Products'];
+        $product_types = ['All Products', 'Inhouse Products', 'Seller Products', 'Digital Products', 'Physical Products', 'Drafts'];
         $brand_id = $request->brand_id;
         $category_id = $request->category_id;
         $back_to = $request->back_to;

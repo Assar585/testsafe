@@ -14,6 +14,8 @@ use App\Services\ProductTaxService;
 use App\Services\ProductStockService;
 use App\Services\FrequentlyBoughtProductService;
 use Artisan;
+use Log;
+
 
 class DigitalProductController extends Controller
 {
@@ -298,15 +300,36 @@ class DigitalProductController extends Controller
 
     public function download(Request $request)
     {
-        $product = Product::findOrFail(decrypt($request->id));
+        try {
+            $id = decrypt($request->id);
+            Log::info('Digital Download attempt (Admin)', ['decrypted_id' => $id]);
 
-        $upload = Upload::findOrFail($product->file_name);
-        if (env('FILESYSTEM_DRIVER') == "s3") {
-            return \Storage::disk('s3')->download($upload->file_name, $upload->file_original_name . "." . $upload->extension);
-        } else {
-            if (file_exists(base_path('public/' . $upload->file_name))) {
-                return response()->download(base_path('public/' . $upload->file_name));
+            $product = Product::findOrFail($id);
+            Log::info('Product found', ['product_id' => $product->id, 'file_name_id' => $product->file_name]);
+
+            if (empty($product->file_name)) {
+                Log::error('Product file_name ID is empty', ['product_id' => $product->id]);
+                abort(404, 'Product file not associated.');
             }
+
+            $upload = Upload::findOrFail($product->file_name);
+            Log::info('Upload record found', ['upload_id' => $upload->id, 'file_name' => $upload->file_name]);
+
+            if (env('FILESYSTEM_DRIVER') == "s3") {
+                return \Storage::disk('s3')->download($upload->file_name, $upload->file_original_name . "." . $upload->extension);
+            } else {
+                $path = base_path('public/' . $upload->file_name);
+                Log::info('Checking local file', ['path' => $path]);
+                if (file_exists($path)) {
+                    return response()->download($path);
+                } else {
+                    Log::error('File does not exist on server', ['path' => $path]);
+                    abort(404, 'Physical file missing.');
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Download error: ' . $e->getMessage());
+            abort(404, 'Download failed.');
         }
     }
 }
