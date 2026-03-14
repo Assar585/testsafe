@@ -473,9 +473,12 @@ class ProductController extends Controller
      */
     public function admin_product_edit(Request $request, $id)
     {
-        CoreComponentRepository::instantiateShopRepository();
-
         $product = Product::findOrFail($id);
+        if ($product->digital == 1) {
+            return redirect()->route('digitalproducts.edit', ['digitalproduct' => $id, 'lang' => $request->lang]);
+        }
+
+        CoreComponentRepository::instantiateShopRepository();
         
         $lang = $request->lang;
         $tags = json_decode($product->tags);
@@ -495,6 +498,10 @@ class ProductController extends Controller
     public function seller_product_edit(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+        if ($product->digital == 1) {
+            return redirect()->route('seller.digitalproducts.edit', ['id' => $id, 'lang' => $request->lang]);
+        }
+
         if ($product->added_by == 'admin') {
             flash(translate('This product is added by admin. You can not edit this product.'))->warning();
             return redirect()->route('products.all');
