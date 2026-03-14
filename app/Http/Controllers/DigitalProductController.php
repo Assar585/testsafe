@@ -308,8 +308,8 @@ class DigitalProductController extends Controller
             Log::info('Product found', ['product_id' => $product->id, 'file_name_id' => $product->file_name]);
 
             if (empty($product->file_name)) {
-                Log::error('Product file_name ID is empty', ['product_id' => $product->id]);
-                flash(translate('Product file not associated.'))->error();
+                Log::error('Product file_name ID is empty', ['product_id' => $product->id, 'digital' => $product->digital, 'added_by' => $product->added_by]);
+                flash(translate('Product file not associated. ID: ') . $product->id . ' Digital: ' . $product->digital . ' Added By: ' . $product->added_by)->error();
                 return back();
             }
 
