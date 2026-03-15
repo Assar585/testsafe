@@ -629,8 +629,10 @@
                                         </div>
                                         <div class="col-md-1">
                                             <label class="aiz-switch aiz-switch-success mb-0">
-                                                <input value="1" type="checkbox" name="colors_active" <?php if (count(json_decode($product->colors)) > 0)
-        echo "checked"; ?>>
+                                                <input value="1" type="checkbox" name="colors_active" @php
+                                                    $colors_array = is_array($product->colors) ? $product->colors : json_decode($product->colors, true);
+                                                    if (is_array($colors_array) && count($colors_array) > 0) echo "checked";
+                                                @endphp>
                                                 <span></span>
                                             </label>
                                         </div>
@@ -648,7 +650,10 @@
                                                 data-placeholder="{{ translate('Choose Attributes') }}">
                                                 @foreach (\App\Models\Attribute::all() as $key => $attribute)
                                                     @php
-                                                        $attributes_array = is_array($product->attributes) ? $product->attributes : json_decode($product->attributes, true);
+                                                        $attributes_array = $product->attributes;
+                                                        if (!is_array($attributes_array)) {
+                                                            $attributes_array = json_decode($attributes_array, true);
+                                                        }
                                                     @endphp
                                                     <option value="{{ $attribute->id }}" @if($attributes_array != null && in_array($attribute->id, $attributes_array))
                                                     selected @endif>{{ $attribute->getTranslation('name') }}</option>
@@ -664,7 +669,10 @@
 
                                     <!-- choice options -->
                                     <div class="customer_choice_options" id="customer_choice_options">
-                                        @foreach (json_decode($product->choice_options) as $key => $choice_option)
+                                        @php
+                                            $choice_options_array = is_array($product->choice_options) ? $product->choice_options : json_decode($product->choice_options);
+                                        @endphp
+                                        @foreach ($choice_options_array as $key => $choice_option)
                                             <div class="form-group row">
                                                 <div class="col-lg-3">
                                                     <input type="hidden" name="choice_no[]"

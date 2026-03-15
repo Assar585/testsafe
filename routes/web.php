@@ -80,60 +80,6 @@ Route::get('/refresh-csrf', function () {
     return csrf_token();
 });
 
-Route::get('/debug/logs_v2', function() {
-    $dir = storage_path('logs');
-    $files = is_dir($dir) ? scandir($dir) : ["Directory not found"];
-    
-    $path = storage_path('logs/laravel.log');
-    if (!file_exists($path)) {
-        $daily_logs = array_filter($files, function($f) { return str_starts_with($f, 'laravel-'); });
-        if (!empty($daily_logs)) {
-            sort($daily_logs);
-            $path = storage_path('logs/' . end($daily_logs));
-        }
-    }
-
-    $content = "";
-    if (file_exists($path)) {
-        $lines = file($path);
-        $content = implode("", array_slice($lines, -500));
-    } else {
-        $content = "Log file not found. Try one of these: " . implode(", ", $files);
-    }
-    
-    return response("FILES: " . implode(", ", $files) . "\n\nPATH: " . $path . "\n\nCONTENT:\n" . $content)
-        ->header('Content-Type', 'text/plain');
-});
-
-Route::get('/nuclear_clear', function () {
-    echo "<h1>Nuclear Cache Clear (via Laravel)</h1>";
-    try {
-        echo "Clearing View Cache... ";
-        \Artisan::call('view:clear');
-        echo "Done.<br>";
-
-        echo "Clearing Config Cache... ";
-        \Artisan::call('config:clear');
-        echo "Done.<br>";
-
-        echo "Clearing Route Cache... ";
-        \Artisan::call('route:clear');
-        echo "Done.<br>";
-
-        echo "Clearing Application Cache... ";
-        \Artisan::call('cache:clear');
-        echo "Done.<br>";
-
-        echo "Re-caching Config... ";
-        \Artisan::call('config:cache');
-        echo "Done.<br>";
-
-        echo "<h2>All caches cleared successfully!</h2>";
-    } catch (\Exception $e) {
-        echo "<h2>Error: " . $e->getMessage() . "</h2>";
-    }
-});
-
 Route::get('/db_init', function () {
     echo "<h1>Database Initialization & Diagnostic (v1.7.0)</h1>";
     echo "<p>Last Updated: " . date('Y-m-d H:i:s') . " (Build ID: " . substr(md5_file(__FILE__), 0, 8) . ")</p>";
