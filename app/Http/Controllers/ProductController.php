@@ -524,67 +524,74 @@ class ProductController extends Controller
      */
     public function update(ProductRequest $request, $id)
     {
-        \Log::info("Product update START id: $id", $request->except(['_token', 'password']));
-        
-        $product = Product::findOrFail($id);
-        $product = $this->productService->update($request->except([
-            '_token',
-            'sku_combinations',
-            'qty_combinations',
-            'price_combinations',
-            'img_combinations',
-            'lang',
-            'category_ids',
-            'sku',
-            'choice',
-            'tax_id',
-            'tax',
-            'tax_type',
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]), $product);
+        try {
+            \Log::info("Product update START id: $id", $request->except(['_token', 'password']));
 
-        //Product categories
-        $product->categories()->sync($request->category_ids);
+            $product = Product::findOrFail($id);
+            
+            // Fix missing product_id for services that depend on it in Request
+            $request->merge(['product_id' => $id]);
 
-        //VAT & Tax
-        if ($request->tax_id) {
-            $this->productTaxService->store($request->only([
+            $product = $this->productService->update($request->except([
+                '_token',
+                'sku_combinations',
+                'qty_combinations',
+                'price_combinations',
+                'img_combinations',
+                'lang',
+                'category_ids',
+                'sku',
+                'choice',
                 'tax_id',
                 'tax',
                 'tax_type',
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type'
+            ]), $product);
+
+            //Product categories
+            $product->categories()->sync($request->category_ids);
+
+            //VAT & Tax
+            if ($request->tax_id) {
+                $product->taxes()->delete();
+                $this->productTaxService->store($request->only([
+                    'tax_id',
+                    'tax',
+                    'tax_type',
+                    'product_id'
+                ]));
+            }
+
+            //Flash Deal
+            $this->productFlashDealService->store($request->only([
+                'flash_deal_id',
+                'flash_discount',
+                'flash_discount_type'
+            ]), $product);
+
+            //Product Stock
+            $product->stocks()->delete();
+            $this->productStockService->store($request->only([
+                'colors_active',
+                'colors',
+                'choice_no',
+                'unit_price',
+                'sku',
+                'current_stock',
                 'product_id'
+            ]), $product);
+
+            // Frequently Bought Products
+            $product->frequently_bought_products()->delete();
+            $this->frequentlyBoughtProductService->store($request->only([
+                'product_id',
+                'frequently_bought_selection_type',
+                'fq_bought_product_ids',
+                'fq_bought_product_category_id'
             ]));
-        }
 
-        //Flash Deal
-        $this->productFlashDealService->store($request->only([
-            'flash_deal_id',
-            'flash_discount',
-            'flash_discount_type'
-        ]), $product);
-
-        //Product Stock
-        $this->productStockService->store($request->only([
-            'colors_active',
-            'colors',
-            'choice_no',
-            'unit_price',
-            'sku',
-            'current_stock',
-            'product_id'
-        ]), $product);
-
-        // Frequently Bought Products
-        $this->frequentlyBoughtProductService->store($request->only([
-            'product_id',
-            'frequently_bought_selection_type',
-            'fq_bought_product_ids',
-            'fq_bought_product_category_id'
-        ]));
-
-        try {
             $lang = $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'));
             $product_translation = ProductTranslation::firstOrNew(['lang' => $lang, 'product_id' => $product->id]);
             $product_translation->name = $request->name;
@@ -602,6 +609,8 @@ class ProductController extends Controller
                 'redirect' => route('products.all')
             ]);
         } catch (\Exception $e) {
+            \Log::error("Product update ERROR id: $id, Message: " . $e->getMessage());
+            \Log::error($e->getTraceAsString());
             return response()->json([
                 'success' => false,
                 'message' => translate('Something went wrong: ') . $e->getMessage()

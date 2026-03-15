@@ -237,6 +237,7 @@ class ProductController extends Controller
         $request->merge([
             'colors_active' => $request->colors_active ?? 0,
             'colors' => $request->colors ?? [],
+            'product_id' => $product->id,
         ]);
 
         //Product
@@ -270,56 +271,45 @@ class ProductController extends Controller
                 'current_stock',
                 'product_id'
             ]), $product);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => translate('Something went wrong: ') . $e->getMessage()
-            ], 500);
-        }
 
-        //VAT & Tax
-        if ($request->tax_id) {
-            $product->taxes()->delete();
-            $request->merge(['product_id' => $product->id]);
-            $this->productTaxService->store($request->only([
-                'tax_id',
-                'tax',
-                'tax_type',
-                'product_id'
+            //VAT & Tax
+            if ($request->tax_id) {
+                $product->taxes()->delete();
+                $this->productTaxService->store($request->only([
+                    'tax_id',
+                    'tax',
+                    'tax_type',
+                    'product_id'
+                ]));
+            }
+
+            // Delete other Taxes if GST Rate is updated
+            if ($request->filled('gst_rate') && addon_is_activated('gst_system')) {
+                $product->taxes()->delete();
+            }
+
+            // Frequently Bought Products
+            $product->frequently_bought_products()->delete();
+            $this->frequentlyBoughtProductService->store($request->only([
+                'product_id',
+                'frequently_bought_selection_type',
+                'fq_bought_product_ids',
+                'fq_bought_product_category_id'
             ]));
-        }
 
-        // Delete other Taxes if GST Rate is updated
-        if ($request->filled('gst_rate') && addon_is_activated('gst_system')) {
-            $product->taxes()->delete();
-        }
-
-        // Frequently Bought Products
-        $product->frequently_bought_products()->delete();
-        $this->frequentlyBoughtProductService->store($request->only([
-            'product_id',
-            'frequently_bought_selection_type',
-            'fq_bought_product_ids',
-            'fq_bought_product_category_id'
-        ]));
-
-        // Product Translations
-        $lang = $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'));
-        ProductTranslation::updateOrCreate(
-            [
-                'lang' => $lang,
-                'product_id' => $product->id
-            ],
-            [
-                'name' => $request->name,
-                'unit' => $request->unit,
-                'description' => $request->description
-            ]
-        );
-
-
-        try {
-            flash(translate('Product has been updated successfully'))->success();
+            // Product Translations
+            $lang = $request->lang ?: (env('DEFAULT_LANGUAGE') ?: config('app.locale', 'en'));
+            ProductTranslation::updateOrCreate(
+                [
+                    'lang' => $lang,
+                    'product_id' => $product->id
+                ],
+                [
+                    'name' => $request->name,
+                    'unit' => $request->unit,
+                    'description' => $request->description
+                ]
+            );
 
             Artisan::call('view:clear');
             Artisan::call('cache:clear');
